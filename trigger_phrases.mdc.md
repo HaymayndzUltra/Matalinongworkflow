@@ -1,0 +1,93 @@
+---
+
+description: Natural-language trigger phrases and intents → agent actions
+
+alwaysApply: true
+
+---
+
+## Natural-Language Triggers → Agent Actions
+
+  
+
+Agents MUST interpret the following phrases (Tagalog/English) anywhere in the user message as intents and immediately execute the mapped action sequence, within the established safety constraints and phase gates.
+
+  
+
+### Plan Ingestion (No Scripts)
+
+- Triggers:
+
+  - "Ingest mo ang plan", "Ingest plan now", "Gawa ka ng actionable plan", "Hatiin mo ang plan by phases"
+
+  - "Prepare Human-Readable Plan Draft", "Phase-by-phase draft"
+
+- Action:
+
+  1. Read the frozen source (default: `memory-bank/DOCUMENTS/plan.md`).
+
+  2. Produce a complete Human-Readable Plan Draft per `agent_plan_ingestion.mdc` (include Phase 0, Explanations, Concluding Step, IMPORTANT NOTE per phase).
+
+  3. Stop for approval.
+
+  
+
+### Approve & Finalize JSON (No File Writes)
+
+- Triggers:
+
+  - "Approve draft", "Finalize JSON", "Generate tasks_active.json content", "Convert to JSON"
+
+  - "Ready for ingestion", "Bigyan mo ako ng final JSON"
+
+- Action:
+
+  1. Convert the approved draft into a single JSON array (one task) conforming to `tasks_active_schema.mdc`.
+
+  2. Ensure `id` is `<slug>_actionable_<YYYYMMDD>` and timestamps are ISO `+08:00`.
+
+  3. Output JSON content only; do not write files.
+
+  
+
+### Validate Before Execution (Phase Gates)
+
+- Triggers:
+
+  - "Validate plan", "Check next phase", "Lint plan", "Show hierarchy <TASK_ID>"
+
+- Action:
+
+  - Run the read-only analyzers per `analysis_tools.mdc` and `phase_gates.mdc`:
+
+    - `python3 plan_next.py` (required)
+
+    - `python3 plain_hier.py <TASK_ID>` (recommended)
+
+  
+
+### Execute or Mark Done
+
+- Triggers:
+
+  - "Show plan <TASK_ID>", "Show next phase", "Mark phase <k> done for <TASK_ID>", "Execute sub-step"
+
+- Action:
+
+  - Use `todo_manager.py` per `todo_manager_flow.mdc` and `exec_policy.mdc`:
+
+    - `python3 todo_manager.py show <TASK_ID>`
+
+    - `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
+
+    - `python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>` (when applicable)
+
+  
+
+### Safety & Enforcement
+
+- Always enforce IMPORTANT NOTE presence per `imporant_note_enforcement.mdc`.
+
+- Honor the no-scripts, no-file-writes policy for ingestion/finalization.
+
+- Respect monotonic completion and sequence order.

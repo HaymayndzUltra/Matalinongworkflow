@@ -1,0 +1,330 @@
+---
+
+description: todo_manager.py task execution command
+
+alwaysApply: true
+
+---
+
+### **1. TASK EXECUTION COMMANDS:**
+
+  
+
+**SHOW HIERARCHICAL STRUCTURE:**
+
+```bash
+
+python3 todo_manager.py show TASK_ID
+
+# Shows main TODOs with all sub-steps
+
+# Displays commands ready for execution
+
+```
+
+  
+
+**EXECUTE SUB-TODO:**
+
+```bash
+
+python3 todo_manager.py exec TASK_ID 4.1
+
+# Executes specific sub-step (4.1)
+
+# Runs the associated command
+
+# Marks as completed automatically
+
+```
+
+  
+
+**MARK MAIN TODO DONE:**
+
+```bash
+
+python3 todo_manager.py done TASK_ID 4
+
+# Marks main TODO as completed
+
+# Only when all sub-steps (4.1-4.7) are done
+
+```
+
+  
+
+### **4. ENHANCED WORKFLOW SEQUENCE:**
+
+```bash
+
+# 1. Check hierarchical status
+
+python3 todo_manager.py show TASK_ID
+
+# 2. Execute sub-step with command
+
+python3 todo_manager.py exec TASK_ID 4.1
+
+# → Runs: diff docker-compose.yml docker-compose.yml.backup
+
+  
+
+# 3. Continue to next sub-step
+
+python3 todo_manager.py exec TASK_ID 4.2
+
+# → Runs: docker-compose build --no-cache
+
+  
+
+# 4. If sub-step fails, run rollback
+
+python3 todo_manager.py exec TASK_ID 4.7
+
+# → Runs: docker-compose down && echo "ROLLBACK COMPLETED"
+
+  
+
+# 5. Mark main TODO done when all sub-steps complete
+
+python3 todo_manager.py done TASK_ID 4
+
+```
+
+  
+
+---
+
+  
+
+## **🧠 MEMORY SYSTEM INTEGRATION**
+
+  
+
+### **AUTO-CONTEXT LOADING:**
+
+When Local Agent starts, it automatically reads:
+
+```json
+
+// memory-bank/cursor_session_context.json
+
+{
+
+  "current_focus": "Task execution ready",
+
+  "hierarchical_todos": {...},
+
+  "execution_commands": {...},
+
+  "context_level": "DETAILED_PLAN_READY"
+
+}
+
+```
+
+  
+
+### **SEAMLESS HANDOVER:**
+
+- Background Agent → prepares everything
+
+- Local Agent → executes with full context
+
+- Zero explanation needed from user
+
+- Instant understanding of the plan
+
+  
+
+---
+
+  
+
+## **🔎 Auxiliary Read-Only Tools**
+
+  
+
+- `python3 plan_next.py`
+
+  - Identifies next unfinished phase per task
+
+  - Extracts command previews from fenced blocks
+
+  - Lints plan: Phase 0 position, IMPORTANT NOTE presence, completion monotonicity
+
+  
+
+- `python3 plain_hier.py <TASK_ID>`
+
+  - Shows compact hierarchical view of phases with checkmarks
+
+  - Prints snippet of "IMPORTANT NOTE:" if present
+
+  - Previews first fenced command block
+
+  
+
+Use these before executing any phase to verify the IMPORTANT NOTE and expected commands.
+
+  
+
+---
+
+  
+
+## **📊 TODO COMPLEXITY LEVELS**
+
+  
+
+### **SIMPLE TODOS:**
+
+```
+
+[✗] 1. Update documentation
+
+    1.1 Edit README.md file
+
+    1.2 Commit changes
+
+```
+
+  
+  
+  
+
+---
+
+  
+
+## **🎯 LOCAL AGENT MODE INSTRUCTIONS**
+
+  
+
+### **WHEN USER MENTIONS TODO/TASK:**
+
+1. **ALWAYS** check current hierarchical structure first
+
+2. **IDENTIFY** which sub-step to execute
+
+3. **SHOW** the specific command to run
+
+4. **EXECUTE** with user approval
+
+5. **MARK** completion and update progress
+
+  
+
+### **AUTO-ABSORB CONTEXT:**
+
+- Read memory-bank files for background context
+
+- Understand hierarchical TODO structures
+
+- No need for user explanation
+
+- Ready to execute detailed plans immediately
+
+  
+
+### **EXECUTION PRIORITY:**
+
+- Follow sub-step sequence (4.1 → 4.2 → 4.3...)
+
+- Include error handling steps
+
+- Provide rollback options
+
+- Validate completion before moving forward
+
+  
+
+---
+
+  
+
+## **🚀 BEST PRACTICES FOR CURSOR AGENT MODE**
+
+  
+
+### **1. HIERARCHICAL AWARENESS:**
+
+- Always understand the sub-step structure
+
+- Execute in proper sequence
+
+- Check dependencies between steps
+
+  
+
+### **2. COMMAND EXECUTION:**
+
+- Show command before running
+
+- Get user approval for critical operations
+
+- Provide clear success/failure feedback
+
+  
+
+### **3. PROGRESS TRACKING:**
+
+- Mark sub-steps as completed
+
+- Update main TODO status
+
+- Sync progress across sessions
+
+  
+
+### **4. ERROR HANDLING:**
+
+- Follow rollback procedures when failures occur
+
+- Provide clear error messages
+
+- Suggest next steps for recovery
+
+  
+
+---
+
+  
+
+## **📱 QUICK REFERENCE COMMANDS**
+
+  
+
+```bash
+
+# Show plan
+
+python3 todo_manager.py show <TASK_ID>
+
+  
+  
+
+python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>
+
+  
+
+# Show all active tasks
+
+python3 todo_manager.py list
+
+```
+
+  
+
+## ✅ EXECUTION POLICY (ENFORCED)
+
+- ORDER ENFORCEMENT:
+
+  - No skipping phases; mark in sequence only
+
+  - If confidence < 90%, repeat review and pre-analysis
+
+  
+
+---
