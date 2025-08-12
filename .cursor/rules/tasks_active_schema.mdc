@@ -1,0 +1,47 @@
+---
+description: tasks_active.json canonical schema and formatting
+alwaysApply: true
+---
+## tasks_active.json Schema (Canonical)
+
+### Top-level (array)
+- Type: `List[Task]`
+- Exactly one Task per plan ingestion.
+
+### Task object
+- `id` (string): `<slug>_actionable_<YYYYMMDD>` (lowercase, underscores only)
+- `description` (string): Concise plan summary and provenance (source doc name/title)
+- `todos` (array of Todo)
+- `status` (string): one of `in_progress` | `done`
+- `created` (string): ISO 8601 timestamp with timezone `+08:00`
+- `updated` (string): ISO 8601 timestamp with timezone `+08:00`
+
+### Todo object
+- `text` (string): Full markdown content of the phase
+  - MUST start with `PHASE k:` where k ∈ {0..N}
+  - MUST include `**Concluding Step: Phase Completion Protocol**` block containing two commands
+  - MUST end with `IMPORTANT NOTE:` paragraph
+- `done` (boolean): defaults to `false`
+
+### Example
+```json
+[
+  {
+    "id": "docker_arch_blueprint_actionable_20250811",
+    "description": "Actionable plan compiled from FINAL Docker Architecture Blueprint (frozen source).",
+    "todos": [
+      { "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n...\nIMPORTANT NOTE: ...", "done": false },
+      { "text": "PHASE 1: BUILD FOUNDATIONAL BASE IMAGES\n\n...\nIMPORTANT NOTE: ...", "done": false }
+    ],
+    "status": "in_progress",
+    "created": "2025-08-11T19:15:00+08:00",
+    "updated": "2025-08-11T19:15:00+08:00"
+  }
+]
+```
+
+### Formatting Rules
+- Preserve newlines; avoid trailing spaces.
+- Keep each phase self-contained; do not reference external state.
+- Ensure monotonic completion (no undone after a done) during execution.
+

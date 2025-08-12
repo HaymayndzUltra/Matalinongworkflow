@@ -1,0 +1,35 @@
+[
+  {
+    "id": "architectural_refinement_roadmap_actionable_20250812",
+    "description": "Actionable plan compiled from 'Architectural Refinement Roadmap — Production-Readiness Action Plan for Dual-Machine AI System' (source: memory-bank/plan/organize.md).",
+    "todos": [
+      {
+        "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:** Establish ingestion protocol with organizer authority. Only produce JSON content; do not write files yourself. Use read-only analyzers to verify structure before execution. All state changes use todo_manager.py.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No direct writes to queue/state files by agent; operator/system will place JSON into memory-bank/queue-system/tasks_active.json. Timestamps use ISO8601 with +08:00. Validate with python3 plan_next.py and python3 plain_hier.py <TASK_ID> before any execution.",
+        "done": false
+      },
+      {
+        "text": "PHASE 1: Critical Bug Fix (MemoryOrchestratorService)\n\n**Explanations:** Immediate: fix syntax error (missing closing parenthesis) causing broken error reporting. Verification: run agent startup tests to confirm error handling works.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 1\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Keep change minimal (fix only). Add/execute unit or startup tests; no refactors; ensure no new lints; document the fix.",
+        "done": false
+      },
+      {
+        "text": "PHASE 2: SPOF Mitigation (SystemDigitalTwin clustering with Redis)\n\n**Explanations:** Week 1: implement clustering with Redis backend. Week 2: add leader election via distributed locks. Verification: simulate SystemDigitalTwin failures; discovery continues.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 2\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Use env-configurable Redis (no hardcoded hosts). Maintain backward compatibility. Add failover and recovery tests.",
+        "done": false
+      },
+      {
+        "text": "PHASE 3: Deployment Enablement (Containerization)\n\n**Explanations:** Days 1–2: replace hardcoded localhost with env variables. Days 3–4: update Docker configs and startup scripts. Day 5: end-to-end container testing. Verification: successful distributed deployment.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 3\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Standardize env var names (e.g., REDIS_HOST). Do not embed secrets. Ensure compose/helm values match. Verify cross-machine connectivity.",
+        "done": false
+      },
+      {
+        "text": "PHASE 4: Resilience Enhancement (Retries/Circuit Breakers)\n\n**Explanations:** Days 1–3: add exponential backoff retries on ZMQ/HTTP. Days 4–5: add circuit breakers. Days 6–7: load/failure testing. Verification: <1% failure under 5x load.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 4\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Pin and audit any new dependencies (e.g., retry libs). Centralize retry policy. Ensure idempotency and bounded retries.",
+        "done": false
+      },
+      {
+        "text": "PHASE 5: Security Hardening (Secrets Management)\n\n**Explanations:** Day 1: env-based secrets loading with validation. Day 2: update services to use secure loading. Day 3: audit and rotation tests. Verification: no secrets in code or logs.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 5\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Fail fast if required secrets are missing. Never log secrets. Document rotation. CI must validate secrets handling without leaks.",
+        "done": false
+      }
+    ],
+    "status": "in_progress",
+    "created": "2025-08-12T10:00:00+08:00",
+    "updated": "2025-08-12T10:00:00+08:00"
+  }
+]

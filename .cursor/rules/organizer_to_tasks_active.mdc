@@ -1,0 +1,50 @@
+---
+description: Canonical mapping from organizer.md → tasks_active.json (content-only)
+alwaysApply: true
+---
+
+## Canonical Organizer → tasks_active Mapping
+
+### Inputs
+- Frozen source: `memory-bank/plan/organize.md` (Background Agent output).
+- Schema: `tasks_active_schema.mdc`.
+
+### Output (Content-Only)
+- Single JSON array with one task object:
+  - `id`: `<slug>_actionable_<YYYYMMDD>` (lowercase, underscores)
+  - `description`: `<organizer_title> (path)`
+  - `status`: `in_progress`
+  - `created`/`updated`: ISO8601 with `+08:00`
+  - `todos`: array of markdown phases
+
+### Phase Construction Rules
+1. Phase 0 is mandatory: `PHASE 0: SETUP & PROTOCOL (READ FIRST)`
+   - Must include `Explanations:`, concluding commands, and `IMPORTANT NOTE:` with global constraints (no file writes by agent; env vars; read-only analyzers).
+2. Detect phases using the organizer’s `^Phase\s+(\d+):\s*(.+)$` headings. Preserve order.
+3. If headings are absent, derive sequential phases from “Implementation Sequence”/“Priority Action Plan” items (1..N) in listed order.
+4. For each phase k:
+   - `text` begins with `PHASE k: <Title>`.
+   - `Explanations:` summarize near-phase lines like `Immediate:`, `Week x:`, `Day(s):`, `Verification:`.
+   - Include the concluding commands block:
+     ```bash
+     python3 todo_manager.py show <TASK_ID>
+     python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>
+     ```
+   - `IMPORTANT NOTE:`
+     - Prefer explicit constraints/version lines from the organizer.
+     - If missing, synthesize from organizer context and tag `[SYNTHESIZED FROM ORGANIZER]`.
+
+### Validation Gates (Read-Only)
+- Before execution, run:
+  - `python3 plan_next.py`
+  - `python3 plain_hier.py <TASK_ID>`
+- Hard errors if:
+  - Phase 0 is missing or not first
+  - Any phase lacks `IMPORTANT NOTE:`
+  - Non-monotonic completion appears in `todos`
+
+### Prohibitions and Safety
+- No direct writes to any queue/state files by the agent.
+- No silent version upgrades or toolchain changes versus organizer text.
+- If organizer conflicts are detected, stop and request Background Agent reconciliation.
+

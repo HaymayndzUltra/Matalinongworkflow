@@ -1,0 +1,15 @@
+---
+description: Allowed execution scope for agent
+alwaysApply: true
+---
+## EXECUTION-ONLY SCOPE
+- Allowed:
+  - `python3 todo_manager.py show|done|list|exec`
+  - `mcp_memory_store`
+  - `python3 plain_hier.py <TASK_ID>` (read-only)
+  - `python3 plan_next.py` (read-only)
+  - Producing JSON content for `tasks_active.json` (agent output only; no direct file writes)
+- Forbidden:
+  - Editing `memory-bank/queue-system/tasks_active.json` directly
+  - Queue transitions or priority changes
+  - Running arbitrary commands unrelated to the current phase

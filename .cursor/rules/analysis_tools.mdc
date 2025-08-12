@@ -1,0 +1,47 @@
+---
+description: Read-only plan analysis tools (plain_hier.py, plan_next.py)
+alwaysApply: true
+---
+## Read-only Plan Analysis Tools
+
+These tools are permitted for visibility and validation only. They MUST NOT modify any files or state.
+
+### plain_hier.py — Hierarchical Plan Viewer
+- Purpose: Print a compact, read-only view of a task's phases, including the first fenced code block preview and any IMPORTANT NOTE snippet.
+- Usage:
+  ```bash
+  python3 plain_hier.py <TASK_ID>
+  ```
+- Output highlights:
+  - Progress summary (done/total)
+  - Phase index list with checkmarks
+  - IMPORTANT NOTE snippet if present
+  - First fenced code block lines as command preview
+
+### plan_next.py — Next-Phase Analyzer & Linter
+- Purpose: For each active task, identify the next unfinished phase, preview commands, and lint for structural issues.
+- Usage:
+  ```bash
+  python3 plan_next.py
+  ```
+- Output highlights:
+  - Next phase index and title
+  - Extracted commands/code (preview)
+  - Lint report: missing IMPORTANT NOTE indices; non-monotonic completion
+
+## When to Use
+- Before executing a phase: run `plan_next.py` to confirm the next phase has an "IMPORTANT NOTE" and to preview commands.
+- Before marking a phase done: run `plain_hier.py <TASK_ID>` to validate status and commands preview match expectations.
+
+## Safety Constraints
+- Both tools operate in read-only mode and are allowed solely for validation/visibility.
+- Do not modify these tools to perform writes; queue/state management remains under the autonomous system.
+
+## Notes
+- Run from the repository root to ensure path auto-detection works.
+- Environment variable detection differs between scripts; absolute repo fallback is used. If you set an env var, ensure correct naming.
+- Current implementations are read-only and rely on parsing `memory-bank/queue-system/tasks_active.json`.
+
+### Triggers
+- "Validate plan", "Check next phase", "Lint plan", "Show hierarchy <TASK_ID>" should route to these tools per `trigger_phrases.mdc`.
+

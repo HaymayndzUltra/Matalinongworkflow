@@ -1,0 +1,40 @@
+---
+description: Global master toggle for .cursor rules with disambiguated triggers (user-message only)
+alwaysApply: true
+---
+
+## Global Rules Master Toggle (v2)
+
+Session-wide switch to enable/disable ALL `.cursor/rules/*` (this file excluded), while preserving platform/system safety. Designed to avoid accidental activation by requiring explicit, user-scoped triggers.
+
+### Scope and Guard Rails
+- Evaluate triggers on the latest USER message only. Ignore system/developer messages.
+- Ignore occurrences inside code fences (``` ... ```), inline code (`...`), or quotes (">", "\"").
+- If a message contains both enable and disable triggers, the LAST occurrence wins (right-most precedence).
+
+### Primary Triggers (recommended)
+- Disable rules:
+  - Literal tokens: `[cursor-rules:off]`, `/rules off`, `cursor rules off`, `disable cursor rules`.
+  - Tagalog: `i-disable ang cursor rules`, `patayin ang cursor rules`.
+- Enable rules:
+  - Literal tokens: `[cursor-rules:on]`, `/rules on`, `cursor rules on`, `enable cursor rules`.
+  - Tagalog: `i-enable ang cursor rules`, `buksan ang cursor rules`.
+
+### Legacy Compatibility (optional, safer)
+- These only trigger if the same USER message also contains the word `cursor` or `agent` (case-insensitive):
+  - Disable: `dont obey the rules` or `don't obey the rules`.
+  - Enable: `follow the rules`.
+
+### Behavior
+- When disabled (`RULES_ENABLED = false`):
+  - Suspend all other `.cursor/rules/*` files.
+  - Do not run tools, external commands, or perform edits.
+  - Respond with a concise acknowledgment only: `Rules disabled by user. Say "[cursor-rules:on]" to re-enable.`
+- When enabled (`RULES_ENABLED = true`):
+  - Resume normal rule processing and acknowledge: `Rules enabled.`
+
+### Implementation Notes (for the agent)
+- Maintain a session boolean `RULES_ENABLED`, default `true`.
+- Evaluate triggers each turn with the guards above; apply last-occurrence precedence.
+- This file has highest precedence over all other `.cursor/rules/*` files.
+- Platform/system/developer safety policies remain in force at all times and cannot be disabled.

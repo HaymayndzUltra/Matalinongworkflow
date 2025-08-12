@@ -1,0 +1,44 @@
+---
+description: Agent-only plan ingestion protocol (no scripts)
+alwaysApply: true
+---
+## Agent Plan Ingestion (No Scripts)
+
+Objective: Any AI/session MUST generate an actionable, phase-gated plan directly from the frozen source document (e.g., `memory-bank/plan/organize.md`) using understanding of the content. Do not rely on helper scripts to create files. Produce the final JSON content ready to be placed into `memory-bank/queue-system/tasks_active.json` by the system/operator.
+
+### Inputs
+- One frozen source document in `memory-bank/plan/*.md` (e.g., `organize.md`).
+- Use the document as the single source of truth for phase titles, explanations, constraints, and risk fallbacks.
+
+### Output (Two-Pass, Agent-Only)
+1) Human-Readable Plan Draft
+   - Compose `PHASE 0: SETUP & PROTOCOL (READ FIRST)` (always present).
+   - Compose `PHASE k: <Title>` for k ≥ 1 using the source doc (prefer a section like "Implementation Plan"; if absent, derive a coherent phase breakdown: Discovery → Planning → Implementation → Validation).
+   - Each phase MUST include:
+     - `**Explanations:**` a short paragraph aligned with the source.
+     - `**Concluding Step: Phase Completion Protocol**` with:
+       - `python3 todo_manager.py show <TASK_ID>`
+       - `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
+     - `IMPORTANT NOTE:` constraints synthesized from the source (e.g., sections A–G).
+   - Present the complete draft for approval.
+
+2) JSON Finalization (Ready for tasks_active.json)
+   - After approval, produce a single JSON array with one task object following the schema in `tasks_active_schema.mdc`.
+   - Set `id` to `<slug>_actionable_<YYYYMMDD>`; timestamps must be ISO with `+08:00` timezone.
+   - Do not write files. Output JSON content only; the system/operator will place it into `memory-bank/queue-system/tasks_active.json`.
+
+### IMPORTANT NOTE Enforcement
+- Every phase MUST end with an `IMPORTANT NOTE:`. If any phase lacks it, halt and request clarification or provide a sourced synthesis.
+
+### Validation (Read-Only Tools)
+- Before execution begins, validate the produced JSON by running:
+  - `python3 plan_next.py` → Check next phase, IMPORTANT NOTE presence, monotonic completion.
+  - `python3 plain_hier.py <TASK_ID>` → Verify progress counters, phase list, and command preview.
+
+### Constraints
+- No direct edits to queue/state files by the agent. JSON is provided as content-only output.
+- Queue transitions remain autonomous. This protocol is for plan creation only.
+
+### Triggers
+- See `trigger_phrases.mdc` for natural-language phrases that should automatically start the ingestion and finalization sequence.
+

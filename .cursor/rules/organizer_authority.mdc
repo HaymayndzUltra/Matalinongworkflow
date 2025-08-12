@@ -1,0 +1,26 @@
+---
+description: Background Agent is the sole author of organizer.md; agent-mode must obey it
+alwaysApply: true
+---
+
+## Organizer Authority (Background Agent Source of Truth)
+
+- The file `memory-bank/plan/organize.md` (the "organizer") is produced by the Background Agent and is the single source of truth for plan content, order, constraints, and versions.
+- Agent Mode (foreground) MUST NOT edit `organize.md`. Any attempt to alter it must be refused with: "Organizer is authoritative and read-only; please update via Background Agent."
+- If the user instruction conflicts with the organizer, the organizer wins. Ask for confirmation only if the organizer is internally ambiguous.
+
+### Session Invariants (All Sessions, All Models)
+- Always read `memory-bank/plan/organize.md` fresh at the start of the ingestion sequence.
+- Respect exact ordering of phases from the organizer. If no explicit phases exist, derive sequential phases from its Implementation/Action sections as specified in `organizer_to_tasks_active.mdc`.
+- Preserve explicit versions/toolchain constraints from the organizer (e.g., CUDA, Torch, model versions) within the `IMPORTANT NOTE:` of the mapped phases. Do not "upgrade" versions implicitly.
+- Never write to queue/state files. The agent outputs JSON content only; file writes are performed by the system/operator.
+
+### Conflict and Ambiguity Handling
+- If multiple conflicting versions are found in the organizer, stop and request Background Agent reconciliation.
+- If a required phase is missing key constraints (e.g., no `IMPORTANT NOTE:`), synthesize from nearby organizer context and clearly mark: `IMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] …` then halt for approval.
+- If the organizer appears outdated relative to repo code (e.g., incompatible CUDA/tooling mentioned elsewhere), surface a warning but do not override the organizer automatically.
+
+### Safety and Precedence
+- This rule applies with highest priority among ingestion-related rules and cannot be disabled except by the master toggle.
+- Platform/system/developer instructions and safety policies continue to apply at all times.
+

@@ -1,0 +1,67 @@
+{
+  "created": "2025-07-30T03:16:55.675968+00:00",
+  "version": "1.0.0",
+  "sections": {
+    "core": {
+      "project-context": {
+        "priority": 1,
+        "description": "Overall project scope and goals"
+      },
+      "architecture-overview": {
+        "priority": 1,
+        "description": "High-level system design"
+      },
+      "technology-stack": {
+        "priority": 2,
+        "description": "Tech choices and rationale"
+      },
+      "naming-conventions": {
+        "priority": 2,
+        "description": "Coding standards"
+      }
+    },
+    "modules": {
+      "cli-system": {
+        "priority": 1,
+        "description": "CLI memory system knowledge"
+      },
+      "task-management": {
+        "priority": 1,
+        "description": "Task workflow intelligence"
+      },
+      "integration-points": {
+        "priority": 2,
+        "description": "Module connections"
+      }
+    },
+    "workflows": {
+      "development-flow": {
+        "priority": 2,
+        "description": "Feature development process"
+      },
+      "testing-strategy": {
+        "priority": 2,
+        "description": "QA approach"
+      },
+      "deployment-process": {
+        "priority": 3,
+        "description": "Release procedures"
+      }
+    },
+    "progress": {
+      "milestone-tracker": {
+        "priority": 1,
+        "description": "Major achievements"
+      },
+      "pain-points": {
+        "priority": 1,
+        "description": "Known issues"
+      },
+      "roadmap": {
+        "priority": 2,
+        "description": "Future plans"
+      }
+    }
+  },
+  "last_updated": "2025-07-30T03:16:55.676060+00:00"
+}
