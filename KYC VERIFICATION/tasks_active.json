@@ -4,7 +4,7 @@
     "description": "Actionable plan compiled from KYC Identity Verification Manifest (memory-bank/plan/organize.md).",
     "status": "in_progress",
     "created": "2025-08-13T23:00:00+08:00",
-    "updated": "2025-08-14T00:19:29.158429+08:00",
+    "updated": "2025-08-14T00:34:35.879122+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\nExplanations: Establish strict protocol and constraints. Organizer is authoritative and read-only; plan execution uses read-only analyzers and explicit completion commands.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No direct writes to queue/state files; secrets via environment variables with .env.example provided; redact PII by default in logs. Use ISO8601 +08:00 timestamps, deterministic seeds, reproducible builds. Config-driven thresholds only (no magic numbers). Respect monotonic completion. The organizer is authoritative; do not alter memory-bank/plan/organize.md.",
@@ -23,12 +23,12 @@
       },
       {
         "text": "PHASE 3: EVIDENCE EXTRACTION (OCR/MRZ/Barcode/NFC)\n\nExplanations: Extract OCR text, validate MRZ (ICAO 9303 checksums), parse PDF417/QR barcodes, and perform NFC passport DG1/DG2 passive auth where available; return ROIs and confidences. Include face detection/crops for downstream biometrics (\u2265112\u00d7112).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 3\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] MRZ checksums pass; PDF417/QR parsed with ROIs and confidences; NFC passive auth verified when supplied; face crops at least 112\u00d7112.",
-        "done": false,
+        "done": true,
         "phase": null
       },
       {
         "text": "PHASE 4: FORENSICS & AUTHENTICITY\n\nExplanations: Implement ELA/noise/resample/copy-move detection, ROI heatmaps, texture/FFT checks, and font/kerning scoring to detect tampering and verify security features per template.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 4\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Tamper/forensics AUC \u2265 0.90; security-feature thresholds documented per issuer template.",
-        "done": false,
+        "done": true,
         "phase": null
       },
       {
