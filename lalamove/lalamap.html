@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Set Location</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        overflow: hidden;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .map-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        background-color: #e0e0e0; /* Placeholder color */
+    }
+    .map-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+    .center-marker {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -100%); /* Position pin just above center */
+        width: 40px;
+        height: 40px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 10;
+    }
+    .center-marker::after {
+        content: '';
+        width: 28px;
+        height: 28px;
+        background-color: #ea6923;
+        border: 3px solid #ffffff;
+        border-radius: 50%;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    .location-card {
+        position: absolute;
+        top: 20px;
+        left: 15px;
+        right: 15px;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 20;
+    }
+    .icon {
+        font-size: 24px;
+        color: #333;
+        cursor: pointer;
+    }
+    .location-details {
+        flex-grow: 1;
+    }
+    .location-details .title {
+        font-weight: 600;
+        font-size: 16px;
+        color: #000;
+    }
+    .location-details .address {
+        font-size: 13px;
+        color: #666;
+    }
+    .recenter-btn {
+        position: absolute;
+        bottom: 100px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+        background: #fff;
+        border-radius: 50%;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 20;
+    }
+    .confirm-btn {
+        position: absolute;
+        bottom: 20px;
+        left: 15px;
+        right: 15px;
+        height: 50px;
+        background: #ea6923;
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        z-index: 20;
+    }
+</style>
+</head>
+<body>
+
+<div class="map-container">
+    <!-- Location Info Card -->
+    <div class="location-card">
+        <div class="icon">&#x276E;</div> <!-- Left Arrow -->
+        <div class="location-details">
+            <div class="title">Museum of Anthropology</div>
+            <div class="address">Valencia Circle, Ermita, Manila, Metro Manil...</div>
+        </div>
+        <div class="icon">&#x270E;</div> <!-- Pencil -->
+    </div>
+
+    <!-- Google Map -->
+    <iframe class="map-iframe"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3861.201505999295!2d120.98188131535715!3d14.58763798981078!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3397ca2d334a275f%3A0x2977789644e12276!2sNational%20Museum%20of%20Anthropology!5e0!3m2!1sen!2sph!4v1693135630224!5m2!1sen!2sph"
+        allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+
+    <!-- Center Marker -->
+    <div class="center-marker"></div>
+
+    <!-- Recenter Button -->
+    <div class="recenter-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 8C9.79 8 8 9.79 8 12s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 6c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z" fill="#333"/>
+            <path d="M3.28 4.72l-1.42 1.42C1 7.1 1 8.26 1 10v4c0 1.74.86 3.26 2.12 4.12l1.42-1.42C3.53 16.13 3 15.11 3 14v-4c0-1.11.53-2.13 1.54-2.7L3.28 4.72zM20.72 4.72L19.3 6.14c1.01.57 1.54 1.59 1.54 2.7v4c0 1.11-.53 2.13-1.54 2.7l1.42 1.42C23 16.26 23 14.74 23 14v-4c0-1.74-.86-3.26-2.12-4.12z" fill="#333"/>
+        </svg>
+    </div>
+
+    <!-- Confirm Button -->
+    <button class="confirm-btn">Confirm</button>
+</div>
+
+</body>
+</html>
