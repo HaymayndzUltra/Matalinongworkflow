@@ -1,0 +1,29 @@
+{
+  "input_path": "/home/haymayndz/MatalinongWorkflow/outputs/aaa.jpg",
+  "ocr_text": "",
+  "missing_keywords": [
+    "REPUBLIC OF THE PHILIPPINES",
+    "DEPARTMENT OF TRANSPORTATION",
+    "LAND TRANSPORTATION OFFICE",
+    "DRIVER'S LICENSE",
+    "Last Name",
+    "First Name",
+    "Nationality",
+    "Sex",
+    "Date of Birth",
+    "Weight",
+    "Height",
+    "Address",
+    "License No",
+    "Expiration Date",
+    "Blood Type",
+    "Eyes Color",
+    "DL Codes",
+    "Conditions"
+  ],
+  "pattern_detection": {
+    "header_high_freq_score": 1847.29,
+    "background_high_freq_score": 11383.83,
+    "microprint_expected_present": true
+  }
+}

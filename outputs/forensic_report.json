@@ -1,0 +1,66 @@
+{
+  "basic_info": {
+    "path": "/home/haymayndz/MatalinongWorkflow/outputs/aaa.jpg",
+    "format": "RGB",
+    "width": 480,
+    "height": 640
+  },
+  "metadata_info": {
+    "jfif": "257",
+    "jfif_version": "(1, 1)",
+    "jfif_unit": "0",
+    "jfif_density": "(1, 1)",
+    "photoshop": "{1028: b'\\x1c\\x02(\\x00bFBMD0a000a21020000e612000030210000062400009b260000ac2f0000fd4e0000935200003756000049590000f8880000\\x00'}",
+    "progressive": "1",
+    "progression": "1"
+  },
+  "ela": {
+    "max_diff": 20,
+    "scale_used": 12.75,
+    "image_path": "/home/haymayndz/MatalinongWorkflow/outputs/ela.png"
+  },
+  "residual_image": "/home/haymayndz/MatalinongWorkflow/outputs/residual.png",
+  "sharpness_stats": {
+    "roi_left_mid": {
+      "laplacian_variance": 24.6439,
+      "mean": 156.6967,
+      "std": 35.9344,
+      "shape": [
+        140,
+        86
+      ]
+    },
+    "roi_upper_center": {
+      "laplacian_variance": 427.4589,
+      "mean": 126.9676,
+      "std": 77.8353,
+      "shape": [
+        76,
+        168
+      ]
+    },
+    "roi_right_mid": {
+      "laplacian_variance": 82.6452,
+      "mean": 119.8485,
+      "std": 45.9859,
+      "shape": [
+        115,
+        134
+      ]
+    },
+    "roi_background": {
+      "laplacian_variance": 65.662,
+      "mean": 40.7103,
+      "std": 30.4711,
+      "shape": [
+        76,
+        96
+      ]
+    }
+  },
+  "artifacts": {
+    "annotated_rois": "/home/haymayndz/MatalinongWorkflow/outputs/annotated_rois.jpg",
+    "ela_image": "/home/haymayndz/MatalinongWorkflow/outputs/ela.png",
+    "residual_image": "/home/haymayndz/MatalinongWorkflow/outputs/residual.png"
+  }
+}
