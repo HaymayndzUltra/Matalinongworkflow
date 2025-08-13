@@ -35,7 +35,7 @@
       {
         "id": 2,
         "name": "PHASE 2: EVIDENCE EXTRACTION PIPELINE",
-        "status": "pending",
+        "status": "completed",
         "explanation": "Build a robust extraction layer: document classifier, OCR/MRZ/Barcode/NFC ingestion.",
         "important_note": "EE1: Document classifier top-1 \u22650.9 confidence. EE2: ICAO 9303 MRZ checksums pass.",
         "tasks": [
@@ -43,7 +43,8 @@
           "OCR integration (Tesseract/Cloud)",
           "MRZ parsing (ICAO 9303)",
           "Face cropping module"
-        ]
+        ],
+        "completed_at": "2025-08-13T16:30:59.137358+08:00"
       },
       {
         "id": 3,
