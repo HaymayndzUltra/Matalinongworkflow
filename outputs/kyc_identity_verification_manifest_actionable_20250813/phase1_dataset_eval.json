@@ -1,0 +1,56 @@
+{
+  "total": 4,
+  "passed": 0,
+  "failed": 4,
+  "pass_rate": 0.0,
+  "acceptance_target": 0.95,
+  "acceptance_met": false,
+  "thresholds": {
+    "min_width": 1000,
+    "min_height": 600,
+    "min_laplacian_variance": 30.0,
+    "max_file_size_bytes": 6291456
+  },
+  "items": [
+    {
+      "path": "/workspace/outputs/aaa.jpg",
+      "width": 640,
+      "height": 480,
+      "quality_score_01": 1.0,
+      "meets_resolution": false,
+      "meets_file_size": true,
+      "meets_sharpness": true,
+      "passed": false
+    },
+    {
+      "path": "/workspace/outputs/annotated_rois.jpg",
+      "width": 640,
+      "height": 480,
+      "quality_score_01": 1.0,
+      "meets_resolution": false,
+      "meets_file_size": true,
+      "meets_sharpness": true,
+      "passed": false
+    },
+    {
+      "path": "/workspace/outputs/residual.png",
+      "width": 640,
+      "height": 480,
+      "quality_score_01": 0.735,
+      "meets_resolution": false,
+      "meets_file_size": true,
+      "meets_sharpness": true,
+      "passed": false
+    },
+    {
+      "path": "/workspace/outputs/ela.png",
+      "width": 640,
+      "height": 480,
+      "quality_score_01": 1.0,
+      "meets_resolution": false,
+      "meets_file_size": true,
+      "meets_sharpness": true,
+      "passed": false
+    }
+  ]
+}

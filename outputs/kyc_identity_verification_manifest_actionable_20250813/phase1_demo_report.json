@@ -1,0 +1,15 @@
+{
+  "front": {
+    "path": "/workspace/a.jpg",
+    "width": 715,
+    "height": 717,
+    "size_bytes": 58154,
+    "laplacian_variance": 705.7455,
+    "meets_resolution": false,
+    "meets_file_size": true,
+    "meets_sharpness": true,
+    "quality_ok": false
+  },
+  "back": null,
+  "selfie_video": null
+}

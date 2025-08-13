@@ -1,0 +1,255 @@
+{
+  "dataset": "outputs/phase1_synth",
+  "num_images": 51,
+  "num_correct": 51,
+  "accuracy": 1.0,
+  "label_counts": {
+    "id_card": 50,
+    "passport_page": 0,
+    "other": 1
+  },
+  "ee1_threshold": 0.9,
+  "ee1_pass": true,
+  "samples": [
+    {
+      "path": "outputs/phase1_synth/img_0000.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0000_face.jpg",
+      "ground_truth": "other",
+      "predicted": "other",
+      "confidence": 0.7,
+      "extra": {
+        "width": 400,
+        "height": 400,
+        "ratio": 1.0
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0001.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0002.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0003.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0004.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0005.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0006.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0007.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0008.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0009.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0010.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0011.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0012.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0013.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0014.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0015.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0016.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0017.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    },
+    {
+      "path": "outputs/phase1_synth/img_0018.jpg",
+      "ground_truth": "id_card",
+      "predicted": "id_card",
+      "confidence": 0.95,
+      "extra": {
+        "width": 1200,
+        "height": 800,
+        "ratio": 1.5
+      },
+      "correct": true
+    }
+  ]
+}

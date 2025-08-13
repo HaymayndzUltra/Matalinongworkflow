@@ -1,0 +1,19 @@
+{
+  "classifier": {
+    "label": "id_card",
+    "confidence": 0.95,
+    "extra": {
+      "width": 1200,
+      "height": 800,
+      "ratio": 1.5
+    }
+  },
+  "mrz_validation": null,
+  "barcode_parsed": null,
+  "face_crop": {
+    "x": 400,
+    "y": 200,
+    "w": 400,
+    "h": 400
+  }
+}
