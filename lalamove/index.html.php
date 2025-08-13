@@ -147,7 +147,7 @@
                 allowfullscreen=""
                 loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
-                onload="locate()">
+                onload="locate(true)">
             </iframe>
 
         </div>
