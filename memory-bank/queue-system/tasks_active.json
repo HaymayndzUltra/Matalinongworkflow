@@ -4,55 +4,55 @@
     "description": "Actionable plan compiled from KYC Identity Verification Manifest (memory-bank/plan/organize.md).",
     "status": "in_progress",
     "created": "2025-08-13T23:00:00+08:00",
-    "updated": "2025-08-13T23:00:00+08:00",
+    "updated": "2025-08-14T04:25:16.314953+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\nExplanations: Establish strict protocol and constraints. Organizer is authoritative and read-only; plan execution uses read-only analyzers and explicit completion commands.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No direct writes to queue/state files; secrets via environment variables with .env.example provided; redact PII by default in logs. Use ISO8601 +08:00 timestamps, deterministic seeds, reproducible builds. Config-driven thresholds only (no magic numbers). Respect monotonic completion. The organizer is authoritative; do not alter memory-bank/plan/organize.md.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 1: CAPTURE QUALITY & COACHING\n\nExplanations: Implement glare/blur/orientation checks, per-frame quality scoring, coaching hints, and pass@1000px metric for capture validation.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 1\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Capture pass@1000px ≥ 95%; auto-correct orientation; quality scores ∈ [0,1].",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 2: DOCUMENT CLASSIFICATION\n\nExplanations: Multi-ID/country classifier that auto-loads issuer templates and returns confidences for supported PH IDs (PhilID, UMID, Driver’s License, Passport, PRC).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 2\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Top-1 accuracy ≥ 0.90 on test set; templates auto-loaded.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 3: EVIDENCE EXTRACTION (OCR/MRZ/Barcode/NFC)\n\nExplanations: Extract OCR text, validate MRZ (ICAO 9303 checksums), parse PDF417/QR barcodes, and perform NFC passport DG1/DG2 passive auth where available; return ROIs and confidences. Include face detection/crops for downstream biometrics (≥112×112).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 3\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] MRZ checksums pass; PDF417/QR parsed with ROIs and confidences; NFC passive auth verified when supplied; face crops at least 112×112.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 4: FORENSICS & AUTHENTICITY\n\nExplanations: Implement ELA/noise/resample/copy-move detection, ROI heatmaps, texture/FFT checks, and font/kerning scoring to detect tampering and verify security features per template.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 4\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Tamper/forensics AUC ≥ 0.90; security-feature thresholds documented per issuer template.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 5: BIOMETRICS & LIVENESS\n\nExplanations: Multi-frame face match for ID-vs-selfie; passive and challenge liveness with calibrated thresholds and multi-frame consensus logic for robustness.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 5\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Face TAR@FAR1% ≥ 0.98; liveness FMR ≤ 1%, FNMR ≤ 3%.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 6: ISSUER RULES & VALIDATORS\n\nExplanations: Implement issuer-specific validators for expiry/format/name/DOB logic and checksums per ID type; all thresholds are config-driven from templates.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 6\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Config-driven validators only; no magic numbers; aligned to issuer templates.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 7: DEVICE INTELLIGENCE & VELOCITY\n\nExplanations: Detect VPN/TOR/proxy; emulator/root/jailbreak; IP/SIM/GPS mismatch; geovelocity anomalies; velocity/reuse patterns, and surface explainable device signals into scoring.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 7\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Device signals integrated into risk model with tunable thresholds and explanations.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 8: RISK SCORING & DECISIONING\n\nExplanations: Aggregate features; combine rules + ML ensemble; use JSON policy thresholds to output risk_score, flags, reasons, and final decision {approve|review|deny} with policy versioning.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 8\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Calibrated thresholds with ROC/AUC reported for aggregate scoring; config-driven policy; auto-approve/deny/review per policy_pack.yaml.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 9: SANCTIONS & AML SCREENING\n\nExplanations: Integrate multi-vendor sanctions/PEP/adverse media screening with explainable hits and IP/geo controls; provide reviewer-visible rationales and audit logging of hits.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 9\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Vendor APIs integrated; hit explainability available to reviewers and audit logs; IP/geo controls enabled.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 10: VENDOR ORCHESTRATOR (RELIABILITY & FAILOVER)\n\nExplanations: Implement timeouts/retries/backoff; circuit breakers; PRIMARY→SECONDARY failover; hedged requests; SLA and cost/latency budgets; Prometheus metrics for vendor health and orchestration paths.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 10\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Availability ≥ 99.9% under failover_sim primary_outage_30pct; circuit breakers open on error_rate >5% over 2 min or p95 > 3× baseline; support half-open recovery; metrics visible in /metrics.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 11: ISSUER REGISTRY & ADAPTERS\n\nExplanations: Build adapters and a router that aggregate proofs and route per issuer; define contracts (request/response pydantic models; limits; evidence fields); tests with simulators and golden JSON artifacts.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 11\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Include proofs {ref_id, signature/hash, timestamp, adapter_name} when adapter available.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 12: HUMAN REVIEW CONSOLE\n\nExplanations: Minimal reviewer console with PII redaction toggle, ELA/noise heatmaps, face-timeline; dual-approval on high-risk; audit links and action logs for accountability.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 12\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Two-person approval enforced for high-risk queues; all actions auditable.",
