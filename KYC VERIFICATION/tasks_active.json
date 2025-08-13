@@ -4,7 +4,7 @@
     "description": "Actionable plan compiled from KYC Identity Verification Manifest (memory-bank/plan/organize.md).",
     "status": "in_progress",
     "created": "2025-08-13T23:00:00+08:00",
-    "updated": "2025-08-14T00:34:35.879122+08:00",
+    "updated": "2025-08-14T01:01:20.302167+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\nExplanations: Establish strict protocol and constraints. Organizer is authoritative and read-only; plan execution uses read-only analyzers and explicit completion commands.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No direct writes to queue/state files; secrets via environment variables with .env.example provided; redact PII by default in logs. Use ISO8601 +08:00 timestamps, deterministic seeds, reproducible builds. Config-driven thresholds only (no magic numbers). Respect monotonic completion. The organizer is authoritative; do not alter memory-bank/plan/organize.md.",
@@ -33,12 +33,12 @@
       },
       {
         "text": "PHASE 5: BIOMETRICS & LIVENESS\n\nExplanations: Multi-frame face match for ID-vs-selfie; passive and challenge liveness with calibrated thresholds and multi-frame consensus logic for robustness.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 5\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Face TAR@FAR1% \u2265 0.98; liveness FMR \u2264 1%, FNMR \u2264 3%.",
-        "done": false,
+        "done": true,
         "phase": null
       },
       {
         "text": "PHASE 6: ISSUER RULES & VALIDATORS\n\nExplanations: Implement issuer-specific validators for expiry/format/name/DOB logic and checksums per ID type; all thresholds are config-driven from templates.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 6\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Config-driven validators only; no magic numbers; aligned to issuer templates.",
-        "done": false,
+        "done": true,
         "phase": null
       },
       {
