@@ -1,0 +1,63 @@
+# Core dependencies for KYC Identity Verification System
+# Python 3.8+ required
+
+# Image Processing
+Pillow==10.2.0
+numpy==1.24.3
+opencv-python==4.9.0.80
+
+# OCR and Document Processing
+pytesseract==0.3.10
+pdf2image==1.16.3
+
+# Machine Learning / Computer Vision
+scikit-learn==1.3.2
+scipy==1.11.4
+
+# Face Detection and Recognition
+face-recognition==1.3.0
+dlib==19.24.2
+
+# Web Framework (for review console)
+fastapi==0.109.0
+uvicorn==0.27.0
+pydantic==2.5.3
+
+# Database
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+
+# Security and Encryption
+cryptography==41.0.7
+pycryptodome==3.19.1
+passlib==1.7.4
+python-jose[cryptography]==3.3.0
+
+# API Clients
+requests==2.31.0
+httpx==0.26.0
+aiohttp==3.9.1
+
+# Monitoring and Logging
+prometheus-client==0.19.0
+python-json-logger==2.0.7
+
+# Data Validation
+jsonschema==4.21.1
+python-dateutil==2.8.2
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+
+# Development Tools
+black==23.12.1
+flake8==7.0.0
+mypy==1.8.0
+pre-commit==3.6.0
+
+# Utilities
+python-dotenv==1.0.0
+pyyaml==6.0.1
+tqdm==4.66.1
