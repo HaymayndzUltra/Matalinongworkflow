@@ -10,3 +10,5 @@ torch==2.5.0
 psutil==5.9.8
 gpustat==1.1.1
 redis==5.0.1
+numpy
+pillow
