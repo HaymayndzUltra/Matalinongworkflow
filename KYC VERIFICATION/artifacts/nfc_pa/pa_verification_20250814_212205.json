@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-08-14T21:22:05.435180+08:00",
+  "is_valid": false,
+  "certificate_chain_valid": true,
+  "hashes_valid": false,
+  "dg_verification": {
+    "1": false,
+    "2": false,
+    "7": false
+  },
+  "processing_time_ms": 0.13113021850585938,
+  "errors": [
+    "Hash mismatch for DG1",
+    "Hash mismatch for DG2",
+    "Hash mismatch for DG7"
+  ],
+  "warnings": [],
+  "artifacts": {
+    "sod_version": 1,
+    "hash_algorithm": "SHA256",
+    "dsc_subject": "CN=Philippines DSC 001, C=PH",
+    "dsc_serial": "1001",
+    "verification_timestamp": "2025-08-14T21:22:05.434929+08:00",
+    "dg_count": 3,
+    "dg_verified": 0
+  }
+}

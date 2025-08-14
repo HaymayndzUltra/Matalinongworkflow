@@ -1,0 +1,13 @@
+{
+  "case_id": "CASE-20250814-0002",
+  "customer_id": "CUST003",
+  "screening_result_id": "81c62e76e0b0bdcd",
+  "status": "open",
+  "priority": "high",
+  "assigned_to": null,
+  "created_at": "2025-08-14T21:29:32.990670+08:00",
+  "sla_deadline": "2025-08-15T21:29:32.990666+08:00",
+  "resolution": null,
+  "resolved_at": null,
+  "notes": []
+}
