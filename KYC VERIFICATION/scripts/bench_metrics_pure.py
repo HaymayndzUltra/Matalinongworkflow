@@ -14,7 +14,7 @@ Outputs CSV with subset, count, authentic_ratio, heuristic_catch_ratio.
 import argparse
 import csv
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 
 def load_ppm(path: Path) -> Tuple[int, int, List[List[Tuple[int, int, int]]]]:
@@ -51,6 +51,8 @@ def heuristic_detect(path: Path) -> bool:
     dark_stripes = 0
     grid_cross = 0
     marker_lines = 0
+    # copy-move block signature counts
+    signatures: Dict[Tuple[int, int, int], List[Tuple[int, int]]] = {}
 
     for y in range(h):
         for x in range(w):
@@ -66,9 +68,43 @@ def heuristic_detect(path: Path) -> bool:
         if row_sum < w * 50:  # very dark row
             marker_lines += 1
 
+    # Lightweight copy-move detection: scan 8x8 blocks, hash mean color, count far duplicates
+    step = 8
+    for by in range(0, h - step, step):
+        for bx in range(0, w - step, step):
+            # compute mean color
+            rs = gs = bs = 0
+            for yy in range(by, by + step):
+                for xx in range(bx, bx + step):
+                    r, g, b = img[yy][xx]
+                    rs += r; gs += g; bs += b
+            area = step * step
+            mr = rs // area; mg = gs // area; mb = bs // area
+            ssum = mr + mg + mb
+            if 50 < ssum < 720:  # ignore almost-black and near-white
+                sig = (mr // 8, mg // 8, mb // 8)
+                signatures.setdefault(sig, []).append((bx, by))
+
+    copy_move_flag = False
+    for locs in signatures.values():
+        if len(locs) >= 2:
+            # check for two occurrences far apart
+            for i in range(len(locs)):
+                for j in range(i + 1, len(locs)):
+                    x1, y1 = locs[i]; x2, y2 = locs[j]
+                    if abs(x1 - x2) + abs(y1 - y2) > 80:
+                        copy_move_flag = True
+                        break
+                if copy_move_flag:
+                    break
+        if copy_move_flag:
+            break
+
     # Decide tamper present if any strong signal
     if marker_lines >= 1:
         return True  # copy-move
+    if copy_move_flag:
+        return True
     if dark_stripes > (w * h) // 40:
         return True  # resample stripe heuristic
     if grid_cross > (w * h) // 20:
