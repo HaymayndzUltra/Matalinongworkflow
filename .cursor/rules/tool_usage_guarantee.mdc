@@ -1,0 +1,31 @@
+## TOOL USAGE GUARANTEE
+
+For any phase execution or completion, the following sequence is MANDATORY:
+
+1) Discovery/Verification before action:
+```bash
+python3 plan_next.py
+python3 plain_hier.py <TASK_ID>
+```
+
+2) Execute sub-step(s) as indicated by the plan preview:
+```bash
+python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>
+```
+
+3) Show current status to confirm progress:
+```bash
+python3 todo_manager.py show <TASK_ID>
+```
+
+4) When a phase's sub-steps are all complete, finalize:
+```bash
+python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>
+```
+
+5) Post-action verification:
+```bash
+python3 plan_next.py
+```
+
+These steps are required to avoid missed "done" transitions and to keep the plan in sync.
