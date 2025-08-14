@@ -1,0 +1,122 @@
+{
+  "decision_p50": {
+    "value": 20000,
+    "category": "slo",
+    "unit": "ms",
+    "description": "P50 decision latency",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "decision_p95": {
+    "value": 60000,
+    "category": "slo",
+    "unit": "ms",
+    "description": "P95 decision latency",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "availability_target": {
+    "value": 0.999,
+    "category": "slo",
+    "unit": "ratio",
+    "description": "System availability target",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "pad_far": {
+    "value": 0.01,
+    "category": "pad",
+    "unit": "ratio",
+    "description": "PAD False Accept Rate",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "pad_frr": {
+    "value": 0.03,
+    "category": "pad",
+    "unit": "ratio",
+    "description": "PAD False Reject Rate",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "pad_tar_far1": {
+    "value": 0.98,
+    "category": "pad",
+    "unit": "ratio",
+    "description": "PAD TAR at FAR 1%",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "aml_rescreen_days": {
+    "value": 30,
+    "category": "aml",
+    "unit": "days",
+    "description": "AML rescreen interval",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "aml_circuit_breaker": {
+    "value": 5,
+    "category": "aml",
+    "unit": "failures",
+    "description": "Circuit breaker threshold",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "tm_velocity_hourly": {
+    "value": 10,
+    "category": "tm",
+    "unit": "transactions",
+    "description": "Hourly velocity limit",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "tm_velocity_daily": {
+    "value": 50,
+    "category": "tm",
+    "unit": "transactions",
+    "description": "Daily velocity limit",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "tm_geovelocity": {
+    "value": 500,
+    "category": "tm",
+    "unit": "km/hour",
+    "description": "Geovelocity threshold",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "tm_structuring_amount": {
+    "value": 500000,
+    "category": "tm",
+    "unit": "PHP",
+    "description": "Structuring detection amount",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "review_irr_kappa": {
+    "value": 0.8,
+    "category": "review",
+    "unit": "ratio",
+    "description": "Inter-rater reliability target",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "retention_days": {
+    "value": 2555,
+    "category": "retention",
+    "unit": "days",
+    "description": "Data retention period",
+    "last_updated": null,
+    "updated_by": null
+  },
+  "rate_limit_per_minute": {
+    "value": 1000,
+    "category": "operational",
+    "unit": "requests",
+    "description": "API rate limit",
+    "last_updated": null,
+    "updated_by": null
+  }
+}

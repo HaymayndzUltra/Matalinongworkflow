@@ -1,0 +1,565 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kyc
+  labels:
+    name: kyc
+    environment: production
+    compliance: bank-grade
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kyc-config
+  namespace: kyc
+data:
+  # SLO Configuration
+  SLO_DECISION_P50_MS: "20000"
+  SLO_DECISION_P95_MS: "60000"
+  SLO_AVAILABILITY_TARGET: "0.999"
+  
+  # PAD Configuration
+  PAD_ENABLED: "true"
+  PAD_LEVEL: "L2"
+  PAD_FAR_THRESHOLD: "0.01"
+  PAD_FRR_THRESHOLD: "0.03"
+  
+  # NFC Configuration
+  NFC_ENABLED: "true"
+  NFC_TIMEOUT_MS: "5000"
+  
+  # AML Configuration
+  AML_BATCH_SIZE: "100"
+  AML_CIRCUIT_BREAKER_THRESHOLD: "5"
+  
+  # Retention Configuration
+  RETENTION_KYC_DAYS: "2555"  # 7 years
+  RETENTION_AUDIT_DAYS: "3650"  # 10 years
+  
+  # Manila Timezone
+  TZ: "Asia/Manila"
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: kyc-secrets
+  namespace: kyc
+type: Opaque
+stringData:
+  # These would be encrypted in production
+  VAULT_TOKEN: "mock-vault-token"
+  DB_PASSWORD: "mock-db-password"
+  API_KEY: "mock-api-key"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyc-api
+  namespace: kyc
+  labels:
+    app: kyc-api
+    version: v1
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0  # Zero downtime deployment
+  selector:
+    matchLabels:
+      app: kyc-api
+  template:
+    metadata:
+      labels:
+        app: kyc-api
+        version: v1
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: kyc-service-account
+      
+      # Anti-affinity for pod distribution
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app
+                  operator: In
+                  values:
+                  - kyc-api
+              topologyKey: kubernetes.io/hostname
+      
+      containers:
+      - name: kyc-api
+        image: kyc-system:latest
+        imagePullPolicy: IfNotPresent
+        
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        - containerPort: 8081
+          name: metrics
+          protocol: TCP
+        
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        
+        envFrom:
+        - configMapRef:
+            name: kyc-config
+        - secretRef:
+            name: kyc-secrets
+        
+        # Resource limits and requests
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        
+        # Readiness probe
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+            httpHeaders:
+            - name: X-Probe-Type
+              value: readiness
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 3
+        
+        # Liveness probe
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8080
+            httpHeaders:
+            - name: X-Probe-Type
+              value: liveness
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        
+        # Startup probe for slow starting containers
+        startupProbe:
+          httpGet:
+            path: /startup
+            port: 8080
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 30
+        
+        # Volume mounts
+        volumeMounts:
+        - name: worm-storage
+          mountPath: /data/worm
+          readOnly: false
+        - name: temp-storage
+          mountPath: /tmp
+        - name: config-volume
+          mountPath: /config
+          readOnly: true
+        
+        # Security context
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+            - ALL
+      
+      # Init container for migrations
+      initContainers:
+      - name: migration
+        image: kyc-system:latest
+        command: ["/bin/sh", "-c"]
+        args: ["echo 'Running database migrations...'; sleep 2; echo 'Migrations complete'"]
+        envFrom:
+        - configMapRef:
+            name: kyc-config
+        - secretRef:
+            name: kyc-secrets
+      
+      volumes:
+      - name: worm-storage
+        persistentVolumeClaim:
+          claimName: worm-storage-pvc
+      - name: temp-storage
+        emptyDir:
+          sizeLimit: 1Gi
+      - name: config-volume
+        configMap:
+          name: kyc-config
+      
+      # Termination grace period for clean shutdown
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kyc-api
+  namespace: kyc
+  labels:
+    app: kyc-api
+spec:
+  type: ClusterIP
+  selector:
+    app: kyc-api
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+    protocol: TCP
+  - name: metrics
+    port: 8081
+    targetPort: 8081
+    protocol: TCP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: kyc-api-hpa
+  namespace: kyc
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: kyc-api
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  # CPU utilization
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  # Memory utilization
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  # Custom metric: Request rate
+  - type: Pods
+    pods:
+      metric:
+        name: kyc_requests_per_second
+      target:
+        type: AverageValue
+        averageValue: "100"
+  # Custom metric: P95 latency
+  - type: Object
+    object:
+      metric:
+        name: kyc_p95_latency_seconds
+      describedObject:
+        apiVersion: v1
+        kind: Service
+        name: kyc-api
+      target:
+        type: Value
+        value: "50"  # Scale up if P95 > 50s
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 60
+      - type: Pods
+        value: 2
+        periodSeconds: 60
+      selectPolicy: Max
+
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: kyc-api-pdb
+  namespace: kyc
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: kyc-api
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kyc-service-account
+  namespace: kyc
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kyc-role
+  namespace: kyc
+rules:
+- apiGroups: [""]
+  resources: ["configmaps", "secrets"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kyc-role-binding
+  namespace: kyc
+subjects:
+- kind: ServiceAccount
+  name: kyc-service-account
+  namespace: kyc
+roleRef:
+  kind: Role
+  name: kyc-role
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: worm-storage-pvc
+  namespace: kyc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: ssd-retain
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: kyc-network-policy
+  namespace: kyc
+spec:
+  podSelector:
+    matchLabels:
+      app: kyc-api
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8081
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: database
+    ports:
+    - protocol: TCP
+      port: 5432
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          name: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+  # Allow DNS
+  - to:
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+
+---
+# Canary Deployment for gradual rollout
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kyc-api-canary
+  namespace: kyc
+  labels:
+    app: kyc-api
+    version: canary
+spec:
+  replicas: 1  # Start with 1 replica for canary
+  selector:
+    matchLabels:
+      app: kyc-api
+      version: canary
+  template:
+    metadata:
+      labels:
+        app: kyc-api
+        version: canary
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: kyc-service-account
+      containers:
+      - name: kyc-api
+        image: kyc-system:canary
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: VERSION
+          value: "canary"
+        - name: CANARY_ENABLED
+          value: "true"
+        envFrom:
+        - configMapRef:
+            name: kyc-config
+        - secretRef:
+            name: kyc-secrets
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "2Gi"
+            cpu: "2000m"
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /live
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1000
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+
+---
+# VirtualService for traffic splitting (Istio)
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: kyc-api-vs
+  namespace: kyc
+spec:
+  hosts:
+  - kyc-api
+  http:
+  - match:
+    - headers:
+        x-canary:
+          exact: "true"
+    route:
+    - destination:
+        host: kyc-api
+        subset: canary
+      weight: 100
+  - route:
+    - destination:
+        host: kyc-api
+        subset: stable
+      weight: 95
+    - destination:
+        host: kyc-api
+        subset: canary
+      weight: 5  # 5% canary traffic
+
+---
+apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: kyc-api-dr
+  namespace: kyc
+spec:
+  host: kyc-api
+  trafficPolicy:
+    connectionPool:
+      tcp:
+        maxConnections: 100
+      http:
+        http1MaxPendingRequests: 100
+        http2MaxRequests: 100
+        maxRequestsPerConnection: 2
+    loadBalancer:
+      simple: LEAST_REQUEST
+    outlierDetection:
+      consecutiveErrors: 5
+      interval: 30s
+      baseEjectionTime: 30s
+      maxEjectionPercent: 50
+      minHealthPercent: 30
+  subsets:
+  - name: stable
+    labels:
+      version: v1
+  - name: canary
+    labels:
+      version: canary

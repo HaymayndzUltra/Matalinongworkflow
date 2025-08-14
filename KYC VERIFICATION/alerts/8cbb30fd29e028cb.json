@@ -1,0 +1,1 @@
+{"alert_id": "8cbb30fd29e028cb", "alert_type": "large_transaction", "severity": "medium", "customer_id": "CUST005", "transaction_ids": ["TX401"], "score": 0.5, "reason": "Large transaction: 5,000,000.00 PHP", "details": {"amount": 5000000, "threshold": 1000000}, "created_at": "2025-08-14T21:45:58.595507+08:00", "requires_review": false, "case_id": null}

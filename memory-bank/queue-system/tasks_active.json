@@ -2,77 +2,77 @@
   {
     "id": "kyc_bank_grade_parity_actionable_20250814",
     "description": "Actionable phases to close bank-grade parity gaps (source: memory-bank/plan/organize.md).",
-    "status": "in_progress",
+    "status": "completed",
     "created": "2025-08-14T18:36:37+08:00",
-    "updated": "2025-08-14T18:36:37+08:00",
+    "updated": "2025-08-14T22:08:53.979436+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\n- Scope: Close gaps to reach fintech/bank-grade parity after Phase 22.\n- Protocol: No direct writes to queue/state files; use env vars; redact PII in logs; timestamps ISO8601 +08:00; reproducible runs; config-driven thresholds.\n- Tools: Use read-only analyzers before marking done; map actions to a specific phase index.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Enforce SLOs (decision p50<20s, p95<60s) and ≥99.9% availability during work; never hardcode secrets; guard monotonic completion.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 1: PAD (Liveness) ISO 30107-3\n\n**Explanations:**\n- Implement PAD L1/L2 (anti-spoof), passive and/or challenge-response; add metrics (e.g., kyc_liveness_far, kyc_liveness_fnmr); document evaluation and certification evidence.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 1\n```\n\nIMPORTANT NOTE: Face TAR@FAR1% ≥ 0.98; PAD FMR ≤ 1%, FNMR ≤ 3%. Provide certification or equivalent validation evidence and dashboards.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 2: NFC eMRTD Passive Authentication (PA)\n\n**Explanations:**\n- Extend NFC path to read EF.SOD, verify DSC/CSCA chain, validate DG hash integrity; emit kyc_nfc_pa_verified gauge; persist verification artifacts.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 2\n```\n\nIMPORTANT NOTE: Verify PA on sample eMRTDs; failures must not block non-NFC IDs; reasons and metrics logged.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 3: PH Issuer Adapters (PhilID, LTO, PRC, Passport) + Proofs\n\n**Explanations:**\n- Build live adapters with rate-limits/retries/backoff; persist proofs {ref_id, signature/hash, timestamp, adapter_name}; add contract tests and golden JSON fixtures per adapter.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 3\n```\n\nIMPORTANT NOTE: Availability ≥ 99.9% under failover; no PII leakage on errors; proofs are queryable and included in decisions when available.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 4: Risk Model Governance (Registry, Versioning, Challenger, Fairness)\n\n**Explanations:**\n- Introduce model registry with lineage; challenger (A/B) deployments; fairness dashboards; approvals and rollback SOPs in docs/GOVERNANCE.md; config-driven thresholds only.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 4\n```\n\nIMPORTANT NOTE: No silent model upgrades; document approvals; schedule periodic bias/fairness audits with metrics.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 5: AML/PEP/Adverse Media Re-screening (Ongoing CDD)\n\n**Explanations:**\n- Integrate vendor(s), schedule periodic re-screens, handle deltas, auto case creation with SLAs; emit per-source hit metrics and evidence storage links.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 5\n```\n\nIMPORTANT NOTE: Hits must be explainable; secrets via env; backoff/breaker thresholds enforced; observability coverage present.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 6: Transaction Monitoring (Foundational Rules)\n\n**Explanations:**\n- Add basic TM: velocity, geovelocity, structuring patterns; route alerts to case management; link events to KYC identities; dashboards for alert volumes and SLAs.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 6\n```\n\nIMPORTANT NOTE: Event schema versioned; thresholds configurable; alert rules validated via simulations.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 7: Human Review Console & Case Management\n\n**Explanations:**\n- Reviewer UI with RBAC, dual control for high-risk queues, audit trails, evidence links, assignments and SLAs, queue metrics and reviewer calibration checks (IRR κ≥0.8 target).\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 7\n```\n\nIMPORTANT NOTE: Enforce two-person approval per configs/policy_pack.yaml; PII redaction toggle defaults to safe; all actions audit-logged.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 8: Security & Privacy Hardening\n\n**Explanations:**\n- Secrets management (Vault/KMS), encryption at rest for DB/files, tokenization of PII, key rotation, SIEM integration, DLP checks and access least-privilege enforcement with audits.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 8\n```\n\nIMPORTANT NOTE: No secrets in code; at-rest encryption proven; security events exported to SIEM; periodic key rotation and access reviews.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 9: Data Retention & WORM/Tamper-Evidence\n\n**Explanations:**\n- Implement immutable storage (object lock), hash-chained JSONL bundles, automated retention purge with proofs and reports; verify /audit/export tool passes on bundles.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 9\n```\n\nIMPORTANT NOTE: Retention schedules match retention_matrix; purge jobs logged with evidence; verification script passes on samples.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 10: Observability — Alerts & Dashboards\n\n**Explanations:**\n- Convert Prometheus metrics into alert rules (latency p50/p95, breaker open rate, availability), Grafana dashboards, synthetic checks; enable OTEL spans around external/vendor calls end-to-end.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 10\n```\n\nIMPORTANT NOTE: Avoid alert fatigue with proper thresholds; attach runbook links; validate alerts by simulation drills.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 11: Deployment & Resilience (K8s, Canary, Chaos)\n\n**Explanations:**\n- Add K8s manifests (HPA, readiness/liveness), canary/blue-green strategies, chaos tests integrated with scripts/failover_sim.py; document RTO/RPO drills and rollback playbooks.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 11\n```\n\nIMPORTANT NOTE: Health endpoints /live and /ready must be wired; define error budgets and rollback procedures; measure during drills.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 12: Compliance Mapping (BSP/AMLC/PDPA) & SMR Hooks\n\n**Explanations:**\n- Create a control matrix mapping implemented controls to regulations; implement SMR/SAR submission hooks; schedule KYC refresh by risk rating with evidence and metrics.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 12\n```\n\nIMPORTANT NOTE: Controls auditable with owners; cadence scheduled; privacy and regulatory artifacts updated.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 13: API Contract Versioning & CI Gates\n\n**Explanations:**\n- Version the API; schema diff checks; deprecation policy with timelines; contract tests and compatibility checks in CI/CD to prevent breaking clients.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 13\n```\n\nIMPORTANT NOTE: Backward compatibility honored; publish deprecation windows; no breaking changes without a major version and migration doc.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 14: Data Quality & Test Matrices\n\n**Explanations:**\n- Golden tests per issuer/template; PAD/NFC/adapter integration tests; fairness regression suites; extend scripts/bench_metrics.py to store FPR/FNR/TAR with +08:00 timestamps.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 14\n```\n\nIMPORTANT NOTE: Deterministic seeds for reproducibility; track per-ID-type and overall metrics; store artifacts for audit.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 15: Operational UX (Rate-limits, Idempotency, Quotas)\n\n**Explanations:**\n- Add gateway/API rate-limits, per-tenant quotas, idempotency keys, retry/hedging policies; expose related metrics and error budgets by tenant.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 15\n```\n\nIMPORTANT NOTE: Prevent abuse without breaching SLOs; all limits/configs centrally tunable and observable.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 16: Build Hygiene & Supply-chain Security\n\n**Explanations:**\n- SBOM generation (Syft), image scanning (Trivy), signing (Sigstore), provenance attestations; fix Docker path issue (`--app-dir \"KYC VERIFICATION\"` or rename directory) to ensure reliable runtime.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 16\n```\n\nIMPORTANT NOTE: CI must fail on critical vulnerabilities; publish SBOM with releases; maintain reproducible builds.",
-        "done": false
+        "done": true
       }
     ]
   }

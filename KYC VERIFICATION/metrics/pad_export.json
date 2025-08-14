@@ -1,0 +1,1342 @@
+{
+  "metadata": {
+    "timestamp": "2025-08-14T20:58:23.128514+08:00",
+    "sample_count": 100
+  },
+  "current_stats": {
+    "far": 0.043478260869565216,
+    "frr": 0.07792207792207792,
+    "tar": 0.922077922077922,
+    "apcer": 0.043478260869565216,
+    "bpcer": 0.07792207792207792,
+    "total_genuine": 77,
+    "total_attacks": 23,
+    "total_samples": 100,
+    "buffer_size": 100,
+    "timestamp": "2025-08-14T20:58:23.128517+08:00"
+  },
+  "compliance": {
+    "iso_30107_3_compliant": false,
+    "far": {
+      "current": 0.043478260869565216,
+      "target": 0.01,
+      "compliant": false
+    },
+    "frr": {
+      "current": 0.07792207792207792,
+      "target": 0.03,
+      "compliant": false
+    },
+    "tar_at_far1": {
+      "current": 0.922077922077922,
+      "target": 0.98,
+      "compliant": false
+    },
+    "apcer": 0.043478260869565216,
+    "bpcer": 0.07792207792207792,
+    "sample_size": 100,
+    "timestamp": "2025-08-14T20:58:23.128524+08:00"
+  },
+  "samples": [
+    {
+      "timestamp": "2025-08-14T20:58:23.099738+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.3899724989142156,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 269.3195736793514,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9492872096742102,
+        "color": 0.3586158996265032
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100103+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7537198693749075,
+      "attack_type": "genuine",
+      "processing_time_ms": 466.0579453295865,
+      "level": "L2",
+      "scores": {
+        "texture": 0.4090154702188229,
+        "color": 0.8626899477679988
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100274+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6421024405344017,
+      "attack_type": "genuine",
+      "processing_time_ms": 129.46438431719133,
+      "level": "L2",
+      "scores": {
+        "texture": 0.5144287365760605,
+        "color": 0.276301470644735
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100403+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6564490731240594,
+      "attack_type": "genuine",
+      "processing_time_ms": 180.65891582616558,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9802122803300554,
+        "color": 0.20867245363913955
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100515+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7273315500174284,
+      "attack_type": "genuine",
+      "processing_time_ms": 105.79449289149818,
+      "level": "L2",
+      "scores": {
+        "texture": 0.10841374996164088,
+        "color": 0.4396322496294345
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100626+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6826573356270924,
+      "attack_type": "genuine",
+      "processing_time_ms": 130.63568614493818,
+      "level": "L2",
+      "scores": {
+        "texture": 0.06630973862948752,
+        "color": 0.9672674611843028
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100739+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": true,
+      "confidence": 0.2578242552212531,
+      "attack_type": "genuine",
+      "processing_time_ms": 116.71796840554873,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9077711795269758,
+        "color": 0.6444884988979472
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100860+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.3263896196033097,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 342.14082560966665,
+      "level": "L2",
+      "scores": {
+        "texture": 0.4095455860145013,
+        "color": 0.7625033147495941
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.100981+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.44445355488427,
+      "attack_type": "screen",
+      "processing_time_ms": 178.33794893272716,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9917876002945262,
+        "color": 0.12680842085498867
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101098+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8103338418396177,
+      "attack_type": "genuine",
+      "processing_time_ms": 366.7370601528337,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6347216915059829,
+        "color": 0.38711623419187247
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101209+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8815089859306582,
+      "attack_type": "genuine",
+      "processing_time_ms": 132.98572092608197,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2967846296695099,
+        "color": 0.03134247711110927
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101318+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7050863176572771,
+      "attack_type": "genuine",
+      "processing_time_ms": 347.17318110054623,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9691962876961234,
+        "color": 0.27696903184790245
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101422+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6489979550653274,
+      "attack_type": "genuine",
+      "processing_time_ms": 301.83494026430924,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7901470453604179,
+        "color": 0.30048932404962336
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101525+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8932922000916437,
+      "attack_type": "genuine",
+      "processing_time_ms": 235.03556731814373,
+      "level": "L2",
+      "scores": {
+        "texture": 0.1390996300632733,
+        "color": 0.20996013923871892
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101631+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.3150579803951627,
+      "attack_type": "screen",
+      "processing_time_ms": 415.10328513279586,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6850569054281508,
+        "color": 0.6666392263589077
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101742+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8994545393997613,
+      "attack_type": "genuine",
+      "processing_time_ms": 322.0288709623873,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2221688759889754,
+        "color": 0.18538907997628395
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101845+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6096233566758834,
+      "attack_type": "genuine",
+      "processing_time_ms": 359.84504469615894,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6566002229951373,
+        "color": 0.16744311994396688
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.101965+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.805749029253829,
+      "attack_type": "genuine",
+      "processing_time_ms": 120.80009308805258,
+      "level": "L2",
+      "scores": {
+        "texture": 0.4160671542939277,
+        "color": 0.7751405099219757
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102074+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.943158491963034,
+      "attack_type": "genuine",
+      "processing_time_ms": 391.76202731959233,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6335634509935181,
+        "color": 0.3907907420626937
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102184+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.27852672352151236,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 329.25333243437774,
+      "level": "L2",
+      "scores": {
+        "texture": 0.07360049283045067,
+        "color": 0.6340391422861309
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102293+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7613541702028127,
+      "attack_type": "genuine",
+      "processing_time_ms": 437.0449252086359,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7211604499633457,
+        "color": 0.8469175141315142
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102426+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.9013810815340173,
+      "attack_type": "genuine",
+      "processing_time_ms": 393.9866932510308,
+      "level": "L2",
+      "scores": {
+        "texture": 0.313849023868525,
+        "color": 0.432137358607973
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102541+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6227024626154651,
+      "attack_type": "genuine",
+      "processing_time_ms": 254.07676204273497,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9488434657542004,
+        "color": 0.44523854709591826
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102656+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": true,
+      "confidence": 0.44418104652626944,
+      "attack_type": "genuine",
+      "processing_time_ms": 233.35719794510857,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6114137238102041,
+        "color": 0.2085428210975292
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102771+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7008517449375846,
+      "attack_type": "genuine",
+      "processing_time_ms": 176.5518915677887,
+      "level": "L2",
+      "scores": {
+        "texture": 0.4048587671187741,
+        "color": 0.26810068760684036
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.102896+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.374313826210388,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 172.26677826255838,
+      "level": "L2",
+      "scores": {
+        "texture": 0.1010447596326568,
+        "color": 0.23097451411612857
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103014+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7337023882344882,
+      "attack_type": "genuine",
+      "processing_time_ms": 460.5034840700007,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2298192339306091,
+        "color": 0.840495123486704
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103131+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6548056854344623,
+      "attack_type": "genuine",
+      "processing_time_ms": 347.54765441981965,
+      "level": "L2",
+      "scores": {
+        "texture": 0.42433048061243717,
+        "color": 0.06854913084694803
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103248+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.2882835485413415,
+      "attack_type": "print",
+      "processing_time_ms": 267.900673749572,
+      "level": "L2",
+      "scores": {
+        "texture": 0.15010645855798377,
+        "color": 0.6717269705583346
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103393+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8600310343961397,
+      "attack_type": "genuine",
+      "processing_time_ms": 324.2579154652495,
+      "level": "L2",
+      "scores": {
+        "texture": 0.5113576806932565,
+        "color": 0.05277844133851939
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103510+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.61871382979094,
+      "attack_type": "genuine",
+      "processing_time_ms": 197.94201438989845,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6233723013434534,
+        "color": 0.03261843026005251
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103625+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7329358686355043,
+      "attack_type": "genuine",
+      "processing_time_ms": 264.3865014409686,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3303469075214476,
+        "color": 0.5151735738794727
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103737+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.9387185204050634,
+      "attack_type": "genuine",
+      "processing_time_ms": 133.91559321994797,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7944710885950712,
+        "color": 0.5340863943460847
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103852+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": true,
+      "confidence": 0.4861887956506581,
+      "attack_type": "genuine",
+      "processing_time_ms": 397.70001963082973,
+      "level": "L2",
+      "scores": {
+        "texture": 0.20057761235818072,
+        "color": 0.5230954111247184
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.103969+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7373367505879558,
+      "attack_type": "genuine",
+      "processing_time_ms": 133.48385998735438,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6494915797655172,
+        "color": 0.08206286112037176
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.104083+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8720024415661247,
+      "attack_type": "genuine",
+      "processing_time_ms": 364.15900307803565,
+      "level": "L2",
+      "scores": {
+        "texture": 0.41173880952956743,
+        "color": 0.1972102021213783
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.104195+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.9354621989857606,
+      "attack_type": "genuine",
+      "processing_time_ms": 473.70682917230596,
+      "level": "L2",
+      "scores": {
+        "texture": 0.10251841607447187,
+        "color": 0.2120313744759188
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.104309+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7708772513024241,
+      "attack_type": "genuine",
+      "processing_time_ms": 172.624151116521,
+      "level": "L2",
+      "scores": {
+        "texture": 0.29410025538681883,
+        "color": 0.9288677233730621
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.104410+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": true,
+      "confidence": 0.41982265993029144,
+      "attack_type": "genuine",
+      "processing_time_ms": 411.2439965341984,
+      "level": "L2",
+      "scores": {
+        "texture": 0.4822064699734868,
+        "color": 0.5900828185263406
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.104687+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7564082128764399,
+      "attack_type": "genuine",
+      "processing_time_ms": 210.91505515021223,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7135669862343531,
+        "color": 0.022655951813181918
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.104869+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7439599419916612,
+      "attack_type": "genuine",
+      "processing_time_ms": 190.5738246959936,
+      "level": "L2",
+      "scores": {
+        "texture": 0.5942789926091423,
+        "color": 0.2968372960041362
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.105170+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.47279597777797694,
+      "attack_type": "screen",
+      "processing_time_ms": 311.7968026695013,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7898029837816469,
+        "color": 0.08397714882644924
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.106676+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8938665603484418,
+      "attack_type": "genuine",
+      "processing_time_ms": 495.59467591406616,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6307642745174705,
+        "color": 0.9704135654102085
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.107030+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.610951630080813,
+      "attack_type": "genuine",
+      "processing_time_ms": 415.7562822863045,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6529912946008168,
+        "color": 0.7146674359097279
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.107222+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7473390422075011,
+      "attack_type": "genuine",
+      "processing_time_ms": 186.1722143663875,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9768096376472745,
+        "color": 0.6561830426721774
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.107389+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6845935612014079,
+      "attack_type": "genuine",
+      "processing_time_ms": 316.88791707547466,
+      "level": "L2",
+      "scores": {
+        "texture": 0.10499145632545259,
+        "color": 0.6392039729340061
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.107545+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7737806395229722,
+      "attack_type": "genuine",
+      "processing_time_ms": 206.60830503723696,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6617327788538776,
+        "color": 0.9696053335576651
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.107692+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.4655640672560689,
+      "attack_type": "screen",
+      "processing_time_ms": 307.79088492423557,
+      "level": "L2",
+      "scores": {
+        "texture": 0.8466181255277069,
+        "color": 0.3374005944922013
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.107847+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.2786175257524628,
+      "attack_type": "screen",
+      "processing_time_ms": 208.00467338065744,
+      "level": "L2",
+      "scores": {
+        "texture": 0.4333312679956245,
+        "color": 0.5625272043831321
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.108007+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8673511533153195,
+      "attack_type": "genuine",
+      "processing_time_ms": 470.73884154208235,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6372238612467388,
+        "color": 0.8732497289347816
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.108154+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6104234198280997,
+      "attack_type": "genuine",
+      "processing_time_ms": 485.4454713713847,
+      "level": "L2",
+      "scores": {
+        "texture": 0.888533701449065,
+        "color": 0.08867385031232256
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.108293+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.4052560458739279,
+      "attack_type": "screen",
+      "processing_time_ms": 496.31979448037924,
+      "level": "L2",
+      "scores": {
+        "texture": 0.1562874547889631,
+        "color": 0.9110476157985725
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.108437+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7517374575572073,
+      "attack_type": "genuine",
+      "processing_time_ms": 329.20049138146544,
+      "level": "L2",
+      "scores": {
+        "texture": 0.25409603645281575,
+        "color": 0.9394362254627756
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.108579+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7835836020183246,
+      "attack_type": "genuine",
+      "processing_time_ms": 342.1029200770866,
+      "level": "L2",
+      "scores": {
+        "texture": 0.023815897124650043,
+        "color": 0.02897108589022579
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.111323+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6480284606841851,
+      "attack_type": "genuine",
+      "processing_time_ms": 137.8167837647456,
+      "level": "L2",
+      "scores": {
+        "texture": 0.0013640909687074876,
+        "color": 0.7788809190744868
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.111538+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6083744320112654,
+      "attack_type": "genuine",
+      "processing_time_ms": 320.1878420500907,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3960969079001422,
+        "color": 0.28374584097263333
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.111709+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7245719361840999,
+      "attack_type": "genuine",
+      "processing_time_ms": 262.12005733836315,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2645683514183109,
+        "color": 0.36695085799294835
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.111892+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.821959195035503,
+      "attack_type": "genuine",
+      "processing_time_ms": 283.7663215452806,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2684856967601391,
+        "color": 0.9921851478735759
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.112051+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8726499360482166,
+      "attack_type": "genuine",
+      "processing_time_ms": 396.1778312035068,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2246998391811761,
+        "color": 0.6835070047543211
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.112205+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7637417386941724,
+      "attack_type": "genuine",
+      "processing_time_ms": 111.1353501068423,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3701960527801631,
+        "color": 0.736341452637927
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.112355+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.210014267341465,
+      "attack_type": "screen",
+      "processing_time_ms": 476.45293994825624,
+      "level": "L2",
+      "scores": {
+        "texture": 0.0605204148813242,
+        "color": 0.6276952331126606
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.112495+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.40552561246991736,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 149.74511451245468,
+      "level": "L2",
+      "scores": {
+        "texture": 0.34205391138147234,
+        "color": 0.037696434346397134
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.112632+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.747803102469489,
+      "attack_type": "genuine",
+      "processing_time_ms": 437.5494327106032,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3977453024553216,
+        "color": 0.7133256253358315
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.112775+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.9168164559273171,
+      "attack_type": "genuine",
+      "processing_time_ms": 186.87853194810265,
+      "level": "L2",
+      "scores": {
+        "texture": 0.1539591849307821,
+        "color": 0.9534995247654291
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.112926+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.9246357848494213,
+      "attack_type": "genuine",
+      "processing_time_ms": 433.826153429182,
+      "level": "L2",
+      "scores": {
+        "texture": 0.46131213857824127,
+        "color": 0.5594547364234003
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.113063+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8044315456937395,
+      "attack_type": "genuine",
+      "processing_time_ms": 488.93802004883463,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7014948106483045,
+        "color": 0.13144773028348733
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.113214+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6891440815248899,
+      "attack_type": "genuine",
+      "processing_time_ms": 357.17637142580134,
+      "level": "L2",
+      "scores": {
+        "texture": 0.9572073939692438,
+        "color": 0.5585681681079034
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.113378+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": true,
+      "confidence": 0.3677638346326524,
+      "attack_type": "genuine",
+      "processing_time_ms": 268.36497487930825,
+      "level": "L2",
+      "scores": {
+        "texture": 0.48893099518142635,
+        "color": 0.23566337989436348
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.113547+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": false,
+      "confidence": 0.6443425203954645,
+      "attack_type": "screen",
+      "processing_time_ms": 215.90104735393896,
+      "level": "L2",
+      "scores": {
+        "texture": 0.758362322451779,
+        "color": 0.7583426961638935
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.113707+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7159348090215713,
+      "attack_type": "genuine",
+      "processing_time_ms": 155.54787609069024,
+      "level": "L2",
+      "scores": {
+        "texture": 0.8229216978661518,
+        "color": 0.6353750254677484
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.113843+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.44145603107906184,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 429.2612412203136,
+      "level": "L2",
+      "scores": {
+        "texture": 0.469948555421113,
+        "color": 0.18785645492992276
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.114004+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.715636516411141,
+      "attack_type": "genuine",
+      "processing_time_ms": 174.2350612484728,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2605115519127853,
+        "color": 0.8553815102798695
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.114145+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.2637585757803066,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 451.5302076281878,
+      "level": "L2",
+      "scores": {
+        "texture": 0.19789577165041905,
+        "color": 0.8488502555552094
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.114279+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7685967035010548,
+      "attack_type": "genuine",
+      "processing_time_ms": 395.89353031221106,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6981742575882558,
+        "color": 0.09562054426289934
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.114446+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.9427282047838452,
+      "attack_type": "genuine",
+      "processing_time_ms": 371.93270578355464,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3950369558588168,
+        "color": 0.41156996848498273
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.114592+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7602387855138872,
+      "attack_type": "genuine",
+      "processing_time_ms": 385.2085017574617,
+      "level": "L2",
+      "scores": {
+        "texture": 0.10961091503549858,
+        "color": 0.44857371849829486
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.114736+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6609269233719788,
+      "attack_type": "genuine",
+      "processing_time_ms": 428.85387592741574,
+      "level": "L2",
+      "scores": {
+        "texture": 0.8487193109094275,
+        "color": 0.2980470726204849
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.114892+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6109347680079648,
+      "attack_type": "genuine",
+      "processing_time_ms": 311.50865474781324,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7288504664619109,
+        "color": 0.7451388791690363
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.115049+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7281765181672003,
+      "attack_type": "genuine",
+      "processing_time_ms": 464.1929297662201,
+      "level": "L2",
+      "scores": {
+        "texture": 0.5351768779298018,
+        "color": 0.8071539593591117
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.115202+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.921614825677862,
+      "attack_type": "genuine",
+      "processing_time_ms": 121.70525797534552,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3205083474580639,
+        "color": 0.6718862755063353
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.115523+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.4903397757022365,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 395.78286239423886,
+      "level": "L2",
+      "scores": {
+        "texture": 0.8824265007609741,
+        "color": 0.3128570065766282
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.115741+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.435465621223322,
+      "attack_type": "print",
+      "processing_time_ms": 463.5854455269344,
+      "level": "L2",
+      "scores": {
+        "texture": 0.354741880280829,
+        "color": 0.6553067964855313
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.115923+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": true,
+      "confidence": 0.4534044170814989,
+      "attack_type": "genuine",
+      "processing_time_ms": 288.25697218181864,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6813632502686252,
+        "color": 0.9390186420031993
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.116076+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6024314094296513,
+      "attack_type": "genuine",
+      "processing_time_ms": 495.5770048817351,
+      "level": "L2",
+      "scores": {
+        "texture": 0.5214939290702522,
+        "color": 0.10319725019407888
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.116225+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6466088605395763,
+      "attack_type": "genuine",
+      "processing_time_ms": 456.0345149515174,
+      "level": "L2",
+      "scores": {
+        "texture": 0.530238501125295,
+        "color": 0.11386093418236753
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.124119+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8976093163301431,
+      "attack_type": "genuine",
+      "processing_time_ms": 353.878413270597,
+      "level": "L2",
+      "scores": {
+        "texture": 0.23549783705936245,
+        "color": 0.06967260972825717
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.124533+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6273766034154941,
+      "attack_type": "genuine",
+      "processing_time_ms": 313.73222259425916,
+      "level": "L2",
+      "scores": {
+        "texture": 0.5928198928452517,
+        "color": 0.19022675264993094
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.124767+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8187941276220297,
+      "attack_type": "genuine",
+      "processing_time_ms": 475.8210521904969,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3670649455054412,
+        "color": 0.6267974997019906
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.124963+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.4813857454210136,
+      "attack_type": "screen",
+      "processing_time_ms": 433.54062494238667,
+      "level": "L2",
+      "scores": {
+        "texture": 0.7923290644857223,
+        "color": 0.10149333237934133
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.125146+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.45446405015222874,
+      "attack_type": "mask_2d",
+      "processing_time_ms": 243.24630322899336,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3166776392612023,
+        "color": 0.7105109113268236
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.125336+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.32377349023933744,
+      "attack_type": "print",
+      "processing_time_ms": 117.58646128869934,
+      "level": "L2",
+      "scores": {
+        "texture": 0.4927497851031607,
+        "color": 0.3656570439082887
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.125504+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.336259652635045,
+      "attack_type": "print",
+      "processing_time_ms": 448.66864045926565,
+      "level": "L2",
+      "scores": {
+        "texture": 0.2551816517952169,
+        "color": 0.8151554598859809
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.125689+08:00",
+      "is_live_predicted": false,
+      "is_live_actual": false,
+      "confidence": 0.36112466512479785,
+      "attack_type": "print",
+      "processing_time_ms": 124.96726495059684,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3191308380459408,
+        "color": 0.3584135463667907
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.125837+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.9442767141645013,
+      "attack_type": "genuine",
+      "processing_time_ms": 495.07461178122645,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3257545909414691,
+        "color": 0.30185045134766086
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.125999+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8009727314954196,
+      "attack_type": "genuine",
+      "processing_time_ms": 101.46318463943538,
+      "level": "L2",
+      "scores": {
+        "texture": 0.31275891832638913,
+        "color": 0.4793758231070676
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.126152+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7965381452345266,
+      "attack_type": "genuine",
+      "processing_time_ms": 108.80753432172754,
+      "level": "L2",
+      "scores": {
+        "texture": 0.39148988704243537,
+        "color": 0.23672214408596448
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.126288+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6342758929105163,
+      "attack_type": "genuine",
+      "processing_time_ms": 250.40228108284106,
+      "level": "L2",
+      "scores": {
+        "texture": 0.6397274591339351,
+        "color": 0.3034288171298183
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.126450+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.8038773381545526,
+      "attack_type": "genuine",
+      "processing_time_ms": 187.42443422504846,
+      "level": "L2",
+      "scores": {
+        "texture": 0.034136642220977675,
+        "color": 0.2274295323654617
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.126598+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.6953101008864921,
+      "attack_type": "genuine",
+      "processing_time_ms": 262.1697223087041,
+      "level": "L2",
+      "scores": {
+        "texture": 0.07874011661555169,
+        "color": 0.49563578215534354
+      }
+    },
+    {
+      "timestamp": "2025-08-14T20:58:23.126752+08:00",
+      "is_live_predicted": true,
+      "is_live_actual": true,
+      "confidence": 0.7458608209003329,
+      "attack_type": "genuine",
+      "processing_time_ms": 238.73596978752803,
+      "level": "L2",
+      "scores": {
+        "texture": 0.3494973617181124,
+        "color": 0.9116860800126244
+      }
+    }
+  ]
+}
