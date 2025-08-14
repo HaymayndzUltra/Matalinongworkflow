@@ -126,6 +126,8 @@ class ThresholdManager:
             # Review Console
             ThresholdConfig("review_irr_kappa", ThresholdCategory.REVIEW, 0.8, 0.6, 1.0, "ratio",
                           "Inter-rater reliability target", "REVIEW_IRR_KAPPA_TARGET"),
+            ThresholdConfig("review_dual_control_risk_threshold", ThresholdCategory.REVIEW, 0.8, 0.0, 1.0, "score",
+                          "Risk threshold for dual control", "REVIEW_DUAL_CONTROL_RISK_THRESHOLD"),
             
             # Retention
             ThresholdConfig("retention_days", ThresholdCategory.RETENTION, 2555, 365, 3650, "days",

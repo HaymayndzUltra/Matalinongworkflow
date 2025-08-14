@@ -4,7 +4,7 @@
     "description": "Actionable phases to close bank-grade parity gaps (source: memory-bank/plan/organize.md).",
     "status": "in_progress",
     "created": "2025-08-14T18:36:37+08:00",
-    "updated": "2025-08-14T21:29:53.725769+08:00",
+    "updated": "2025-08-14T21:47:48.485370+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\n- Scope: Close gaps to reach fintech/bank-grade parity after Phase 22.\n- Protocol: No direct writes to queue/state files; use env vars; redact PII in logs; timestamps ISO8601 +08:00; reproducible runs; config-driven thresholds.\n- Tools: Use read-only analyzers before marking done; map actions to a specific phase index.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Enforce SLOs (decision p50<20s, p95<60s) and ≥99.9% availability during work; never hardcode secrets; guard monotonic completion.",
@@ -32,7 +32,7 @@
       },
       {
         "text": "PHASE 6: Transaction Monitoring (Foundational Rules)\n\n**Explanations:**\n- Add basic TM: velocity, geovelocity, structuring patterns; route alerts to case management; link events to KYC identities; dashboards for alert volumes and SLAs.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 6\n```\n\nIMPORTANT NOTE: Event schema versioned; thresholds configurable; alert rules validated via simulations.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 7: Human Review Console & Case Management\n\n**Explanations:**\n- Reviewer UI with RBAC, dual control for high-risk queues, audit trails, evidence links, assignments and SLAs, queue metrics and reviewer calibration checks (IRR κ≥0.8 target).\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 7\n```\n\nIMPORTANT NOTE: Enforce two-person approval per configs/policy_pack.yaml; PII redaction toggle defaults to safe; all actions audit-logged.",
