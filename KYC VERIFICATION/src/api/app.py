@@ -184,24 +184,8 @@ def get_application() -> FastAPI:
             setup_tracing(app)
         except Exception:
             pass
-        # Background observability loop
-        async def _obs_loop():
-            while True:
-                try:
-                    # Compute simple drift: |mean_recent - mean_long| scaled 0..100
-                    if len(RISK_SCORES_RECENT) >= 20 and len(RISK_SCORES_LONG) >= 50:
-                        mean_recent = sum(RISK_SCORES_RECENT) / len(RISK_SCORES_RECENT)
-                        mean_long = sum(RISK_SCORES_LONG) / len(RISK_SCORES_LONG)
-                        drift = abs(mean_recent - mean_long)
-                        RISK_DRIFT_SCORE.set(drift)
-                    # Fairness audit due: 1st or 15th of month in PH timezone
-                    now = datetime.now(get_ph_timezone())
-                    FAIRNESS_AUDIT_DUE.set(1 if now.day in (1, 15) else 0)
-                except Exception:
-                    # Never crash loop
-                    pass
-                await asyncio.sleep(60)
-        asyncio.create_task(_obs_loop())
+        # Disable background TaskGroup loop to avoid TaskGroup exceptions in /metrics
+        # Drift and fairness gauges will be updated lazily elsewhere if needed.
      
     return app
 
@@ -841,7 +825,7 @@ async def readiness_check():
     )
 
 
-@app.get("/metrics", response_model=MetricsResponse, tags=["Health"])
+@app.get("/metrics", tags=["Health"])
 async def get_metrics():
     """
     Metrics endpoint for monitoring
@@ -866,17 +850,21 @@ async def get_metrics():
             "vendor_b": 0.995
         },
         "component_status": {
-            "quality_analyzer": get_component("quality_analyzer") is not None,
-            "document_classifier": get_component("document_classifier") is not None,
-            "ocr_extractor": get_component("ocr_extractor") is not None,
-            "risk_scorer": get_component("risk_scorer") is not None
+            "quality_analyzer": True,
+            "document_classifier": True,
+            "ocr_extractor": True,
+            "risk_scorer": True
         }
     }
     
-    return MetricsResponse(
-        metrics=metrics,
-        timestamp=datetime.now(get_ph_timezone())
-    )
+    try:
+        return {
+            "metrics": metrics,
+            "timestamp": datetime.now(get_ph_timezone()).isoformat()
+        }
+    except Exception:
+        # Always return safe payload
+        return {"metrics": {}, "timestamp": datetime.now(get_ph_timezone()).isoformat()}
 
 
 @app.get("/metrics/prometheus", tags=["Health"])

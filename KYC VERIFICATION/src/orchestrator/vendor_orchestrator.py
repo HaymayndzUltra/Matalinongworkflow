@@ -664,6 +664,39 @@ class VendorOrchestrator:
             "vendor_breakdown": vendor_costs,
             "cost_optimization_enabled": self.config["performance"]["cost_optimization"]
         }
+
+    # --- Convenience sync wrappers expected by API layer ---
+    def verify_with_issuer(
+        self,
+        document_type: str,
+        document_number: str,
+        personal_info: Dict[str, Any],
+        adapter: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """
+        Synchronous convenience method for issuer verification expected by /issuer/verify endpoint.
+        Returns a normalized dict: {verified, match_score, issuer_response}.
+        """
+        # In this demo implementation, we do not call real issuers. We simulate a result
+        # and return a stable structure for the API response model.
+        normalized_number = (document_number or "").strip().upper()
+        heuristic_ok = bool(normalized_number) and len(normalized_number) >= 6
+        match_score = 0.85 if heuristic_ok else 0.3
+        verified = heuristic_ok and normalized_number[0].isalpha()
+
+        issuer_response: Dict[str, Any] = {
+            "document_type": document_type,
+            "document_number": document_number,
+            "personal_info": personal_info or {},
+            "adapter": adapter or "default_adapter",
+            "notes": "Demo verification (stub)",
+        }
+
+        return {
+            "verified": bool(verified),
+            "match_score": float(match_score),
+            "issuer_response": issuer_response,
+        }
     
     async def health_check(self) -> Dict[str, bool]:
         """Perform health check on all vendors"""

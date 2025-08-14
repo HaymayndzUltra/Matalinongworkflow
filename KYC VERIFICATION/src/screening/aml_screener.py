@@ -14,7 +14,24 @@ from enum import Enum
 from datetime import datetime, date, timedelta
 from pathlib import Path
 import difflib
-from fuzzywuzzy import fuzz, process
+# Optional fuzzywuzzy import (graceful fallback if not installed)
+try:
+    from fuzzywuzzy import fuzz, process  # type: ignore
+    FUZZY_AVAILABLE = True
+except Exception:
+    FUZZY_AVAILABLE = False
+    class _FuzzShim:
+        @staticmethod
+        def token_sort_ratio(a: str, b: str) -> int:
+            import difflib
+            return int(difflib.SequenceMatcher(None, a, b).ratio() * 100)
+        @staticmethod
+        def partial_ratio(a: str, b: str) -> int:
+            import difflib
+            # crude approximation
+            return int(difflib.SequenceMatcher(None, a, b).ratio() * 100)
+    fuzz = _FuzzShim()  # type: ignore
+    process = None  # type: ignore
 import re
 
 # Configure logging
@@ -242,6 +259,58 @@ class AMLScreener:
                 "timeout": 30,
                 "retry_count": 3
             }
+        }
+
+    # Compatibility wrapper expected by API layer
+    def screen(
+        self,
+        full_name: str,
+        birth_date: Optional[str],
+        nationality: Optional[str],
+        additional_info: Optional[Dict[str, Any]],
+        screening_level: str,
+    ) -> Dict[str, Any]:
+        """
+        Screen an individual and return a dict compatible with API expectations.
+        """
+        individual_data = {
+            "name": full_name or "",
+            "date_of_birth": birth_date,
+            "nationality": nationality,
+            "id_numbers": (additional_info or {}).get("id_numbers", {}),
+        }
+        result = self.screen_individual(individual_data)
+        # Map internal result → API dict
+        hits: list[dict[str, Any]] = []
+        for h in result.sanctions_hits:
+            hits.append({
+                "list_name": h.source.value,
+                "match_score": float(h.match_score),
+                "entity_type": "person",
+                "reasons": list(h.reasons or []),
+                "metadata": {
+                    "entity_name": h.entity_name,
+                    "matched_name": h.matched_name,
+                    "risk_level": h.risk_level.value,
+                }
+            })
+        for h in result.pep_hits:
+            hits.append({
+                "list_name": ScreeningType.PEP.value,
+                "match_score": float(h.match_score),
+                "entity_type": "person",
+                "reasons": list(h.reasons or []),
+                "metadata": {
+                    "entity_name": h.entity_name,
+                    "matched_name": h.matched_name,
+                    "risk_level": h.risk_level.value,
+                }
+            })
+        screened_lists = [k for k, v in self.config.get("sources", {}).items() if v.get("enabled", False)]
+        return {
+            "hits": hits,
+            "screened_lists": screened_lists,
+            "vendor": "internal"
         }
     
     def screen_individual(self, individual_data: Dict[str, Any]) -> ScreeningResult:
