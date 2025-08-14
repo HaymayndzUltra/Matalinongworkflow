@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Action Saved</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Action Saved</h1>
+  </header>
+  <main>
+    <p>Case {{ case.get('case_id', '(unknown)') }} updated. Current status: {{ case.get('status') }}</p>
+    <p><a href="/review">Back to Review</a></p>
+  </main>
+</body>
+</html>

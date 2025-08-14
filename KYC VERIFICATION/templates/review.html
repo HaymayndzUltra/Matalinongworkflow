@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Review Queue</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Review Queue</h1>
+    <nav>
+      <a href="/">Home</a>
+    </nav>
+  </header>
+  <main>
+    <table>
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Doc Type</th>
+          <th>Risk</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cid, case in cases.items() %}
+        <tr>
+          <td>{{ cid }}</td>
+          <td>{{ case.get('document_type', '-') }}</td>
+          <td>{{ case.get('risk_score', '-') }}</td>
+          <td>{{ case.get('status', '-') }}</td>
+          <td>
+            <form action="/review/action" method="post" style="display:inline">
+              <input type="hidden" name="case_id" value="{{ cid }}" />
+              <input type="hidden" name="action" value="approved" />
+              <button type="submit">Approve</button>
+            </form>
+            <form action="/review/action" method="post" style="display:inline">
+              <input type="hidden" name="case_id" value="{{ cid }}" />
+              <input type="hidden" name="action" value="denied" />
+              <button type="submit">Deny</button>
+            </form>
+            <form action="/review/action" method="post" style="display:inline">
+              <input type="hidden" name="case_id" value="{{ cid }}" />
+              <input type="hidden" name="action" value="escalated" />
+              <button type="submit">Escalate</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No cases</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+</body>
+</html>
