@@ -1,0 +1,361 @@
+# PRC License Template
+# Version: 1.0.0
+# Last Updated: 2025-01-14
+# Description: Template for Professional Regulation Commission License
+
+document:
+  type: "PRC_LICENSE"
+  name: "PRC Professional License"
+  issuer: "Professional Regulation Commission"
+  country: "PH"
+  version: "2020"
+  
+  dimensions:
+    width: 85.6
+    height: 53.98
+    aspect_ratio: 1.586
+  
+  characteristics:
+    material: "PVC"
+    color_scheme: ["green", "white", "gold"]
+    has_chip: false
+    has_magnetic_strip: false
+    has_barcode: true
+    has_qr_code: true
+    has_mrz: false
+    has_hologram: true
+
+fields:
+  front:
+    # PRC License Number
+    license_number:
+      roi:
+        x: 10
+        y: 15
+        width: 35
+        height: 7
+      format: "XXXXXXX"
+      validation:
+        type: "numeric"
+        length: 7
+      font: "Arial Bold"
+      font_size: 14
+      required: true
+    
+    # Profession
+    profession:
+      roi:
+        x: 10
+        y: 23
+        width: 50
+        height: 6
+      values: [
+        "PHYSICIAN",
+        "NURSE",
+        "ENGINEER",
+        "ARCHITECT",
+        "TEACHER",
+        "ACCOUNTANT",
+        "LAWYER",
+        "DENTIST",
+        "PHARMACIST",
+        "VETERINARIAN"
+      ]
+      font: "Arial Bold"
+      font_size: 13
+      required: true
+    
+    # Full Name
+    last_name:
+      roi:
+        x: 10
+        y: 32
+        width: 50
+        height: 5
+      font: "Arial Bold"
+      font_size: 12
+      required: true
+    
+    first_name:
+      roi:
+        x: 10
+        y: 38
+        width: 50
+        height: 5
+      font: "Arial Bold"
+      font_size: 12
+      required: true
+    
+    middle_name:
+      roi:
+        x: 10
+        y: 44
+        width: 50
+        height: 5
+      font: "Arial"
+      font_size: 11
+      required: false
+    
+    # Registration Date
+    registration_date:
+      roi:
+        x: 10
+        y: 50
+        width: 25
+        height: 5
+      format: "MM/DD/YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Validity Date
+    validity_date:
+      roi:
+        x: 40
+        y: 50
+        width: 25
+        height: 5
+      format: "MM/DD/YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Photo
+    photo:
+      roi:
+        x: 70
+        y: 20
+        width: 23
+        height: 30
+      required: true
+    
+    # Signature
+    signature:
+      roi:
+        x: 10
+        y: 60
+        width: 30
+        height: 10
+      required: true
+    
+    # QR Code
+    qr_code:
+      roi:
+        x: 45
+        y: 56
+        width: 18
+        height: 18
+      encoding: "alphanumeric"
+      error_correction: "M"
+      validation:
+        type: "qr_code"
+        verify_content: true
+      required: true
+    
+    # PRC Seal
+    prc_seal:
+      roi:
+        x: 75
+        y: 55
+        width: 15
+        height: 15
+      type: "embossed"
+      required: true
+  
+  back:
+    # Address
+    address:
+      roi:
+        x: 10
+        y: 10
+        width: 80
+        height: 12
+      font: "Arial"
+      font_size: 9
+      required: true
+    
+    # Date of Birth
+    birth_date:
+      roi:
+        x: 10
+        y: 25
+        width: 25
+        height: 5
+      format: "MM/DD/YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Place of Birth
+    birth_place:
+      roi:
+        x: 40
+        y: 25
+        width: 50
+        height: 5
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # School
+    school:
+      roi:
+        x: 10
+        y: 32
+        width: 80
+        height: 5
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Date Graduated
+    graduation_date:
+      roi:
+        x: 10
+        y: 39
+        width: 25
+        height: 5
+      format: "YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Board Exam Date
+    board_exam_date:
+      roi:
+        x: 40
+        y: 39
+        width: 25
+        height: 5
+      format: "Month YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Board Exam Rating
+    board_rating:
+      roi:
+        x: 70
+        y: 39
+        width: 20
+        height: 5
+      format: "XX.XX%"
+      font: "Arial"
+      font_size: 10
+      required: false
+    
+    # Barcode
+    barcode:
+      roi:
+        x: 10
+        y: 60
+        width: 80
+        height: 12
+      type: "code128"
+      encoding: "alphanumeric"
+      required: true
+    
+    # Specialization (if any)
+    specialization:
+      roi:
+        x: 10
+        y: 46
+        width: 80
+        height: 5
+      font: "Arial"
+      font_size: 10
+      required: false
+
+security_features:
+  hologram:
+    location:
+      x: 85
+      y: 10
+      width: 12
+      height: 15
+    type: "prc_logo"
+    verification_method: "tilt_test"
+  
+  uv_features:
+    - location:
+        x: 0
+        y: 0
+        width: 100
+        height: 100
+      pattern: "prc_watermark"
+      color: "green"
+      wavelength: 365
+  
+  microprinting:
+    - location:
+        x: 5
+        y: 75
+        width: 90
+        height: 1
+      text: "PROFESSIONALREGULATIONCOMMISSION"
+      font_size: 0.4
+  
+  embossed_seal:
+    location:
+      x: 75
+      y: 55
+      width: 15
+      height: 15
+    type: "dry_seal"
+    pattern: "prc_official_seal"
+    verification: "tactile"
+
+validation_rules:
+  license_number_format:
+    length: 7
+    type: "numeric"
+    unique: true
+  
+  validity_period:
+    regular: "3 years"
+    rule: "validity_date = registration_date + 3 years"
+  
+  renewal_window:
+    rule: "Can renew 60 days before expiry"
+  
+  profession_specific:
+    PHYSICIAN:
+      board: "Medicine"
+      cpe_units: 45
+    NURSE:
+      board: "Nursing"
+      cpe_units: 45
+    ENGINEER:
+      board: "Engineering"
+      cpe_units: 45
+      specializations: ["Civil", "Electrical", "Mechanical", "Chemical"]
+    TEACHER:
+      board: "Professional Teachers"
+      cpe_units: 45
+  
+  qr_content_validation:
+    expected_fields:
+      - "license_number"
+      - "full_name"
+      - "profession"
+      - "validity_date"
+      - "verification_url"
+
+ocr_settings:
+  language: "eng"
+  preprocessing:
+    - "deskew"
+    - "denoise"
+    - "contrast_enhancement"
+  engine: "tesseract"
+  oem: 3
+  psm: 3
+
+metadata:
+  created_date: "2025-01-14"
+  version: "1.0.0"
+  supported_versions: ["2015", "2018", "2020"]
+  known_issues:
+    - "QR code may not scan in older licenses"
+    - "Embossed seal may be worn"
+    - "Different professions have different card layouts"

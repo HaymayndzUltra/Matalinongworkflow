@@ -1,0 +1,322 @@
+# Philippine Driver's License Template
+# Version: 1.0.0
+# Last Updated: 2025-01-14
+# Description: Template for Philippine Driver's License issued by LTO
+
+document:
+  type: "DRIVERS_LICENSE"
+  name: "Philippine Driver's License"
+  issuer: "Land Transportation Office (LTO)"
+  country: "PH"
+  version: "5-year"
+  
+  dimensions:
+    width: 85.6
+    height: 53.98
+    aspect_ratio: 1.586
+  
+  characteristics:
+    material: "PVC"
+    color_scheme: ["blue", "white", "red"]
+    has_chip: false
+    has_magnetic_strip: false
+    has_barcode: true
+    has_qr_code: false
+    has_mrz: true
+    has_hologram: true
+
+fields:
+  front:
+    # License Number
+    license_number:
+      roi:
+        x: 10
+        y: 15
+        width: 35
+        height: 7
+      format: "XXX-XX-XXXXXX"
+      validation:
+        type: "regex"
+        pattern: "^[A-Z][0-9]{2}-[0-9]{2}-[0-9]{6}$"
+      font: "OCR-B"
+      font_size: 12
+      required: true
+    
+    # Full Name
+    last_name:
+      roi:
+        x: 10
+        y: 25
+        width: 50
+        height: 5
+      font: "Arial Bold"
+      font_size: 12
+      required: true
+    
+    first_name:
+      roi:
+        x: 10
+        y: 31
+        width: 50
+        height: 5
+      font: "Arial Bold"
+      font_size: 12
+      required: true
+    
+    middle_name:
+      roi:
+        x: 10
+        y: 37
+        width: 50
+        height: 5
+      font: "Arial"
+      font_size: 11
+      required: false
+    
+    # Nationality
+    nationality:
+      roi:
+        x: 10
+        y: 43
+        width: 20
+        height: 5
+      default: "FILIPINO"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Sex
+    sex:
+      roi:
+        x: 35
+        y: 43
+        width: 10
+        height: 5
+      values: ["M", "F"]
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Date of Birth
+    birth_date:
+      roi:
+        x: 50
+        y: 43
+        width: 25
+        height: 5
+      format: "YYYY/MM/DD"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Height & Weight
+    height:
+      roi:
+        x: 10
+        y: 49
+        width: 15
+        height: 5
+      format: "X.XX"
+      unit: "m"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    weight:
+      roi:
+        x: 30
+        y: 49
+        width: 15
+        height: 5
+      format: "XXX"
+      unit: "kg"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Blood Type
+    blood_type:
+      roi:
+        x: 50
+        y: 49
+        width: 10
+        height: 5
+      values: ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+      font: "Arial"
+      font_size: 10
+      required: false
+    
+    # Address
+    address:
+      roi:
+        x: 10
+        y: 55
+        width: 60
+        height: 10
+      font: "Arial"
+      font_size: 9
+      required: true
+    
+    # Photo
+    photo:
+      roi:
+        x: 72
+        y: 20
+        width: 23
+        height: 30
+      required: true
+    
+    # Signature
+    signature:
+      roi:
+        x: 10
+        y: 68
+        width: 30
+        height: 10
+      required: true
+    
+    # Expiry Date
+    expiry_date:
+      roi:
+        x: 45
+        y: 68
+        width: 25
+        height: 5
+      format: "YYYY/MM/DD"
+      font: "Arial Bold"
+      font_size: 11
+      required: true
+  
+  back:
+    # Restrictions
+    restrictions:
+      roi:
+        x: 10
+        y: 10
+        width: 40
+        height: 8
+      values: ["1", "2", "3", "4", "5", "6", "7", "8"]
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Conditions
+    conditions:
+      roi:
+        x: 55
+        y: 10
+        width: 40
+        height: 8
+      values: ["A", "B", "C", "D", "E"]
+      font: "Arial"
+      font_size: 10
+      required: false
+    
+    # Agency Code
+    agency_code:
+      roi:
+        x: 10
+        y: 20
+        width: 20
+        height: 5
+      format: "XXXX"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Date of Issue
+    issue_date:
+      roi:
+        x: 35
+        y: 20
+        width: 25
+        height: 5
+      format: "YYYY/MM/DD"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Barcode
+    barcode:
+      roi:
+        x: 10
+        y: 60
+        width: 80
+        height: 15
+      type: "pdf417"
+      encoding: "binary"
+      required: true
+    
+    # MRZ (Machine Readable Zone)
+    mrz:
+      roi:
+        x: 5
+        y: 80
+        width: 90
+        height: 15
+      lines: 2
+      format: "ICAO9303"
+      font: "OCR-B"
+      font_size: 12
+      required: true
+
+security_features:
+  hologram:
+    location:
+      x: 88
+      y: 10
+      width: 10
+      height: 15
+    type: "lto_logo"
+    verification_method: "tilt_test"
+  
+  uv_features:
+    - location:
+        x: 0
+        y: 0
+        width: 100
+        height: 100
+      pattern: "lto_watermark"
+      color: "blue"
+      wavelength: 365
+  
+  microprinting:
+    - location:
+        x: 5
+        y: 85
+        width: 90
+        height: 1
+      text: "LANDTRANSPORTATIONOFFICE"
+      font_size: 0.5
+
+validation_rules:
+  license_format:
+    rule: "First character must be letter, followed by numbers"
+    pattern: "^[A-Z][0-9]{2}-[0-9]{2}-[0-9]{6}$"
+  
+  expiry_validation:
+    rule: "expiry_date = issue_date + 5 years (birth_month)"
+  
+  restriction_codes:
+    "1": "Motorcycles/Motorized Tricycles"
+    "2": "Vehicle up to 4500 kg GVW"
+    "3": "Vehicle above 4500 kg GVW"
+    "4": "Automatic clutch up to 4500 kg GVW"
+    "5": "Automatic clutch above 4500 kg GVW"
+    "6": "Articulated Vehicle 1600 kg GVW"
+    "7": "Articulated Vehicle 2700 kg GVW"
+    "8": "Articulated Vehicle 3500 kg GVW"
+  
+  mrz_checksums:
+    document_number: true
+    birth_date: true
+    expiry_date: true
+    composite: true
+
+metadata:
+  created_date: "2025-01-14"
+  version: "1.0.0"
+  supported_versions: ["3-year", "5-year"]
+  known_issues:
+    - "MRZ may be missing in older licenses"
+    - "Barcode encoding varies by issuing office"

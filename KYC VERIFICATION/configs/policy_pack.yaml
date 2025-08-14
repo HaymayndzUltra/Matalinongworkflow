@@ -1,0 +1,372 @@
+# KYC Policy Configuration Pack
+# Version: 2024.1.0
+# Last Updated: 2025-01-14
+# Description: Centralized decision thresholds and policy rules
+
+# Policy Metadata
+policy:
+  version: "2024.1.0"
+  effective_date: "2024-01-01"
+  review_date: "2024-07-01"
+  environment: "production"
+  jurisdiction: "PH"  # Philippines
+
+# Risk Score Thresholds
+risk_thresholds:
+  # Overall risk score ranges (0-100)
+  low:
+    min: 0
+    max: 20
+    action: "auto_approve"
+    color: "green"
+  
+  medium:
+    min: 21
+    max: 50
+    action: "manual_review"
+    color: "yellow"
+  
+  high:
+    min: 51
+    max: 80
+    action: "enhanced_review"
+    color: "orange"
+  
+  critical:
+    min: 81
+    max: 100
+    action: "auto_deny"
+    color: "red"
+
+# Decision Rules
+decision_rules:
+  # Auto-approval conditions (ALL must be met)
+  auto_approve:
+    max_risk_score: 20
+    min_confidence: 0.95
+    min_quality_score: 0.90
+    min_face_match_score: 0.85
+    max_verification_attempts: 3
+    required_checks:
+      - document_valid
+      - quality_passed
+      - face_matched
+      - no_aml_hits
+    excluded_countries: []  # Countries that cannot be auto-approved
+    excluded_document_types: []
+  
+  # Auto-denial conditions (ANY triggers denial)
+  auto_deny:
+    min_risk_score: 81
+    max_confidence: 0.30
+    max_quality_score: 0.40
+    max_face_match_score: 0.40
+    min_verification_attempts: 10
+    triggers:
+      - document_tampered
+      - biometric_spoof_detected
+      - sanctions_hit_confirmed
+      - blacklisted_device
+      - velocity_limit_exceeded
+  
+  # Manual review triggers
+  manual_review:
+    risk_score_range: [21, 50]
+    confidence_range: [0.60, 0.94]
+    quality_score_range: [0.70, 0.89]
+    face_match_score_range: [0.60, 0.84]
+    triggers:
+      - new_document_type
+      - unusual_location
+      - device_mismatch
+      - partial_aml_match
+      - missing_security_features
+  
+  # Enhanced review (two-person approval)
+  enhanced_review:
+    risk_score_range: [51, 80]
+    triggers:
+      - high_value_transaction
+      - pep_match
+      - adverse_media_hit
+      - multiple_identities
+      - cross_border_activity
+
+# Verification Thresholds
+verification_thresholds:
+  # Document quality thresholds
+  document_quality:
+    min_resolution: [1000, 800]  # [width, height] in pixels
+    min_dpi: 150
+    max_blur_score: 0.3
+    max_glare_score: 0.3
+    min_contrast: 0.5
+    min_brightness: 0.3
+    max_brightness: 0.9
+  
+  # OCR confidence thresholds
+  ocr_confidence:
+    min_overall: 0.85
+    min_name: 0.90
+    min_id_number: 0.95
+    min_date: 0.85
+    min_address: 0.80
+  
+  # Biometric thresholds
+  biometric:
+    face_detection:
+      min_confidence: 0.90
+      min_face_size: [112, 112]  # pixels
+      max_faces: 1
+    
+    face_matching:
+      min_similarity: 0.85
+      liveness_min_score: 0.90
+      max_yaw: 30  # degrees
+      max_pitch: 30
+      max_roll: 30
+    
+    anti_spoofing:
+      min_confidence: 0.95
+      max_texture_score: 0.3
+      min_depth_score: 0.7
+  
+  # MRZ validation
+  mrz_validation:
+    min_checksum_match: 3  # Number of checksums that must pass
+    allowed_errors: 1  # Maximum character errors allowed
+    date_tolerance_years: 0  # Future date tolerance
+
+# Velocity Limits
+velocity_limits:
+  # Per user limits
+  per_user:
+    max_attempts_per_hour: 5
+    max_attempts_per_day: 10
+    max_documents_per_day: 3
+    max_unique_documents: 5
+    cooldown_minutes: 60
+  
+  # Per device limits
+  per_device:
+    max_users_per_day: 10
+    max_attempts_per_hour: 20
+    max_failed_attempts: 5
+    device_block_hours: 24
+  
+  # Per IP limits
+  per_ip:
+    max_requests_per_minute: 30
+    max_users_per_hour: 50
+    max_failed_per_hour: 20
+    ip_block_hours: 6
+  
+  # Geographic velocity
+  geographic:
+    max_distance_km_per_hour: 1000
+    impossible_distance_km: 5000
+    location_change_cooldown_minutes: 30
+
+# AML/Sanctions Settings
+aml_settings:
+  # Screening thresholds
+  screening:
+    min_name_match_score: 0.85
+    min_fuzzy_match_score: 0.75
+    max_edit_distance: 3
+    check_aliases: true
+    check_transliterations: true
+  
+  # Lists to screen
+  screening_lists:
+    - "OFAC"
+    - "UN"
+    - "EU"
+    - "PH_AMLC"  # Philippines Anti-Money Laundering Council
+    - "PEP"
+    - "ADVERSE_MEDIA"
+  
+  # Auto-clear thresholds
+  auto_clear:
+    max_match_score: 0.60
+    max_hits: 0
+  
+  # Auto-escalate thresholds
+  auto_escalate:
+    min_match_score: 0.90
+    min_hits: 1
+    pep_match: true
+
+# Data Retention Settings
+retention_settings:
+  # Document retention (days)
+  documents:
+    approved: 2555  # 7 years
+    denied: 365     # 1 year
+    abandoned: 90   # 3 months
+  
+  # Biometric retention (days)
+  biometrics:
+    face_image: 90
+    face_encoding: 90
+    liveness_video: 30
+  
+  # Audit retention (days)
+  audit_logs:
+    min_retention: 2555  # 7 years
+    archive_after: 365   # 1 year
+  
+  # Session data (days)
+  session_data:
+    active: 1
+    completed: 30
+    failed: 7
+
+# Security Settings
+security_settings:
+  # Encryption requirements
+  encryption:
+    algorithm: "AES-256-GCM"
+    key_rotation_days: 90
+    pii_fields_encrypted: true
+    biometric_encryption: true
+  
+  # Session security
+  session:
+    timeout_minutes: 30
+    max_idle_minutes: 5
+    require_mfa: false
+    ip_binding: true
+  
+  # API security
+  api:
+    rate_limit_per_minute: 60
+    require_api_key: true
+    require_signature: true
+    allowed_origins:
+      - "https://app.example.com"
+      - "https://kyc.example.com"
+
+# Notification Settings
+notifications:
+  # Email notifications
+  email:
+    enabled: true
+    smtp_server: "smtp.example.com"
+    smtp_port: 587
+    from_address: "kyc@example.com"
+    
+    templates:
+      approval: "templates/email/approval.html"
+      denial: "templates/email/denial.html"
+      review_required: "templates/email/review.html"
+  
+  # SMS notifications
+  sms:
+    enabled: false
+    provider: "twilio"
+    from_number: "+1234567890"
+  
+  # Webhook notifications
+  webhooks:
+    enabled: true
+    endpoints:
+      - url: "https://api.example.com/kyc/webhook"
+        events: ["decision_made", "review_completed"]
+        retry_count: 3
+        timeout_seconds: 30
+
+# Feature Flags
+feature_flags:
+  # Processing features
+  enable_ocr: true
+  enable_mrz: true
+  enable_barcode: true
+  enable_nfc: false
+  
+  # Biometric features
+  enable_face_matching: true
+  enable_liveness_detection: true
+  enable_anti_spoofing: true
+  
+  # Verification features
+  enable_issuer_verification: true
+  enable_aml_screening: true
+  enable_device_intelligence: true
+  
+  # Advanced features
+  enable_ai_risk_scoring: true
+  enable_behavioral_analysis: true
+  enable_cross_reference: true
+  
+  # Experimental features
+  enable_homomorphic_encryption: false
+  enable_zero_knowledge_proofs: false
+  enable_federated_learning: false
+
+# Compliance Settings
+compliance:
+  # GDPR compliance
+  gdpr:
+    enabled: true
+    consent_required: true
+    right_to_erasure: true
+    data_portability: true
+  
+  # Philippines Data Privacy Act
+  ph_dpa:
+    enabled: true
+    npc_registration: "NPC-REG-2024-001"
+    breach_notification_hours: 72
+  
+  # BSP Circular 808
+  bsp_808:
+    enabled: true
+    reporting_required: true
+    audit_frequency_days: 90
+
+# Monitoring and Alerts
+monitoring:
+  # Performance thresholds
+  performance:
+    max_response_time_ms: 3000
+    max_processing_time_ms: 10000
+    min_success_rate: 0.95
+  
+  # Alert thresholds
+  alerts:
+    high_risk_threshold: 70
+    fraud_spike_threshold: 5  # per hour
+    system_error_threshold: 10  # per hour
+    
+  # Metrics to track
+  metrics:
+    - "approval_rate"
+    - "denial_rate"
+    - "review_rate"
+    - "processing_time"
+    - "face_match_accuracy"
+    - "ocr_accuracy"
+    - "false_positive_rate"
+    - "false_negative_rate"
+
+# Environment-specific overrides
+environments:
+  development:
+    risk_thresholds:
+      low:
+        max: 30
+    feature_flags:
+      enable_aml_screening: false
+      enable_issuer_verification: false
+  
+  staging:
+    decision_rules:
+      auto_approve:
+        max_risk_score: 15
+    velocity_limits:
+      per_user:
+        max_attempts_per_day: 20
+  
+  production:
+    # Use default values

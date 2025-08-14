@@ -4,7 +4,7 @@
     "description": "Actionable plan compiled from KYC Identity Verification Manifest (memory-bank/plan/organize.md).",
     "status": "in_progress",
     "created": "2025-08-13T23:00:00+08:00",
-    "updated": "2025-08-14T06:18:37.993864+08:00",
+    "updated": "2025-08-14T08:46:59.433493+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\nExplanations: Establish strict protocol and constraints. Organizer is authoritative and read-only; plan execution uses read-only analyzers and explicit completion commands.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No direct writes to queue/state files; secrets via environment variables with .env.example provided; redact PII by default in logs. Use ISO8601 +08:00 timestamps, deterministic seeds, reproducible builds. Config-driven thresholds only (no magic numbers). Respect monotonic completion. The organizer is authoritative; do not alter memory-bank/plan/organize.md.",
@@ -60,19 +60,19 @@
       },
       {
         "text": "PHASE 13: API SERVICE (FASTAPI)\n\nExplanations: Implement endpoints /validate, /extract, /score, /decide, /issuer/verify, /aml/screen, /audit/export, /compliance/generate, /metrics, /ready, /health with JSON contracts and OpenAPI spec; include examples in codebase.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 13\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Endpoints follow JSON contracts with examples; /metrics exposes orchestrator and pipeline metrics.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 14: AUDIT EXPORT\n\nExplanations: WORM/append-only JSONL bundle + manifest with SHA-256 hash chain; verification script; S3/GCS/local targets; API returns a signed bundle for the given time range.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 14\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Verify tool passes; bundles are tamper-evident and signed; WORM links referenced in decision records.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 15: COMPLIANCE ARTIFACTS\n\nExplanations: Generators for DPIA, ROPA, and retention matrix using templates and code inventory; produce artifacts into ./artifacts/ with complete data flows and minimization map.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 15\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] DPIA.md, ROPA.csv, and retention_matrix.csv are generated and populated.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 16: CONFIGS & ISSUER TEMPLATES (PH)\n\nExplanations: Ship policy_pack.yaml, vendors.yaml, and PH issuer templates (PhilID, UMID, driver’s license, passport, PRC) with ROIs, fonts, tolerances, checksum rules, and security features (incl. UV/hologram zones).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 16\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Centralized thresholds in configs; templates define ROI boxes, fonts, tolerances, security features, and checksums.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 17: DATASETS (SYNTHETIC & RED-TEAM)\n\nExplanations: Provide generator for legit and fraud splits; red-team variants (reprint, screenshot-of-screenshot, font-edit, field-swap, barcode/MRZ mismatch, resample, copy-move, GAN face swap); benchmark via bench_metrics.py and store metrics with timestamps.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 17\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] ≥95% fraud catch on attack set; log FPR/FNR per ID type and overall; timestamps ISO +08:00.",

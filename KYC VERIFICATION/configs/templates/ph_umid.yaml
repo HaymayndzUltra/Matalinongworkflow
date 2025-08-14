@@ -1,0 +1,334 @@
+# UMID (Unified Multi-Purpose ID) Template
+# Version: 1.0.0
+# Last Updated: 2025-01-14
+# Description: Template for UMID card issued by SSS, GSIS, PhilHealth, and Pag-IBIG
+
+document:
+  type: "UMID"
+  name: "Unified Multi-Purpose ID"
+  issuer: "SSS/GSIS/PhilHealth/Pag-IBIG"
+  country: "PH"
+  version: "3.0"
+  
+  dimensions:
+    width: 85.6
+    height: 53.98
+    aspect_ratio: 1.586
+  
+  characteristics:
+    material: "PVC"
+    color_scheme: ["blue", "white", "yellow"]
+    has_chip: true
+    has_magnetic_strip: true
+    has_barcode: true
+    has_qr_code: false
+    has_mrz: false
+    has_hologram: true
+
+fields:
+  front:
+    # Header
+    header_text:
+      roi:
+        x: 10
+        y: 5
+        width: 80
+        height: 8
+      expected_text: "UNIFIED MULTI-PURPOSE ID"
+      font: "Arial Bold"
+      font_size: 12
+    
+    # CRN (Common Reference Number)
+    crn:
+      roi:
+        x: 10
+        y: 15
+        width: 40
+        height: 7
+      field_name: "CRN"
+      format: "XXXX-XXXXXXX-X"
+      validation:
+        type: "regex"
+        pattern: "^[0-9]{4}-[0-9]{7}-[0-9]$"
+        checksum: "mod11"
+      font: "OCR-B"
+      font_size: 12
+      required: true
+    
+    # Full Name
+    full_name:
+      roi:
+        x: 10
+        y: 25
+        width: 60
+        height: 12
+      subfields:
+        last_name:
+          roi:
+            x: 10
+            y: 25
+            width: 60
+            height: 4
+        first_name:
+          roi:
+            x: 10
+            y: 29
+            width: 60
+            height: 4
+        middle_name:
+          roi:
+            x: 10
+            y: 33
+            width: 60
+            height: 4
+      font: "Arial Bold"
+      font_size: 13
+      required: true
+    
+    # Date of Birth
+    birth_date:
+      roi:
+        x: 10
+        y: 40
+        width: 25
+        height: 5
+      format: "MM/DD/YYYY"
+      font: "Arial"
+      font_size: 11
+      required: true
+    
+    # Sex
+    sex:
+      roi:
+        x: 40
+        y: 40
+        width: 15
+        height: 5
+      values: ["M", "F"]
+      font: "Arial"
+      font_size: 11
+      required: true
+    
+    # Photo
+    photo:
+      roi:
+        x: 70
+        y: 18
+        width: 25
+        height: 32
+      required: true
+    
+    # Signature
+    signature:
+      roi:
+        x: 10
+        y: 65
+        width: 35
+        height: 12
+      required: true
+    
+    # Agency Numbers
+    sss_number:
+      roi:
+        x: 10
+        y: 48
+        width: 30
+        height: 5
+      field_name: "SSS"
+      format: "XX-XXXXXXX-X"
+      validation:
+        type: "regex"
+        pattern: "^[0-9]{2}-[0-9]{7}-[0-9]$"
+      font: "Arial"
+      font_size: 10
+      required: false
+    
+    gsis_number:
+      roi:
+        x: 45
+        y: 48
+        width: 30
+        height: 5
+      field_name: "GSIS"
+      format: "XXXXXXXXXXX"
+      validation:
+        type: "numeric"
+        length: 11
+      font: "Arial"
+      font_size: 10
+      required: false
+    
+    philhealth_number:
+      roi:
+        x: 10
+        y: 54
+        width: 30
+        height: 5
+      field_name: "PhilHealth"
+      format: "XX-XXXXXXXXX-X"
+      validation:
+        type: "regex"
+        pattern: "^[0-9]{2}-[0-9]{9}-[0-9]$"
+      font: "Arial"
+      font_size: 10
+      required: false
+    
+    pagibig_number:
+      roi:
+        x: 45
+        y: 54
+        width: 30
+        height: 5
+      field_name: "Pag-IBIG"
+      format: "XXXXXXXXXXXX"
+      validation:
+        type: "numeric"
+        length: 12
+      font: "Arial"
+      font_size: 10
+      required: false
+  
+  back:
+    # Card Serial Number
+    serial_number:
+      roi:
+        x: 10
+        y: 10
+        width: 35
+        height: 5
+      format: "XXXX-XXXX-XXXX"
+      font: "OCR-B"
+      font_size: 10
+      required: true
+    
+    # Issue Date
+    issue_date:
+      roi:
+        x: 10
+        y: 20
+        width: 25
+        height: 5
+      format: "MM/DD/YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Expiry Date
+    expiry_date:
+      roi:
+        x: 40
+        y: 20
+        width: 25
+        height: 5
+      format: "MM/DD/YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Address
+    address:
+      roi:
+        x: 10
+        y: 30
+        width: 80
+        height: 15
+      font: "Arial"
+      font_size: 9
+      required: true
+    
+    # Barcode
+    barcode:
+      roi:
+        x: 10
+        y: 60
+        width: 80
+        height: 15
+      type: "code128"
+      encoding: "alphanumeric"
+      required: true
+    
+    # Magnetic Strip
+    magnetic_strip:
+      roi:
+        x: 0
+        y: 80
+        width: 100
+        height: 10
+      tracks: 3
+      encoding: "ISO7811"
+      required: true
+
+security_features:
+  hologram:
+    location:
+      x: 85
+      y: 5
+      width: 12
+      height: 18
+    type: "philippine_flag"
+    verification_method: "tilt_test"
+  
+  uv_features:
+    - location:
+        x: 0
+        y: 0
+        width: 100
+        height: 100
+      pattern: "umid_logo"
+      color: "yellow"
+      wavelength: 365
+  
+  microprinting:
+    - location:
+        x: 5
+        y: 85
+        width: 90
+        height: 2
+      text: "UNIFIEDMULTIPURPOSEID"
+      font_size: 0.5
+  
+  chip:
+    location:
+      x: 15
+      y: 35
+      width: 8
+      height: 10
+    type: "contact"
+    standard: "ISO7816"
+    data_stored:
+      - "biometric_template"
+      - "personal_info"
+      - "agency_numbers"
+
+validation_rules:
+  crn_checksum:
+    algorithm: "mod11"
+    check_digit_position: 13
+  
+  agency_number_validation:
+    rule: "at_least_one_required"
+    fields: ["sss_number", "gsis_number", "philhealth_number", "pagibig_number"]
+    error: "At least one agency number must be present"
+  
+  date_consistency:
+    - rule: "birth_date < issue_date"
+    - rule: "issue_date < expiry_date"
+    - rule: "expiry_date - issue_date = 5 years"
+
+ocr_settings:
+  language: "eng"
+  preprocessing:
+    - "deskew"
+    - "denoise"
+    - "contrast_enhancement"
+  engine: "tesseract"
+  oem: 3
+  psm: 3
+
+metadata:
+  created_date: "2025-01-14"
+  version: "1.0.0"
+  supported_versions: ["2.0", "3.0"]
+  known_issues:
+    - "Chip may be non-functional in older cards"
+    - "Magnetic strip data may be corrupted"

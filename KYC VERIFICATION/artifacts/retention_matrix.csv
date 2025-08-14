@@ -1,0 +1,17 @@
+Data Category,Data Field,Description,Retention Period (Days),Retention Period (Human),Legal Basis for Retention,Deletion Method,Archive Required,Encryption Required,Special Handling
+Behavioral Data,risk_score,Calculated risk score,2555,7 years,Legal/Tax requirements,Standard deletion,Yes,No,None
+Behavioral Data,verification_attempts,Number and pattern of verification attempts,365,1 year,Business purpose,Standard deletion,Yes,No,None
+Biometric Data,face_encoding,Mathematical representation of facial features,90,3 months,Fraud prevention (limited retention),Secure overwrite (DOD 5220.22-M),No,Yes,Sensitive data; Biometric protection required; Encryption required
+Biometric Data,face_image,Facial image for biometric verification,90,3 months,Fraud prevention (limited retention),Secure overwrite (DOD 5220.22-M),No,Yes,Sensitive data; Biometric protection required; Encryption required
+Contact Data,address,Physical address,2555,7 years,Legal/Tax requirements,Standard deletion,Yes,Yes,Encryption required
+Contact Data,email,Email address,2555,7 years,Legal/Tax requirements,Standard deletion,Yes,No,None
+Contact Data,phone_number,Phone number,2555,7 years,Legal/Tax requirements,Standard deletion,Yes,No,None
+Device/Technical Data,device_id,Unique device identifier,365,1 year,Business purpose,Standard deletion,Yes,No,None
+Device/Technical Data,ip_address,IP address of the device,180,6 months,Business purpose,Standard deletion,No,No,None
+Device/Technical Data,user_agent,Browser/app user agent string,90,3 months,Business purpose,Standard deletion,No,No,None
+Government ID Data,id_number,Government-issued ID number,2555,7 years,Regulatory requirement (AML/KYC),Secure overwrite (DOD 5220.22-M),Yes,Yes,Sensitive data; Encryption required
+Government ID Data,passport_number,Passport number,2555,7 years,Regulatory requirement (AML/KYC),Secure overwrite (DOD 5220.22-M),Yes,Yes,Sensitive data; Encryption required
+Identity Data,birth_date,Date of birth,2555,7 years,Legal/Tax requirements,Standard deletion,Yes,Yes,Encryption required
+Identity Data,full_name,Full legal name of the individual,2555,7 years,Legal/Tax requirements,Standard deletion,Yes,Yes,Encryption required
+Identity Data,nationality,Nationality/Citizenship,2555,7 years,Legal/Tax requirements,Standard deletion,Yes,No,None
+Location Data,gps_coordinates,GPS coordinates,30,1 month,Business purpose,Standard deletion,No,Yes,Encryption required
