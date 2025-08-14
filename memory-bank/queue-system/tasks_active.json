@@ -4,11 +4,11 @@
     "description": "Actionable phases to close bank-grade parity gaps (source: memory-bank/plan/organize.md).",
     "status": "in_progress",
     "created": "2025-08-14T18:36:37+08:00",
-    "updated": "2025-08-14T18:36:37+08:00",
+    "updated": "2025-08-14T20:49:57.219234+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\n- Scope: Close gaps to reach fintech/bank-grade parity after Phase 22.\n- Protocol: No direct writes to queue/state files; use env vars; redact PII in logs; timestamps ISO8601 +08:00; reproducible runs; config-driven thresholds.\n- Tools: Use read-only analyzers before marking done; map actions to a specific phase index.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Enforce SLOs (decision p50<20s, p95<60s) and ≥99.9% availability during work; never hardcode secrets; guard monotonic completion.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 1: PAD (Liveness) ISO 30107-3\n\n**Explanations:**\n- Implement PAD L1/L2 (anti-spoof), passive and/or challenge-response; add metrics (e.g., kyc_liveness_far, kyc_liveness_fnmr); document evaluation and certification evidence.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 1\n```\n\nIMPORTANT NOTE: Face TAR@FAR1% ≥ 0.98; PAD FMR ≤ 1%, FNMR ≤ 3%. Provide certification or equivalent validation evidence and dashboards.",
