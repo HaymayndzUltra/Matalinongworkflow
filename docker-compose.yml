@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  api:
+    api:
     build:
       context: .
       dockerfile: Dockerfile
@@ -13,12 +13,33 @@ services:
     ports:
       - "8000:8000"
     working_dir: "/app/KYC VERIFICATION"
+    command: ["python", "run_api.py"]
     volumes:
       - ./:/app:rw
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://127.0.0.1:8000/ready').read(); print('ok')"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
+    interval: 30s
+    timeout: 5s
+    retries: 3
+    restart: unless-stopped
+    profiles: ["dev"]
+
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kyc_ui
+    environment:
+      - TZ=Asia/Manila
+      - API_BASE=http://api:8000
+      - UI_PORT=8080
+    ports:
+      - "8080:8080"
+    working_dir: "/app/KYC VERIFICATION"
+    command: ["python", "run_ui.py"]
+    volumes:
+      - ./:/app:rw
+    depends_on:
+      - api
     restart: unless-stopped
     profiles: ["dev"]

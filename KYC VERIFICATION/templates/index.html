@@ -1,0 +1,47 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KYC UI</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>KYC Verification UI</h1>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/review">Review Queue</a>
+      <a href="{{ api_base }}/docs" target="_blank">API Docs</a>
+    </nav>
+  </header>
+
+  <main>
+    <section>
+      <h2>Complete Flow</h2>
+      <form action="/run-complete" method="post" enctype="multipart/form-data">
+        <div>
+          <label for="id_image">Document Image</label>
+          <input type="file" id="id_image" name="id_image" accept="image/*" required />
+        </div>
+        <div>
+          <label for="selfie_image">Selfie Image (optional)</label>
+          <input type="file" id="selfie_image" name="selfie_image" accept="image/*" />
+        </div>
+        <div>
+          <label for="document_type">Document Type</label>
+          <select id="document_type" name="document_type">
+            <option value="">Auto</option>
+            <option value="PHILIPPINE_ID">PhilID</option>
+            <option value="UMID">UMID</option>
+            <option value="DRIVERS_LICENSE">Driver's License</option>
+            <option value="PASSPORT">Passport</option>
+            <option value="PRC_LICENSE">PRC</option>
+          </select>
+        </div>
+        <button type="submit">Run Verification</button>
+      </form>
+    </section>
+  </main>
+</body>
+</html>

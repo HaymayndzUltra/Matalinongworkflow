@@ -20,6 +20,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 COPY . /app
 
 EXPOSE 8000
+EXPOSE 8080
 
 CMD ["python3", "-m", "uvicorn", "KYC VERIFICATION.src.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
 
@@ -71,6 +72,7 @@ RUN pip install --upgrade pip && \
 ENV PYTHONPATH="/app/KYC VERIFICATION:${PYTHONPATH}"
 
 EXPOSE 8000
+EXPOSE 8080
 
 # Healthcheck probes FastAPI readiness endpoint
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \

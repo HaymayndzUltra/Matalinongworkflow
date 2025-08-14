@@ -1,166 +1,369 @@
-You are a KYC Fraud-Detection Engineer. Build a production-ready, bank-grade eKYC Fraud ID detection system with tests, configs, datasets, and docs. Deliver a complete repo scaffold that's runnable locally and in Docker.
+# AI eKYC Confidence ≥95% Plan (Executable)
 
-STRICT CONSTRAINTS
-- Do not write to shared state/queue files; provide functions + CLI + API + unit/integration tests.
-- Security: never hardcode secrets; provide .env.example and use env vars; redact PII in logs by default.
-- Timestamps: ISO8601 +08:00. Deterministic seeds for tests; reproducible builds.
-- KPIs/Targets:
-  - Capture pass@1000px ≥ 95%
-  - Doc classifier top-1 ≥ 0.90
-  - Tamper/forensics AUC ≥ 0.90
-  - Face TAR@FAR1% ≥ 0.98
-  - Liveness FMR ≤ 1%, FNMR ≤ 3%
-  - Decision p50<20s p95<60s; Availability ≥ 99.9% under vendor outage sim
-  - False-approve rate ≤ target in policy_pack.yaml
+This plan makes your eKYC pipeline consistently achieve ≥95% combined confidence by: (1) capture quality gating; (2) probability calibration for classification; (3) multi-signal confidence aggregation; (4) policy thresholds; (5) continuous validation. All steps below are executable.
 
-DELIVERABLES (folders/files)
-1) capture_quality.py — glare/blur/orientation; coaching hints; per-frame quality; pass@1000px metric.
-2) doc_classifier.py — multi-ID/country classifier (top-1 ≥0.90). Auto-loads issuer templates.
-3) extract.py — OCR; MRZ (ICAO 9303 checksums); Barcode (PDF417/QR); NFC passport (DG1/DG2 passive auth).
-4) forensics.py — ELA/noise/resample/copy-move detection; ROI heatmaps; texture/FFT checks; font/kerning scoring.
-5) biometrics.py — multi-frame face match (report TAR@FAR1%); passive + challenge liveness.
-6) rules.py — issuer-specific validators (expiry/format/name/DOB logic, checksum per ID type).
-7) device_intel.py — VPN/TOR/proxy; emulator/root/jailbreak; IP/SIM/GPS mismatch; geovelocity; velocity/reuse.
-8) risk_model.py — feature aggregation; rules + ML ensemble; JSON policy thresholds; explainable reasons.
-9) sanctions_aml.py — sanctions/PEP/adverse media; IP/geo controls; explainable hits; multi-vendor via orchestrator.
-10) vendor_orchestrator.py — timeouts/retries/backoff; circuit breakers; PRIMARY→SECONDARY failover; hedged requests; SLAs and cost/latency budgets; Prometheus metrics.
-11) issuer_registry/  (adapters + router)
-    - adapters/: philid_adapter.py, lto_adapter.py, prc_adapter.py, psa_adapter.py, passport_adapter.py
-    - contracts/: request/response pydantic models; availability, rate limits, evidence fields
-    - registry_router.py — routes & aggregates proofs (reference ID, signature/hash, timestamp)
-    - tests/ with simulators and golden JSON
-12) ui_reviewer/ — minimal reviewer console (PII toggle, ELA/noise heatmaps, face-timeline); two-person approval on high-risk; audit links.
-13) api.py — FastAPI service: /validate, /extract, /score, /decide, /issuer/verify, /aml/screen, /audit/export, /compliance/generate, /metrics, /ready, /health. Provide OpenAPI spec.
-14) audit_export.py — WORM/append-only JSONL bundle + manifest with SHA-256 hash chain; verify script; S3/GCS/local targets.
-15) compliance/ — artifact generators:
-    - templates: dpia_template.md.j2, ropa_register.csv.j2, retention_matrix.csv.j2, breach_notif_playbook.md.j2
-    - generators/: generate_dpia.py, generate_ropa.py, generate_retention.py (pulls from configs + code inventory)
-16) configs/
-    - policy_pack.yaml — CDD/EDD tiers; auto-approve/deny rules; review queues; dispute/appeal SOP; reviewer calibration checks
-    - vendors.yaml — vendor priorities, timeouts, retry/backoff, breaker thresholds, cost weights, quotas
-    - issuer_templates/PH/
-        philid.yaml
-        umid.yaml
-        drivers_license.yaml
-        passport.yaml
-        prc.yaml
-      (ROI boxes, fonts, tolerances, checksum rules, security features incl. uv_expected/hologram zones)
-17) datasets/  (synthetic & red-team)
-    - generator/: synth_legit.py, synth_fraud.py (reprint, screenshot-of-screenshot, font-edit, field-swap, barcode/MRZ mismatch, resample, copy-move, GAN face swap)
-    - fixtures/: legit/*, fraud/*
-    - README_dataset.md — consent & usage, bias notes, and splits
-18) scripts/
-    - run_pipeline.py — end-to-end from session JSON to decision JSON
-    - bench_metrics.py — AUC/TAR@FAR1%/FPR per issuer & overall; latency TAT; exporter to CSV
-    - vendor_healthcheck.py — vendor probes; SLA conformance
-    - failover_sim.py — simulate outages/latency; assert continuity & SLOs
-    - generate_artifacts.py — DPIA/ROPA/retention outputs into ./artifacts/
-    - redact_dataset.py — strip PII for sharing
-19) tests/ — pytest unit + integration; contract tests for adapters; red-team regression suite; golden contracts.
-20) docs/
-    - README.md — setup, run, KPIs, dashboards, SLOs, failover patterns, artifact generation, reviewer SOPs
-    - RUNBOOK_oncall.md — incident triage, vendor outage playbook, breach timelines
-    - GOVERNANCE.md — model registry, lineage, canary, sign-off gates, bias/fairness schedule
-21) docker/
-    - Dockerfile (GPU-optional) + docker-compose.yml with healthchecks; /ready & /live; resource limits; tmpfs for PII staging
-22) .env.example — placeholders for vendor keys; local defaults
-23) .pre-commit-config.yaml — black/isort/ruff/mypy; secrets scan; large file guard
-24) Makefile — make dev | test | bench | compose-up | compose-down | generate-artifacts
+---
 
-ACCEPTANCE CRITERIA (must implement)
-- Multi-ID support: PH National ID (PhilID), UMID, Driver’s License, Passport, PRC with working templates under configs/issuer_templates/PH/.
-- Vendor Failover: sustain ≥99.9% availability with failover_sim primary_outage_30pct; decision p95<60s.
-- Circuit Breakers: open on error_rate >5% over 2 min or p95 latency >3× baseline; support half-open recovery; metrics visible in /metrics.
-- Issuer/Registry proofs: when adapter available, include proofs {ref_id, signature/hash, timestamp, adapter_name}.
-- Compliance artifacts: generate_artifacts.py outputs DPIA.md, ROPA.csv, retention_matrix.csv; populated with data flows and minimization map.
-- Audit export: /audit/export returns signed JSONL bundle + manifest; verify tool passes.
-- Policy pack: enforce two-person approval on high-risk; dispute/appeal path; reviewer calibration checks (IRR κ≥0.8 target).
-- Dataset generator: produce legit & fraud splits; red-team variants; benchmark via bench_metrics.py; store metrics with timestamps.
-- Logs: redact PII by default; per-request correlation IDs; WORM links in decisions.
-- Config-driven thresholds: no magic numbers in code; everything tunable in configs.
+## 0) Prerequisites
 
-API SURFACE (JSON contracts; examples included in code)
-- POST /validate  — capture quality report (glare/blur/orientation, coaching)
-- POST /extract   — OCR/MRZ/Barcode/NFC results + ROIs and confidences
-- POST /score     — features → risk_score, flags, reasons
-- POST /decide    — final decision {approve|review|deny}, risk_score, reasons[], audit_refs[], policy_version
-- GET  /issuer/verify?type=PHILID&id=... — {verified, proofs{...}, adapter}
-- POST /aml/screen — multi-vendor sanctions/PEP/adverse media with explainable hits
-- GET  /audit/export?from=...&to=... — signed bundle + manifest
-- POST /compliance/generate — returns DPIA/ROPA/retention artifacts (files)
-- GET  /metrics | /health | /ready
+- Python 3.10+ or Docker. For local dev without GPU:
+```bash
+# Recommended: Docker compose (full deps handled inside container)
+# From project root
+docker compose up -d api ui
+# UI:  http://localhost:8080
+# API: http://localhost:8000/docs
+```
 
-CONFIG SNIPPETS (minimal examples)
-# configs/vendors.yaml
-vendors:
-  - name: vendorA_sanctions
-    type: sanctions
-    priority: 1
-    timeout_ms: 2500
-    retry: {max: 2, backoff: exponential, base_ms: 200}
-    breaker: {error_rate_threshold: 0.05, min_samples: 100, reset_sec: 60}
-    cost_weight: 1.0
-  - name: vendorB_sanctions
-    type: sanctions
-    priority: 2
-    timeout_ms: 3500
-    retry: {max: 1, backoff: linear, base_ms: 300}
-    breaker: {error_rate_threshold: 0.05, min_samples: 100, reset_sec: 60}
-    cost_weight: 0.7
+- Local minimal run (no heavy CV/ML libs):
+```bash
+# API (minimal)
+python3 -m pip install --user fastapi uvicorn pydantic numpy opencv-python pillow scikit-image python-multipart
+API_PORT=8000 python3 "KYC VERIFICATION/run_api.py"
 
-# configs/policy_pack.yaml (excerpt)
-decisions:
-  auto_deny:
-    - mrz_checksum_fail AND barcode_mismatch
-    - device.vpn AND forensics.ela_auc >= 0.9
-  auto_approve:
-    - nfc.passive_auth_ok AND integrity.consistency_ok AND biometrics.tar_far1 >= 0.98
-review_thresholds:
-  risk_score_review_min: 0.20
-  risk_score_deny_min: 0.45
-queues:
-  high_risk: {two_person_approval: true, sla_min: 15}
+# UI
+python3 -m pip install --user jinja2 httpx starlette fastapi uvicorn python-multipart
+API_BASE=http://localhost:8000 UI_PORT=8080 python3 "KYC VERIFICATION/run_ui.py"
+```
 
-# configs/issuer_templates/PH/philid.yaml (excerpt)
-issuer: "PH"
-id_type: "PHILID"
-version: "v1.0"
-dimensions_mm: [85.60, 53.98]
-dpi_expected: 300
-rois:
-  full_name: {bbox_mm: [15.2, 20.5, 50.0, 6.0], font: "Arial-Bold", font_size_pt: 9}
-  philid_number: {bbox_mm: [60.0, 10.0, 20.0, 5.0], checksum: "mod10"}
-security_features:
-  uv_expected: true
-checks:
-  expiry: null
-  barcode: {format: "QR", required: true, data_fields: ["philid_number","full_name","dob"]}
-tolerances:
-  roi_shift_mm: 0.5
-# (Also provide umid.yaml, drivers_license.yaml, passport.yaml, prc.yaml similarly.)
+- Create artifacts folder for models/calibrators:
+```bash
+mkdir -p "KYC VERIFICATION/artifacts" "KYC VERIFICATION/datasets/val"
+```
 
-SCRIPTS & CLI EXAMPLES
-- End-to-end:      python scripts/run_pipeline.py --input sample/session.json
-- Benchmarks:      python scripts/bench_metrics.py --dataset datasets/redteam/
-- Vendor Health:   python scripts/vendor_healthcheck.py --configs configs/vendors.yaml
-- Failover Sim:    python scripts/failover_sim.py --scenario primary_outage_30pct
-- Artifacts:       python scripts/generate_artifacts.py --out ./artifacts/
-- Audit Export:    curl -o export.zip 'http://localhost:8000/audit/export?from=...&to=...'
+---
 
-TESTING REQUIREMENTS
-- pytest unit & integration; contract tests for issuer adapters; circuit breaker state transitions covered.
-- Red-team regression: ensure ≥95% fraud catch rate on attack set; log FPR/FNR per ID type & overall.
-- Bias/fairness: report metrics per demographic bucket (if labels available); document in GOVERNANCE.md.
+## 1) Capture Quality Gating (pass@1000px ≥ 95%)
 
-OPS & METRICS
-- /metrics (Prometheus): vendor latencies, error rates, breaker states, decision TAT, capture pass rate, fraud catch rate, FPR/FNR.
-- SLOs: Decision p50<20s p95<60s; Availability 99.9% under vendor issues; Error budget policy documented.
-- On-call: RUNBOOK_oncall.md with incident flow; breach notification timelines; DR (RPO/RTO) checklist.
+Enforce high capture quality before classification/extraction. This script checks a single image.
+```bash
+cat > "KYC VERIFICATION/scripts/run_quality_gate.py" <<'PY'
+import cv2
+from src.capture.quality_analyzer import CaptureQualityAnalyzer
 
-DOCUMENTATION
-- docs/README.md: setup (venv + Docker), running, configs, KPIs, dashboards, SLOs, failover patterns, reviewer SOPs (CDD/EDD, dispute/appeal), data minimization map & retention.
-- GOVERNANCE.md: model registry, lineage, datasets, canary rollout, approval gate, periodic bias/fairness audits.
+QUALITY_MIN = 0.97
 
-OUTPUTS
-- Complete repo scaffold with code, configs, datasets, tests, docs, Docker setup.
-- Clear TODOs where external vendor/issuer credentials are required. Everything else should run locally with synthetic data.
+def passes_quality(img):
+    qa = CaptureQualityAnalyzer()
+    qm, hints = qa.analyze_frame(img)
+    return qm.overall_score >= QUALITY_MIN, qm, hints
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("Usage: python run_quality_gate.py <image_path>")
+        sys.exit(2)
+    img = cv2.imread(sys.argv[1])
+    ok, qm, hints = passes_quality(img)
+    print({"ok": ok, "overall": qm.overall_score, "blur": qm.blur_score, "glare": qm.glare_score})
+PY
+```
+Run:
+```bash
+python3 "KYC VERIFICATION/scripts/run_quality_gate.py" /path/to/sample_id.jpg
+```
+
+---
+
+## 2) Classifier Probability Calibration (Guo et al., ICML 2017)
+
+Fit a calibrator so document-type probabilities are well-calibrated.
+```bash
+cat > "KYC VERIFICATION/scripts/calibrate_classifier.py" <<'PY'
+import os
+import numpy as np
+from joblib import dump
+from sklearn.linear_model import LogisticRegression
+from sklearn.calibration import CalibratedClassifierCV
+from src.classification.document_classifier import DocumentClassifier
+import cv2
+
+VAL_DIR = os.environ.get("VAL_DIR", "KYC VERIFICATION/datasets/val")
+
+# Expect directory structure: datasets/val/<label>/*.jpg
+# where <label> is one of: PHILIPPINE_ID, UMID, DRIVERS_LICENSE, PASSPORT, PRC_LICENSE
+
+labels_map = {"PHILIPPINE_ID", "UMID", "DRIVERS_LICENSE", "PASSPORT", "PRC_LICENSE"}
+
+def iter_val():
+    for label in labels_map:
+        cls_dir = os.path.join(VAL_DIR, label)
+        if not os.path.isdir(cls_dir):
+            continue
+        for f in os.listdir(cls_dir):
+            if f.lower().endswith((".jpg",".jpeg",".png")):
+                yield os.path.join(cls_dir, f), label
+
+def main():
+    clf = DocumentClassifier()
+    X, y = [], []
+    for pth, true_label in iter_val():
+        img = cv2.imread(pth)
+        res = clf.classify(img)  # res.confidence (top-1), res.document_type.value
+        p = float(res.confidence)
+        p = np.clip(p, 1e-6, 1-1e-6)
+        logit = np.log(p/(1-p))
+        X.append([logit])
+        y.append(int(true_label == str(res.document_type.value)))
+    X = np.array(X); y = np.array(y)
+
+    base = LogisticRegression(max_iter=1000)
+    cal = CalibratedClassifierCV(base_estimator=base, cv=3, method="sigmoid")
+    cal.fit(X, y)
+
+    os.makedirs("KYC VERIFICATION/artifacts", exist_ok=True)
+    dump(cal, "KYC VERIFICATION/artifacts/classifier_calibrator.joblib")
+    print({"saved": "KYC VERIFICATION/artifacts/classifier_calibrator.joblib", "N": len(y)})
+
+if __name__ == "__main__":
+    main()
+PY
+```
+Run:
+```bash
+VAL_DIR="KYC VERIFICATION/datasets/val" python3 "KYC VERIFICATION/scripts/calibrate_classifier.py"
+```
+
+---
+
+## 3) Multi-Signal Confidence Aggregation (Quality + Calibrated Classifier + Authenticity + Consistency)
+
+Train a logistic aggregator on features: [quality_score, p_cls_cal, authenticity_conf, consistency_score].
+```bash
+cat > "KYC VERIFICATION/scripts/train_aggregator.py" <<'PY'
+import os, json
+import numpy as np
+import cv2
+from joblib import load, dump
+from sklearn.linear_model import LogisticRegression
+from src.capture.quality_analyzer import CaptureQualityAnalyzer
+from src.classification.document_classifier import DocumentClassifier
+from src.forensics.authenticity_checker import AuthenticityChecker
+from src.extraction.evidence_extractor import EvidenceExtractor
+
+VAL_DIR = os.environ.get("VAL_DIR", "KYC VERIFICATION/datasets/val")
+META_FILE = os.environ.get("VAL_META", "KYC VERIFICATION/datasets/val_meta.jsonl")
+# val_meta.jsonl rows: {"path": "/img.jpg", "label": 1 for legit, 0 for fraud}
+
+clf_cal = load("KYC VERIFICATION/artifacts/classifier_calibrator.joblib")
+
+def to_logodds(p):
+    p = np.clip(p, 1e-6, 1-1e-6)
+    return np.log(p/(1-p))
+
+def iter_meta():
+    with open(META_FILE, "r", encoding="utf-8") as f:
+        for line in f:
+            o = json.loads(line)
+            yield os.path.join(VAL_DIR, o["path"]) if not o["path"].startswith("/") else o["path"], int(o["label"]) 
+
+def extract_features(img_bgr):
+    qa = CaptureQualityAnalyzer(); qm, _ = qa.analyze_frame(img_bgr)
+    dc = DocumentClassifier(); res = dc.classify(img_bgr)
+    p = float(res.confidence)
+    p = np.clip(p, 1e-6, 1-1e-6)
+    p_cls = clf_cal.predict_proba([[to_logodds(p)]])[0,1]
+    ac = AuthenticityChecker(); auth = ac.check_authenticity(img_bgr)
+    p_auth = float(auth.get("confidence", 0.9))
+    ex = EvidenceExtractor(); exr = ex.extract_all(img_bgr, "auto")
+    consistency = 0.5
+    if exr.mrz_data and exr.barcodes: consistency = 1.0
+    elif exr.mrz_data or exr.barcodes: consistency = 0.8
+    return np.array([qm.overall_score, p_cls, p_auth, consistency], dtype=float)
+
+def main():
+    X, y = [], []
+    for pth, label in iter_meta():
+        img = cv2.imread(pth)
+        X.append(extract_features(img))
+        y.append(label)
+    X = np.vstack(X); y = np.array(y)
+
+    clf = LogisticRegression(max_iter=1000, class_weight="balanced")
+    clf.fit(X, y)
+
+    os.makedirs("KYC VERIFICATION/artifacts", exist_ok=True)
+    dump(clf, "KYC VERIFICATION/artifacts/aggregator_calibrator.joblib")
+    np.save("KYC VERIFICATION/artifacts/agg_features.npy", X)
+    np.save("KYC VERIFICATION/artifacts/agg_labels.npy", y)
+    print({"saved": "KYC VERIFICATION/artifacts/aggregator_calibrator.joblib", "N": int(len(y))})
+
+if __name__ == "__main__":
+    main()
+PY
+```
+Run:
+```bash
+VAL_DIR="KYC VERIFICATION/datasets/val" \
+VAL_META="KYC VERIFICATION/datasets/val_meta.jsonl" \
+python3 "KYC VERIFICATION/scripts/train_aggregator.py"
+```
+
+---
+
+## 4) Runtime Combined Confidence (drop-in function)
+
+Use the trained calibrators to compute final combined confidence p_final.
+```bash
+cat > "KYC VERIFICATION/scripts/combined_confidence.py" <<'PY'
+import numpy as np, cv2
+from pathlib import Path
+from joblib import load
+from src.capture.quality_analyzer import CaptureQualityAnalyzer
+from src.classification.document_classifier import DocumentClassifier
+from src.forensics.authenticity_checker import AuthenticityChecker
+from src.extraction.evidence_extractor import EvidenceExtractor
+
+clf_cal = load("KYC VERIFICATION/artifacts/classifier_calibrator.joblib")
+agg_cal_pth = Path("KYC VERIFICATION/artifacts/aggregator_calibrator.joblib")
+agg_cal = load(agg_cal_pth) if agg_cal_pth.exists() else None
+
+def to_logodds(p):
+    p = np.clip(p, 1e-6, 1-1e-6); return np.log(p/(1-p))
+
+def combined_confidence(image_bgr):
+    qa = CaptureQualityAnalyzer(); qm, _ = qa.analyze_frame(image_bgr)
+    dc = DocumentClassifier(); res = dc.classify(image_bgr)
+    p = float(res.confidence); p = np.clip(p, 1e-6, 1-1e-6)
+    p_cls = clf_cal.predict_proba([[to_logodds(p)]])[0,1]
+    ac = AuthenticityChecker(); auth = ac.check_authenticity(image_bgr)
+    p_auth = float(auth.get("confidence", 0.9))
+    ex = EvidenceExtractor(); exr = ex.extract_all(image_bgr, "auto")
+    consistency = 0.5
+    if exr.mrz_data and exr.barcodes: consistency = 1.0
+    elif exr.mrz_data or exr.barcodes: consistency = 0.8
+    feats = np.array([qm.overall_score, p_cls, p_auth, consistency], dtype=float).reshape(1,-1)
+    if agg_cal is not None:
+        p_final = float(agg_cal.predict_proba(feats)[0,1])
+    else:
+        p_final = float(np.clip((qm.overall_score * p_cls * p_auth * consistency) ** 0.25, 0.0, 1.0))
+    return p_final, {"quality": qm.overall_score, "cls": p_cls, "auth": p_auth, "consistency": consistency}
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("Usage: python combined_confidence.py <image_path>"); raise SystemExit(2)
+    img = cv2.imread(sys.argv[1])
+    p, parts = combined_confidence(img)
+    print({"combined_confidence": p, "parts": parts})
+PY
+```
+Run:
+```bash
+python3 "KYC VERIFICATION/scripts/combined_confidence.py" /path/to/sample_id.jpg
+```
+
+---
+
+## 5) Policy thresholds (no magic numbers)
+
+Configure thresholds in YAML (example):
+```bash
+cat > "KYC VERIFICATION/configs/policy_thresholds.yaml" <<'YAML'
+confidence:
+  min_approve: 0.95
+  min_review: 0.80
+YAML
+```
+Apply these thresholds in the decision engine (code change required in `src/scoring/decision_engine.py` or within `src/api/app.py` when constructing responses). Example logic:
+- if p_final ≥ 0.95 → approve (if other checks clean)
+- else if p_final ≥ 0.80 → review
+- else → deny
+
+---
+
+## 6) Tests and acceptance checks
+
+- Assert ≥95% of legit validation samples produce combined_confidence ≥ 0.95.
+```bash
+cat > "KYC VERIFICATION/tests/test_confidence_calibration.py" <<'PY'
+import numpy as np
+
+def test_combined_confidence_target():
+    p = np.load("KYC VERIFICATION/artifacts/val_combined_conf_legit.npy")
+    assert (p >= 0.95).mean() >= 0.95
+PY
+```
+- Generate the validation distribution (example):
+```bash
+# Example script to save validation confidences
+cat > "KYC VERIFICATION/scripts/eval_combined_conf_val.py" <<'PY'
+import os, json, cv2, numpy as np
+from combined_confidence import combined_confidence
+
+VAL_DIR = os.environ.get("VAL_DIR", "KYC VERIFICATION/datasets/val")
+META_FILE = os.environ.get("VAL_META", "KYC VERIFICATION/datasets/val_meta.jsonl")
+
+conf_legit = []
+with open(META_FILE, "r", encoding="utf-8") as f:
+    for line in f:
+        o = json.loads(line)
+        pth = o["path"] if o["path"].startswith("/") else os.path.join(VAL_DIR, o["path"]) 
+        if o["label"] != 1: # legit only
+            continue
+        img = cv2.imread(pth)
+        p,_ = combined_confidence(img)
+        conf_legit.append(p)
+
+import numpy as np
+np.save("KYC VERIFICATION/artifacts/val_combined_conf_legit.npy", np.array(conf_legit))
+print({"saved": "KYC VERIFICATION/artifacts/val_combined_conf_legit.npy", "N": len(conf_legit)})
+PY
+
+VAL_DIR="KYC VERIFICATION/datasets/val" \
+VAL_META="KYC VERIFICATION/datasets/val_meta.jsonl" \
+python3 "KYC VERIFICATION/scripts/eval_combined_conf_val.py"
+pytest -q "KYC VERIFICATION/tests/test_confidence_calibration.py"
+```
+
+---
+
+## 7) Rolling out (runtime integration)
+
+- Load `classifier_calibrator.joblib` and `aggregator_calibrator.joblib` at API startup, and compute `p_final` in `/validate` or `/complete` before constructing the response. Suggested integration points:
+  - `src/api/app.py` → inside `validate_document` (after quality/classifier/authenticity) OR
+  - inside `complete_kyc_verification` and propagate as `confidence`.
+- Use `policy_thresholds.yaml` in the decision engine.
+
+Rollback-safe: keep old logic behind a feature flag (env var `CONF_AGG_ENABLED=true|false`).
+
+---
+
+## 8) Monitoring & drift
+
+- Export histograms: extend `/metrics` to expose moving average of combined_confidence; alert if median/confidence drops.
+- Schedule monthly calibration: re-run steps (2)-(3) on fresh labeled data.
+
+---
+
+## 9) UI validation
+
+- Start both servers and run a few documents end-to-end:
+```bash
+make run-api
+API_BASE=http://localhost:8000 UI_PORT=8080 make run-ui
+# Open http://localhost:8080, upload ID (and selfie optional), verify decision & confidence
+```
+
+---
+
+## Acceptance Criteria
+
+- Combined confidence p_final on legit validation set: ≥95% of samples have p_final ≥ 0.95
+- API latency budget preserved (added aggregator < 10ms P99).
+- Policy thresholds configurable (no magic numbers).
+- Tests pass and metrics show stability.
+
+---
+
+## Failure modes & mitigations
+
+- Over-confidence due to drift → monthly recalibration, drift alerts, feature flag for rollbacks.
+- Low-quality capture → coaching via UI; enforce `QUALITY_MIN`.
+- Vendor outages → existing vendor orchestrator and circuit breakers; do not block calibration.
+
+---
+
+## References
+- Guo, Chuan, et al. "On Calibration of Modern Neural Networks." ICML 2017.
+- FastAPI & Pydantic docs (for runtime integration of thresholds and models).
