@@ -1,0 +1,7 @@
+{
+  "weights": { "blur": 0.4, "glare": 0.3, "orientation": 0.1, "resolution": 0.2 },
+  "blur": { "target_variance": 400.0, "pass_threshold": 200.0 },
+  "glare": { "white_threshold": 240, "max_fraction": 0.02 },
+  "resolution": { "min_long_side": 1000 },
+  "coaching": { "max_hints": 3 }
+}
