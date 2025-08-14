@@ -15,22 +15,29 @@ import csv
 import time
 from pathlib import Path
 from typing import Dict, List
+from datetime import datetime, timezone, timedelta
+import sys
 
 import cv2
 import numpy as np
+
+# Ensure package root is on sys.path so `src` can be imported when running from repo root
+PKG_ROOT = Path(__file__).resolve().parents[1]  # .../KYC VERIFICATION
+if str(PKG_ROOT) not in sys.path:
+    sys.path.append(str(PKG_ROOT))
 
 from src.forensics.authenticity_verifier import AuthenticityVerifier
 
 
 def list_images(root: Path) -> List[Path]:
-    exts = {".jpg", ".jpeg", ".png", ".bmp"}
+    exts = {".jpg", ".jpeg", ".png", ".bmp", ".ppm"}
     return [p for p in root.rglob("*") if p.suffix.lower() in exts]
 
 
 def assess_dir(verifier: AuthenticityVerifier, path: Path) -> Dict[str, float]:
     images = list_images(path)
     if not images:
-        return {"count": 0, "authentic_ratio": 0.0, "avg_ms": 0.0}
+        return {"count": 0, "authentic_count": 0, "authentic_ratio": 0.0, "avg_ms": 0.0}
 
     authentic = 0
     total_ms = 0.0
@@ -46,6 +53,7 @@ def assess_dir(verifier: AuthenticityVerifier, path: Path) -> Dict[str, float]:
     n = max(1, len(images))
     return {
         "count": len(images),
+        "authentic_count": authentic,
         "authentic_ratio": authentic / n,
         "avg_ms": total_ms / n,
     }
@@ -80,15 +88,95 @@ def main() -> None:
             subsets.append((f"red_team_{name}", sub))
 
     rows: List[List[str]] = []
-    header = ["subset", "count", "authentic_ratio", "avg_ms"]
+    header = ["subset", "id_type", "count", "authentic_ratio", "avg_ms", "fpr", "fnr", "tpr", "timestamp"]
+
+    # Aggregates for overall metrics
+    overall_legit_count = 0
+    overall_legit_fp = 0
+    overall_legit_ms_sum = 0.0
+    overall_fraud_count = 0
+    overall_fraud_fn = 0
+    overall_fraud_ms_sum = 0.0
 
     for label, path in subsets:
         stats = assess_dir(verifier, path)
+        ts = datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
+        count = int(stats["count"])
+        authentic_count = int(stats.get("authentic_count", round(stats["authentic_ratio"] * max(1, count))))
+        pred_fraud = max(0, count - authentic_count)  # predicted tamper
+        id_type = "legit" if label.endswith("legit") else "fraud"
+        # Metrics
+        fpr = (pred_fraud / count) if (id_type == "legit" and count) else 0.0
+        fnr = (authentic_count / count) if (id_type != "legit" and count) else 0.0
+        tpr = (1.0 - fnr) if (id_type != "legit" and count) else ""
+
+        # Aggregates
+        if id_type == "legit":
+            overall_legit_count += count
+            overall_legit_fp += pred_fraud
+            overall_legit_ms_sum += stats["avg_ms"] * count
+        else:
+            overall_fraud_count += count
+            overall_fraud_fn += authentic_count
+            overall_fraud_ms_sum += stats["avg_ms"] * count
+
         rows.append([
             label,
-            str(int(stats["count"])),
+            id_type,
+            str(count),
             f"{stats['authentic_ratio']:.4f}",
             f"{stats['avg_ms']:.2f}",
+            f"{fpr:.4f}",
+            f"{fnr:.4f}" if fnr != 0.0 else "",
+            f"{tpr:.4f}" if isinstance(tpr, float) else "",
+            ts,
+        ])
+
+    # Append overall summaries
+    ts_all = datetime.now(timezone(timedelta(hours=8))).isoformat(timespec="seconds")
+    # Overall legit
+    if overall_legit_count > 0:
+        overall_legit_auth = overall_legit_count - overall_legit_fp
+        rows.append([
+            "overall_legit",
+            "legit",
+            str(overall_legit_count),
+            f"{(overall_legit_auth / overall_legit_count):.4f}",
+            f"{(overall_legit_ms_sum / max(1, overall_legit_count)):.2f}",
+            f"{(overall_legit_fp / overall_legit_count):.4f}",
+            "",
+            "",
+            ts_all,
+        ])
+    # Overall fraud (incl. red-team)
+    if overall_fraud_count > 0:
+        rows.append([
+            "overall_fraud",
+            "fraud",
+            str(overall_fraud_count),
+            f"{(overall_fraud_fn / overall_fraud_count):.4f}",
+            f"{(overall_fraud_ms_sum / max(1, overall_fraud_count)):.2f}",
+            "",
+            f"{(overall_fraud_fn / overall_fraud_count):.4f}",
+            f"{(1.0 - (overall_fraud_fn / overall_fraud_count)):.4f}",
+            ts_all,
+        ])
+    # Overall all
+    total_count = overall_legit_count + overall_fraud_count
+    if total_count > 0:
+        overall_ms = (overall_legit_ms_sum + overall_fraud_ms_sum) / total_count
+        overall_fp = overall_legit_fp
+        overall_fn = overall_fraud_fn
+        rows.append([
+            "overall_all",
+            "mixed",
+            str(total_count),
+            "",
+            f"{overall_ms:.2f}",
+            f"{(overall_fp / overall_legit_count):.4f}" if overall_legit_count else "",
+            f"{(overall_fn / overall_fraud_count):.4f}" if overall_fraud_count else "",
+            "",
+            ts_all,
         ])
 
     with open(out_path, "w", newline="", encoding="utf-8") as f:

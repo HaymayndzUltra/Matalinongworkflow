@@ -1,0 +1,41 @@
+---
+trigger: always_on
+description: Rules-only mapping from organizer.md → tasks_active.json (no scripts)
+globs:
+---
+
+## Canonical Understanding — Organizer → tasks_active.json
+
+### Ground Truth
+- Source: `memory-bank/plan/organize.md` (Background Agent output)
+- Schema: `tasks_active_schema.mdc`
+- Output: Provide JSON content only; the system/operator writes files.
+
+### Phase Construction (Understanding-Based)
+1) Phase 0 is mandatory: `PHASE 0: SETUP & PROTOCOL (READ FIRST)`
+   - Must contain:
+     - `**Explanations:**` global protocol and constraints
+     - Concluding commands block:
+       ```bash
+       python3 todo_manager.py show <TASK_ID>
+       python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>
+       ```
+     - `IMPORTANT NOTE:` with global constraints (no direct writes; env vars; read-only analyzers)
+2) Detect phases using organizer headings `^Phase (\d+): (.+)$`. Preserve exact order and titles.
+3) If headings are absent, derive sequential phases from organizer’s “Implementation/Action/Priority” sections in listed order.
+4) For each phase k:
+   - Start with `PHASE k: <Title>` (title from organizer)
+   - `**Explanations:**` summarizing the organizer’s immediate/week/day/verification lines for that phase
+   - Concluding commands (same two lines as above)
+   - `IMPORTANT NOTE:` capturing constraints, versions, acceptance checks. If absent, synthesize and tag `[SYNTHESIZED FROM ORGANIZER]`.
+
+### Validation Gates (Read-Only, Rules-Level)
+- Phase 0 must be first.
+- Every phase must end with `IMPORTANT NOTE:`.
+- Completion monotonicity enforced (no undone after a done).
+
+### Prohibitions
+- No direct edits to `memory-bank/queue-system/tasks_active.json` by the agent.
+- No silent version/toolchain changes vs organizer.
+- If organizer conflicts are detected, stop and request Background Agent reconciliation.
+

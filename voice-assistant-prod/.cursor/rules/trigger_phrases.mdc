@@ -1,0 +1,25 @@
+## Natural-Language Triggers → Agent Actions
+
+Agents MUST interpret the following phrases (Tagalog/English) anywhere in the user message as intents and immediately execute the mapped action sequence, within the established safety constraints and phase gates.
+
+### Validate Before Execution (Phase Gates)
+- Triggers:
+  - "Validate plan", "Check next phase", "Lint plan", "Show hierarchy <TASK_ID>", "I-validate ang plan", "Suriin ang susunod"
+- Action:
+  - Run the read-only analyzers per `analysis_tools.mdc` and `phase_gates.mdc`:
+    - `python3 plan_next.py` (required)
+    - `python3 plain_hier.py <TASK_ID>` (recommended)
+
+### Execute or Mark Done
+- Triggers:
+  - "Show plan <TASK_ID>", "Show next phase", "Mark phase <k> done for <TASK_ID>", "Execute sub-step", "Tapusin ang phase <k>"
+- Action:
+  - Use `todo_manager.py` per `todo_manager_flow.mdc` and `exec_policy.mdc`:
+    - `python3 todo_manager.py show <TASK_ID>`
+    - `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
+    - `python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>` (when applicable)
+
+### Safety & Enforcement
+- Always enforce IMPORTANT NOTE presence per `imporant_note_enforcement.mdc`.
+- Honor the no-scripts, no-file-writes policy for ingestion/finalization.
+- Respect monotonic completion and sequence order.

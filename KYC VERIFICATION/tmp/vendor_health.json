@@ -1,0 +1,60 @@
+{
+  "timestamp": "2025-08-14T05:03:23.627413Z",
+  "vendors": {
+    "vendor_a": {
+      "name": "Primary Vendor A",
+      "status": "healthy",
+      "available": true,
+      "capabilities": [
+        "ocr",
+        "face_match",
+        "document_verify"
+      ],
+      "metrics": {
+        "total_requests": 0,
+        "success_rate": "100.00%",
+        "average_latency_ms": "0",
+        "p95_latency_ms": "0",
+        "last_success": null,
+        "last_failure": null
+      }
+    },
+    "vendor_b": {
+      "name": "Secondary Vendor B",
+      "status": "healthy",
+      "available": true,
+      "capabilities": [
+        "ocr",
+        "face_match",
+        "liveness",
+        "aml_screen"
+      ],
+      "metrics": {
+        "total_requests": 0,
+        "success_rate": "100.00%",
+        "average_latency_ms": "0",
+        "p95_latency_ms": "0",
+        "last_success": null,
+        "last_failure": null
+      }
+    },
+    "vendor_c": {
+      "name": "Tertiary Vendor C",
+      "status": "healthy",
+      "available": true,
+      "capabilities": [
+        "aml_screen",
+        "address_verify",
+        "phone_verify"
+      ],
+      "metrics": {
+        "total_requests": 0,
+        "success_rate": "100.00%",
+        "average_latency_ms": "0",
+        "p95_latency_ms": "0",
+        "last_success": null,
+        "last_failure": null
+      }
+    }
+  }
+}

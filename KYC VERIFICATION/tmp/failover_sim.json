@@ -1,0 +1,6 @@
+
+✅ Failover simulation done in 52.53s for 30 requests
+Health summary:
+  - vendor_a: status=healthy available=False metrics={'total_requests': 12, 'success_rate': '0.00%', 'average_latency_ms': '36', 'p95_latency_ms': '392', 'last_success': None, 'last_failure': '2025-08-14T13:07:39.119529'}
+  - vendor_b: status=healthy available=False metrics={'total_requests': 12, 'success_rate': '0.00%', 'average_latency_ms': '8', 'p95_latency_ms': '58', 'last_success': None, 'last_failure': '2025-08-14T13:07:33.434762'}
+  - vendor_c: status=healthy available=False metrics={'total_requests': 12, 'success_rate': '0.00%', 'average_latency_ms': '20', 'p95_latency_ms': '197', 'last_success': None, 'last_failure': '2025-08-14T13:07:48.261989'}

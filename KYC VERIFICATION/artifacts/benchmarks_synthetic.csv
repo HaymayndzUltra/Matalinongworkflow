@@ -1,0 +1,6 @@
+subset,id_type,count,authentic_ratio,avg_ms,fpr,fnr,tpr,timestamp
+synthetic_legit,legit,30,0.0000,10700.53,1.0000,,,2025-08-14T11:51:32+08:00
+synthetic_fraud,fraud,30,0.0000,11117.67,0.0000,,1.0000,2025-08-14T11:57:05+08:00
+overall_legit,legit,30,0.0000,10700.53,1.0000,,,2025-08-14T11:57:05+08:00
+overall_fraud,fraud,30,0.0000,11117.67,,0.0000,1.0000,2025-08-14T11:57:05+08:00
+overall_all,mixed,60,,10909.10,1.0000,0.0000,,2025-08-14T11:57:05+08:00

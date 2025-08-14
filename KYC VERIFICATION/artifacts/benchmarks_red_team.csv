@@ -1,0 +1,7 @@
+subset,id_type,count,authentic_ratio,avg_ms,fpr,fnr,tpr,timestamp
+red_team_copy_move,fraud,30,0.0000,1218.09,0.0000,,1.0000,2025-08-14T11:42:21+08:00
+red_team_resample,fraud,30,0.0000,1142.46,0.0000,,1.0000,2025-08-14T11:42:56+08:00
+red_team_screenshot,fraud,30,0.0000,1201.91,0.0000,,1.0000,2025-08-14T11:43:32+08:00
+red_team_font_edit,fraud,30,0.0000,1222.80,0.0000,,1.0000,2025-08-14T11:44:08+08:00
+overall_fraud,fraud,120,0.0000,1196.32,,0.0000,1.0000,2025-08-14T11:44:08+08:00
+overall_all,mixed,120,,1196.32,,0.0000,,2025-08-14T11:44:08+08:00

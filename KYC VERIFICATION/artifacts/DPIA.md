@@ -1,6 +1,6 @@
 # Data Protection Impact Assessment (DPIA)
 
-**Generated:** 2025-08-14T08:01:23.682279+08:00
+**Generated:** 2025-08-14T13:08:23.692246+08:00
 **System:** KYC Identity Verification System
 **Version:** 1.0.0
 
@@ -264,9 +264,9 @@ The system supports the following data subject rights:
 
 ### 8.2 Code Analysis Results
 
-- Files scanned: 29
+- Files scanned: 39
 - PII fields identified: 11
-- API endpoints: 13
+- API endpoints: 18
 
 ## 9. Recommendations
 

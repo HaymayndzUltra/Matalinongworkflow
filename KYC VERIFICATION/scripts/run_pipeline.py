@@ -29,7 +29,7 @@ from src.risk.risk_engine import RiskEngine
 
 
 def list_images(root: Path) -> List[Path]:
-    exts = {".jpg", ".jpeg", ".png", ".bmp"}
+    exts = {".jpg", ".jpeg", ".png", ".bmp", ".ppm"}
     return [p for p in root.rglob("*") if p.suffix.lower() in exts]
 
 
