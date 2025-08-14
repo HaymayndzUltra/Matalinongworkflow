@@ -1,0 +1,31 @@
+{
+  "export_id": "export_900af40c80af",
+  "timestamp": "2025-08-14T07:50:58.711004+08:00",
+  "version": "1.0",
+  "record_count": 5,
+  "sequence_range": {
+    "start": 0,
+    "end": 4
+  },
+  "date_range": {
+    "start": "2025-08-14T07:50:58.708030+08:00",
+    "end": "2025-08-14T07:50:58.709842+08:00"
+  },
+  "file_name": "export_900af40c80af_20250813_235058.jsonl",
+  "file_size": 3152,
+  "file_hash": "0496ba53d221f08e2983708a8188ebc1f6d6984860f17399a394cbedee1b5025",
+  "include_pii": false,
+  "hash_chain": {
+    "algorithm": "SHA-256",
+    "genesis_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+    "final_hash": "4ce07953337bd3f284af745ce5dd871107c9c4985f9eec965f2bc3b1af0dfa3f",
+    "chain_length": 5,
+    "verified": true
+  },
+  "worm_refs": [
+    "worm://1755129058708367/audit_2fb78fa7ab434df9bd451485ea3b0ab8",
+    "worm://1755129058708561/audit_8615ca5f08cd4867925a95e21d2c67fb",
+    "worm://1755129058709358/audit_3ef20fd42f7341bfaa63f1d1e226cd65",
+    "worm://1755129058709866/audit_611c5b9ee4e042e49c5b442ce7e082d2"
+  ]
+}

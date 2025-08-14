@@ -1,0 +1,339 @@
+# Philippine Passport Template
+# Version: 1.0.0
+# Last Updated: 2025-01-14
+# Description: Template for Philippine Passport issued by DFA
+
+document:
+  type: "PASSPORT"
+  name: "Philippine Passport"
+  issuer: "Department of Foreign Affairs (DFA)"
+  country: "PH"
+  version: "e-Passport"
+  
+  dimensions:
+    width: 125
+    height: 88
+    aspect_ratio: 1.42
+  
+  characteristics:
+    material: "paper_polycarbonate"
+    color_scheme: ["maroon", "gold"]
+    has_chip: true
+    has_magnetic_strip: false
+    has_barcode: false
+    has_qr_code: false
+    has_mrz: true
+    has_hologram: true
+
+fields:
+  data_page:
+    # Passport Number
+    passport_number:
+      roi:
+        x: 60
+        y: 10
+        width: 25
+        height: 5
+      format: "PXXXXXXXXX"
+      validation:
+        type: "regex"
+        pattern: "^P[0-9A-Z]{9}$"
+      font: "OCR-B"
+      font_size: 12
+      required: true
+    
+    # Type
+    document_type:
+      roi:
+        x: 10
+        y: 10
+        width: 15
+        height: 5
+      expected: "P"
+      font: "Arial"
+      font_size: 11
+      required: true
+    
+    # Country Code
+    country_code:
+      roi:
+        x: 30
+        y: 10
+        width: 15
+        height: 5
+      expected: "PHL"
+      font: "Arial"
+      font_size: 11
+      required: true
+    
+    # Surname
+    surname:
+      roi:
+        x: 10
+        y: 18
+        width: 50
+        height: 5
+      font: "Arial Bold"
+      font_size: 12
+      required: true
+    
+    # Given Names
+    given_names:
+      roi:
+        x: 10
+        y: 24
+        width: 50
+        height: 5
+      font: "Arial Bold"
+      font_size: 12
+      required: true
+    
+    # Middle Name
+    middle_name:
+      roi:
+        x: 10
+        y: 30
+        width: 50
+        height: 5
+      font: "Arial"
+      font_size: 11
+      required: false
+    
+    # Nationality
+    nationality:
+      roi:
+        x: 10
+        y: 36
+        width: 25
+        height: 5
+      expected: "FILIPINO"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Date of Birth
+    birth_date:
+      roi:
+        x: 10
+        y: 42
+        width: 25
+        height: 5
+      format: "DD MMM YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Sex
+    sex:
+      roi:
+        x: 40
+        y: 42
+        width: 10
+        height: 5
+      values: ["M", "F"]
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Place of Birth
+    birth_place:
+      roi:
+        x: 10
+        y: 48
+        width: 50
+        height: 5
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Date of Issue
+    issue_date:
+      roi:
+        x: 10
+        y: 54
+        width: 25
+        height: 5
+      format: "DD MMM YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Date of Expiry
+    expiry_date:
+      roi:
+        x: 40
+        y: 54
+        width: 25
+        height: 5
+      format: "DD MMM YYYY"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Authority
+    issuing_authority:
+      roi:
+        x: 10
+        y: 60
+        width: 50
+        height: 5
+      expected_contains: "DFA"
+      font: "Arial"
+      font_size: 10
+      required: true
+    
+    # Photo
+    photo:
+      roi:
+        x: 65
+        y: 20
+        width: 30
+        height: 40
+      required: true
+    
+    # Signature
+    signature:
+      roi:
+        x: 10
+        y: 66
+        width: 35
+        height: 10
+      required: true
+    
+    # MRZ Lines
+    mrz_line1:
+      roi:
+        x: 5
+        y: 78
+        width: 90
+        height: 6
+      format: "P<PHLSURNAME<<GIVEN<NAMES<<<<<<<<<<<<<<<<<<<"
+      length: 44
+      font: "OCR-B"
+      font_size: 12
+      required: true
+    
+    mrz_line2:
+      roi:
+        x: 5
+        y: 84
+        width: 90
+        height: 6
+      format: "PXXXXXXXXX<PHL9999999M9999999<<<<<<<<<<<<<<<2"
+      length: 44
+      font: "OCR-B"
+      font_size: 12
+      required: true
+
+security_features:
+  chip:
+    location:
+      x: 50
+      y: 90
+      width: 8
+      height: 8
+    type: "contactless"
+    standard: "ICAO9303"
+    data_stored:
+      - "biometric_data"
+      - "personal_info"
+      - "digital_signature"
+      - "photo"
+  
+  hologram:
+    location:
+      x: 85
+      y: 15
+      width: 12
+      height: 18
+    type: "philippine_eagle"
+    layers: 3
+    verification_method: "tilt_test"
+  
+  uv_features:
+    - location:
+        x: 0
+        y: 0
+        width: 100
+        height: 100
+      pattern: "philippine_map"
+      color: "yellow"
+      wavelength: 365
+    
+    - location:
+        x: 50
+        y: 40
+        width: 20
+        height: 20
+      pattern: "dfa_seal"
+      color: "blue"
+      wavelength: 365
+  
+  watermark:
+    location:
+      x: 25
+      y: 25
+      width: 50
+      height: 50
+    pattern: "philippine_flag"
+    visibility: "backlight"
+  
+  security_thread:
+    location:
+      x: 30
+      y: 0
+      width: 2
+      height: 100
+    type: "embedded"
+    text: "PILIPINAS"
+    color_shift: true
+
+validation_rules:
+  mrz_validation:
+    format: "ICAO9303"
+    checksums:
+      - field: "passport_number"
+        position: [10, 19]
+      - field: "birth_date"
+        position: [20, 26]
+      - field: "expiry_date"
+        position: [27, 33]
+      - field: "composite"
+        position: [44]
+  
+  passport_number_format:
+    pattern: "^P[0-9]{7}[A-Z]{2}$|^P[A-Z]{1}[0-9]{7}[A-Z]{1}$"
+    variants:
+      - "Regular: P + 7 digits + 2 letters"
+      - "Diplomatic: P + letter + 7 digits + letter"
+  
+  validity_period:
+    regular: "10 years"
+    minor: "5 years"
+    rule: "if age < 18 then validity = 5 else validity = 10"
+  
+  date_consistency:
+    - rule: "birth_date < issue_date"
+    - rule: "issue_date < expiry_date"
+
+ocr_settings:
+  language: "eng"
+  preprocessing:
+    - "perspective_correction"
+    - "deskew"
+    - "denoise"
+  engine: "tesseract"
+  oem: 3
+  psm: 11  # Sparse text
+  mrz_specific:
+    font: "OCR-B"
+    char_whitelist: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<"
+
+metadata:
+  created_date: "2025-01-14"
+  version: "1.0.0"
+  supported_versions: ["e-Passport", "Machine Readable Passport"]
+  known_issues:
+    - "Chip may be damaged or non-readable"
+    - "MRZ may be faded in older passports"
+    - "Photo page lamination may cause glare"

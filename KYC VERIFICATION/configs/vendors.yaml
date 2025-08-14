@@ -1,0 +1,447 @@
+# Vendor Configuration
+# Version: 1.0.0
+# Last Updated: 2025-01-14
+# Description: Third-party vendor configurations for KYC services
+
+# Vendor Registry
+vendors:
+  # OCR Service Providers
+  ocr_providers:
+    tesseract:
+      type: "local"
+      enabled: true
+      priority: 1
+      settings:
+        language: "eng+fil"  # English + Filipino
+        oem: 3  # OCR Engine Mode
+        psm: 3  # Page Segmentation Mode
+        dpi: 300
+        timeout_seconds: 10
+      
+    google_vision:
+      type: "cloud"
+      enabled: false
+      priority: 2
+      settings:
+        api_key: "${GOOGLE_VISION_API_KEY}"
+        endpoint: "https://vision.googleapis.com/v1"
+        features:
+          - "TEXT_DETECTION"
+          - "DOCUMENT_TEXT_DETECTION"
+        timeout_seconds: 30
+        retry_count: 3
+        cost_per_request: 0.0015
+    
+    aws_textract:
+      type: "cloud"
+      enabled: false
+      priority: 3
+      settings:
+        access_key_id: "${AWS_ACCESS_KEY_ID}"
+        secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
+        region: "ap-southeast-1"  # Singapore
+        timeout_seconds: 30
+        retry_count: 3
+        cost_per_request: 0.0015
+
+  # Face Recognition Providers
+  face_recognition_providers:
+    deepface:
+      type: "local"
+      enabled: true
+      priority: 1
+      settings:
+        model: "Facenet512"
+        detector: "mtcnn"
+        distance_metric: "cosine"
+        enforce_detection: true
+        timeout_seconds: 15
+    
+    face_plusplus:
+      type: "cloud"
+      enabled: false
+      priority: 2
+      settings:
+        api_key: "${FACE_PLUSPLUS_API_KEY}"
+        api_secret: "${FACE_PLUSPLUS_API_SECRET}"
+        endpoint: "https://api-us.faceplusplus.com/facepp/v3"
+        features:
+          - "face_detect"
+          - "face_compare"
+          - "face_search"
+        timeout_seconds: 30
+        retry_count: 3
+        cost_per_request: 0.001
+    
+    aws_rekognition:
+      type: "cloud"
+      enabled: false
+      priority: 3
+      settings:
+        access_key_id: "${AWS_ACCESS_KEY_ID}"
+        secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
+        region: "ap-southeast-1"
+        collection_id: "kyc_faces"
+        timeout_seconds: 30
+        retry_count: 3
+        cost_per_request: 0.001
+
+  # Liveness Detection Providers
+  liveness_providers:
+    local_liveness:
+      type: "local"
+      enabled: true
+      priority: 1
+      settings:
+        min_frames: 30
+        challenge_types:
+          - "blink"
+          - "smile"
+          - "turn_head"
+        timeout_seconds: 60
+    
+    iproov:
+      type: "cloud"
+      enabled: false
+      priority: 2
+      settings:
+        api_key: "${IPROOV_API_KEY}"
+        api_secret: "${IPROOV_API_SECRET}"
+        base_url: "https://api.iproov.com/v2"
+        assurance_type: "genuine_presence"
+        timeout_seconds: 60
+        retry_count: 2
+        cost_per_request: 0.50
+    
+    bioid:
+      type: "cloud"
+      enabled: false
+      priority: 3
+      settings:
+        app_id: "${BIOID_APP_ID}"
+        app_secret: "${BIOID_APP_SECRET}"
+        endpoint: "https://bws.bioid.com/extension/livedetection"
+        timeout_seconds: 45
+        retry_count: 2
+        cost_per_request: 0.30
+
+  # AML/Sanctions Screening Providers
+  aml_providers:
+    local_screening:
+      type: "local"
+      enabled: true
+      priority: 1
+      settings:
+        database_path: "./data/sanctions_lists"
+        update_frequency_days: 7
+        fuzzy_matching: true
+        threshold: 0.85
+    
+    comply_advantage:
+      type: "cloud"
+      enabled: false
+      priority: 2
+      settings:
+        api_key: "${COMPLY_ADVANTAGE_API_KEY}"
+        base_url: "https://api.complyadvantage.com"
+        search_filters:
+          - "sanction"
+          - "pep"
+          - "adverse_media"
+        fuzziness: 0.8
+        timeout_seconds: 30
+        retry_count: 3
+        cost_per_search: 0.25
+    
+    trulioo:
+      type: "cloud"
+      enabled: false
+      priority: 3
+      settings:
+        username: "${TRULIOO_USERNAME}"
+        password: "${TRULIOO_PASSWORD}"
+        base_url: "https://api.globaldatacompany.com"
+        timeout_seconds: 45
+        retry_count: 3
+        cost_per_search: 0.35
+
+  # Philippine Government Verification
+  ph_government_apis:
+    philsys:
+      type: "government"
+      enabled: false
+      priority: 1
+      provider: "Philippine Statistics Authority"
+      settings:
+        api_key: "${PHILSYS_API_KEY}"
+        base_url: "https://api.philsys.gov.ph/v1"
+        endpoints:
+          verify: "/verify/national-id"
+          status: "/status"
+        timeout_seconds: 60
+        retry_count: 3
+        rate_limit_per_minute: 60
+    
+    lto:
+      type: "government"
+      enabled: false
+      priority: 2
+      provider: "Land Transportation Office"
+      settings:
+        api_key: "${LTO_API_KEY}"
+        base_url: "https://api.lto.gov.ph/v1"
+        endpoints:
+          verify: "/verify/license"
+          status: "/status"
+        timeout_seconds: 45
+        retry_count: 3
+    
+    dfa:
+      type: "government"
+      enabled: false
+      priority: 3
+      provider: "Department of Foreign Affairs"
+      settings:
+        api_key: "${DFA_API_KEY}"
+        base_url: "https://api.dfa.gov.ph/v1"
+        endpoints:
+          verify: "/verify/passport"
+          status: "/status"
+        timeout_seconds: 45
+        retry_count: 3
+    
+    prc:
+      type: "government"
+      enabled: false
+      priority: 4
+      provider: "Professional Regulation Commission"
+      settings:
+        api_key: "${PRC_API_KEY}"
+        base_url: "https://api.prc.gov.ph/v1"
+        endpoints:
+          verify: "/verify/license"
+          status: "/status"
+        timeout_seconds: 45
+        retry_count: 3
+
+  # Device Intelligence Providers
+  device_intelligence_providers:
+    local_fingerprint:
+      type: "local"
+      enabled: true
+      priority: 1
+      settings:
+        collect_features:
+          - "user_agent"
+          - "screen_resolution"
+          - "timezone"
+          - "language"
+          - "platform"
+        hash_algorithm: "sha256"
+    
+    sift:
+      type: "cloud"
+      enabled: false
+      priority: 2
+      settings:
+        api_key: "${SIFT_API_KEY}"
+        account_id: "${SIFT_ACCOUNT_ID}"
+        base_url: "https://api.sift.com"
+        javascript_key: "${SIFT_JS_KEY}"
+        timeout_seconds: 30
+        retry_count: 3
+        cost_per_request: 0.005
+    
+    maxmind:
+      type: "cloud"
+      enabled: false
+      priority: 3
+      settings:
+        account_id: "${MAXMIND_ACCOUNT_ID}"
+        license_key: "${MAXMIND_LICENSE_KEY}"
+        base_url: "https://minfraud.maxmind.com/minfraud/v2.0"
+        services:
+          - "insights"
+          - "factors"
+        timeout_seconds: 30
+        retry_count: 3
+        cost_per_request: 0.005
+
+  # Storage Providers
+  storage_providers:
+    local:
+      type: "local"
+      enabled: true
+      priority: 1
+      settings:
+        base_path: "./storage"
+        max_file_size_mb: 10
+        allowed_extensions:
+          - ".jpg"
+          - ".jpeg"
+          - ".png"
+          - ".pdf"
+    
+    aws_s3:
+      type: "cloud"
+      enabled: false
+      priority: 2
+      settings:
+        access_key_id: "${AWS_ACCESS_KEY_ID}"
+        secret_access_key: "${AWS_SECRET_ACCESS_KEY}"
+        bucket_name: "${S3_BUCKET_NAME}"
+        region: "ap-southeast-1"
+        storage_class: "STANDARD_IA"
+        encryption: "AES256"
+        lifecycle_rules:
+          transition_to_glacier_days: 90
+          expiration_days: 2555
+    
+    google_cloud_storage:
+      type: "cloud"
+      enabled: false
+      priority: 3
+      settings:
+        project_id: "${GCP_PROJECT_ID}"
+        credentials_path: "${GCP_CREDENTIALS_PATH}"
+        bucket_name: "${GCS_BUCKET_NAME}"
+        location: "asia-southeast1"
+        storage_class: "NEARLINE"
+    
+    azure_blob:
+      type: "cloud"
+      enabled: false
+      priority: 4
+      settings:
+        account_name: "${AZURE_ACCOUNT_NAME}"
+        account_key: "${AZURE_ACCOUNT_KEY}"
+        container_name: "${AZURE_CONTAINER_NAME}"
+        tier: "cool"
+
+# Orchestration Settings
+orchestration:
+  # Failover configuration
+  failover:
+    enabled: true
+    strategy: "priority"  # priority, round_robin, weighted
+    health_check_interval_seconds: 60
+    circuit_breaker:
+      enabled: true
+      failure_threshold: 5
+      recovery_timeout_seconds: 60
+      half_open_requests: 3
+  
+  # Retry configuration
+  retry:
+    max_attempts: 3
+    backoff_strategy: "exponential"  # linear, exponential, fibonacci
+    initial_delay_ms: 1000
+    max_delay_ms: 30000
+    jitter: true
+  
+  # Timeout configuration
+  timeouts:
+    default_seconds: 30
+    connect_seconds: 10
+    read_seconds: 30
+    write_seconds: 30
+  
+  # Rate limiting
+  rate_limiting:
+    enabled: true
+    default_limit_per_minute: 100
+    burst_size: 20
+  
+  # Cost optimization
+  cost_optimization:
+    enabled: true
+    daily_budget_usd: 100
+    alert_threshold_percent: 80
+    prefer_local_when_possible: true
+
+# Vendor Health Monitoring
+health_monitoring:
+  # Health check endpoints
+  health_checks:
+    enabled: true
+    interval_seconds: 60
+    timeout_seconds: 10
+    consecutive_failures_for_unhealthy: 3
+    consecutive_successes_for_healthy: 2
+  
+  # Metrics to track
+  metrics:
+    - "response_time"
+    - "error_rate"
+    - "success_rate"
+    - "cost_per_day"
+    - "requests_per_minute"
+  
+  # Alerting
+  alerts:
+    enabled: true
+    channels:
+      - type: "email"
+        recipients:
+          - "ops@example.com"
+      - type: "slack"
+        webhook_url: "${SLACK_WEBHOOK_URL}"
+    
+    thresholds:
+      error_rate_percent: 5
+      response_time_ms: 5000
+      availability_percent: 99.9
+
+# Vendor Credentials Management
+credentials:
+  # Credential storage
+  storage:
+    type: "environment"  # environment, vault, kms
+    vault_address: "${VAULT_ADDR}"
+    vault_token: "${VAULT_TOKEN}"
+    kms_key_id: "${KMS_KEY_ID}"
+  
+  # Rotation policy
+  rotation:
+    enabled: true
+    frequency_days: 90
+    notify_before_days: 7
+
+# Vendor Audit Settings
+audit:
+  # Audit logging
+  logging:
+    enabled: true
+    log_requests: true
+    log_responses: false  # PII consideration
+    redact_sensitive_data: true
+    retention_days: 90
+  
+  # Performance tracking
+  performance:
+    track_latency: true
+    track_cost: true
+    track_accuracy: true
+    report_frequency: "daily"
+
+# Vendor-specific SLAs
+slas:
+  ocr:
+    availability: 99.9
+    response_time_p95_ms: 2000
+    accuracy_percent: 95
+  
+  face_matching:
+    availability: 99.9
+    response_time_p95_ms: 3000
+    accuracy_percent: 98
+  
+  aml_screening:
+    availability: 99.9
+    response_time_p95_ms: 5000
+    false_positive_rate: 5
+  
+  government_verification:
+    availability: 95.0  # Government APIs typically have lower SLAs
+    response_time_p95_ms: 10000
+    success_rate: 90
