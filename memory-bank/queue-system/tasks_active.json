@@ -2,9 +2,9 @@
   {
     "id": "kyc_bank_grade_parity_actionable_20250814",
     "description": "Actionable phases to close bank-grade parity gaps (source: memory-bank/plan/organize.md).",
-    "status": "in_progress",
+    "status": "completed",
     "created": "2025-08-14T18:36:37+08:00",
-    "updated": "2025-08-14T21:58:25.102311+08:00",
+    "updated": "2025-08-14T22:08:53.979436+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\n- Scope: Close gaps to reach fintech/bank-grade parity after Phase 22.\n- Protocol: No direct writes to queue/state files; use env vars; redact PII in logs; timestamps ISO8601 +08:00; reproducible runs; config-driven thresholds.\n- Tools: Use read-only analyzers before marking done; map actions to a specific phase index.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Enforce SLOs (decision p50<20s, p95<60s) and ≥99.9% availability during work; never hardcode secrets; guard monotonic completion.",
@@ -56,23 +56,23 @@
       },
       {
         "text": "PHASE 12: Compliance Mapping (BSP/AMLC/PDPA) & SMR Hooks\n\n**Explanations:**\n- Create a control matrix mapping implemented controls to regulations; implement SMR/SAR submission hooks; schedule KYC refresh by risk rating with evidence and metrics.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 12\n```\n\nIMPORTANT NOTE: Controls auditable with owners; cadence scheduled; privacy and regulatory artifacts updated.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 13: API Contract Versioning & CI Gates\n\n**Explanations:**\n- Version the API; schema diff checks; deprecation policy with timelines; contract tests and compatibility checks in CI/CD to prevent breaking clients.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 13\n```\n\nIMPORTANT NOTE: Backward compatibility honored; publish deprecation windows; no breaking changes without a major version and migration doc.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 14: Data Quality & Test Matrices\n\n**Explanations:**\n- Golden tests per issuer/template; PAD/NFC/adapter integration tests; fairness regression suites; extend scripts/bench_metrics.py to store FPR/FNR/TAR with +08:00 timestamps.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 14\n```\n\nIMPORTANT NOTE: Deterministic seeds for reproducibility; track per-ID-type and overall metrics; store artifacts for audit.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 15: Operational UX (Rate-limits, Idempotency, Quotas)\n\n**Explanations:**\n- Add gateway/API rate-limits, per-tenant quotas, idempotency keys, retry/hedging policies; expose related metrics and error budgets by tenant.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 15\n```\n\nIMPORTANT NOTE: Prevent abuse without breaching SLOs; all limits/configs centrally tunable and observable.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 16: Build Hygiene & Supply-chain Security\n\n**Explanations:**\n- SBOM generation (Syft), image scanning (Trivy), signing (Sigstore), provenance attestations; fix Docker path issue (`--app-dir \"KYC VERIFICATION\"` or rename directory) to ensure reliable runtime.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 16\n```\n\nIMPORTANT NOTE: CI must fail on critical vulnerabilities; publish SBOM with releases; maintain reproducible builds.",
-        "done": false
+        "done": true
       }
     ]
   }
