@@ -38,3 +38,10 @@ Session-wide switch to enable/disable ALL `.cursor/rules/*` (this file excluded)
 - Evaluate triggers each turn with the guards above; apply last-occurrence precedence.
 - This file has highest precedence over all other `.cursor/rules/*` files.
 - Platform/system/developer safety policies remain in force at all times and cannot be disabled.
+
+### Coupled (Mutual-Exclusion) Toggles
+- To avoid conflicts when switching environments (Cursor vs Windsurf), honor cross-environment tokens and enforce exclusivity using last-occurrence precedence:
+  - If the latest USER message contains `[windsurf-rules:on]`, treat this ruleset as disabled for the turn (equivalent to `[cursor-rules:off]`).
+  - If the latest USER message contains `[cursor-rules:on]`, treat this ruleset as enabled and assume Windsurf rules are disabled.
+  - Also recognize Windsurf tokens for convenience: `[windsurf-rules:on]`, `[windsurf-rules:off]`.
+  - Precedence note: If both `[cursor-rules:on]` and `[windsurf-rules:on]` appear, the right‑most token wins.
