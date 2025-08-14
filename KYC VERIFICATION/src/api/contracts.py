@@ -127,7 +127,7 @@ class ExtractRequest(BaseModel):
 
 class ExtractedData(BaseModel):
     """Extracted document data"""
-    ocr_text: Dict[str, str] = Field(..., description="OCR extracted fields")
+    ocr_text: Dict[str, Any] = Field(..., description="OCR extracted fields")
     mrz_data: Optional[Dict[str, Any]] = Field(None, description="MRZ parsed data")
     barcode_data: Optional[Dict[str, Any]] = Field(None, description="Barcode parsed data")
     face_image: Optional[str] = Field(None, description="Base64 encoded face crop")

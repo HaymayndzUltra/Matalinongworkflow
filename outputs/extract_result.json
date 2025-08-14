@@ -1,0 +1,1 @@
+{"success":true,"document_type":"DRIVERS_LICENSE","extracted_data":{"ocr_text":{"full_text":"","total_words":"0","avg_confidence":"0"},"mrz_data":null,"barcode_data":null,"face_image":null,"face_bbox":[258,203,296,296],"confidence_scores":{}},"metadata":{"processing_time_ms":731,"ocr_engine":"tesseract","extraction_timestamp":"2025-08-14T19:26:02.180965+08:00"}}

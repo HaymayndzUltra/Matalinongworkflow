@@ -1,101 +1,77 @@
 [
   {
-    "id": "kyc_identity_verification_manifest_actionable_20250813",
-    "description": "Actionable plan compiled from KYC Identity Verification Manifest (memory-bank/plan/organize.md).",
+    "id": "kyc_bank_grade_parity_actionable_20250814",
+    "description": "Actionable phases to close bank-grade parity gaps (source: memory-bank/plan/organize.md).",
     "status": "in_progress",
-    "created": "2025-08-13T23:00:00+08:00",
-    "updated": "2025-08-14T04:00:13.285933+08:00",
+    "created": "2025-08-14T18:36:37+08:00",
+    "updated": "2025-08-14T18:36:37+08:00",
     "todos": [
       {
-        "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\nExplanations: Establish strict protocol and constraints. Organizer is authoritative and read-only; plan execution uses read-only analyzers and explicit completion commands.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No direct writes to queue/state files; secrets via environment variables with .env.example provided; redact PII by default in logs. Use ISO8601 +08:00 timestamps, deterministic seeds, reproducible builds. Config-driven thresholds only (no magic numbers). Respect monotonic completion. The organizer is authoritative; do not alter memory-bank/plan/organize.md.",
-        "done": true
-      },
-      {
-        "text": "PHASE 1: CAPTURE QUALITY & COACHING\n\nExplanations: Implement glare/blur/orientation checks, per-frame quality scoring, coaching hints, and pass@1000px metric for capture validation.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 1\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Capture pass@1000px ≥ 95%; auto-correct orientation; quality scores ∈ [0,1].",
-        "done": true
-      },
-      {
-        "text": "PHASE 2: DOCUMENT CLASSIFICATION\n\nExplanations: Multi-ID/country classifier that auto-loads issuer templates and returns confidences for supported PH IDs (PhilID, UMID, Driver’s License, Passport, PRC).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 2\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Top-1 accuracy ≥ 0.90 on test set; templates auto-loaded.",
-        "done": true
-      },
-      {
-        "text": "PHASE 3: EVIDENCE EXTRACTION (OCR/MRZ/Barcode/NFC)\n\nExplanations: Extract OCR text, validate MRZ (ICAO 9303 checksums), parse PDF417/QR barcodes, and perform NFC passport DG1/DG2 passive auth where available; return ROIs and confidences. Include face detection/crops for downstream biometrics (≥112×112).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 3\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] MRZ checksums pass; PDF417/QR parsed with ROIs and confidences; NFC passive auth verified when supplied; face crops at least 112×112.",
-        "done": true
-      },
-      {
-        "text": "PHASE 4: FORENSICS & AUTHENTICITY\n\nExplanations: Implement ELA/noise/resample/copy-move detection, ROI heatmaps, texture/FFT checks, and font/kerning scoring to detect tampering and verify security features per template.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 4\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Tamper/forensics AUC ≥ 0.90; security-feature thresholds documented per issuer template.",
-        "done": true
-      },
-      {
-        "text": "PHASE 5: BIOMETRICS & LIVENESS\n\nExplanations: Multi-frame face match for ID-vs-selfie; passive and challenge liveness with calibrated thresholds and multi-frame consensus logic for robustness.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 5\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Face TAR@FAR1% ≥ 0.98; liveness FMR ≤ 1%, FNMR ≤ 3%.",
-        "done": true
-      },
-      {
-        "text": "PHASE 6: ISSUER RULES & VALIDATORS\n\nExplanations: Implement issuer-specific validators for expiry/format/name/DOB logic and checksums per ID type; all thresholds are config-driven from templates.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 6\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Config-driven validators only; no magic numbers; aligned to issuer templates.",
-        "done": true
-      },
-      {
-        "text": "PHASE 7: DEVICE INTELLIGENCE & VELOCITY\n\nExplanations: Detect VPN/TOR/proxy; emulator/root/jailbreak; IP/SIM/GPS mismatch; geovelocity anomalies; velocity/reuse patterns, and surface explainable device signals into scoring.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 7\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Device signals integrated into risk model with tunable thresholds and explanations.",
-        "done": true
-      },
-      {
-        "text": "PHASE 8: RISK SCORING & DECISIONING\n\nExplanations: Aggregate features; combine rules + ML ensemble; use JSON policy thresholds to output risk_score, flags, reasons, and final decision {approve|review|deny} with policy versioning.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 8\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Calibrated thresholds with ROC/AUC reported for aggregate scoring; config-driven policy; auto-approve/deny/review per policy_pack.yaml.",
-        "done": true
-      },
-      {
-        "text": "PHASE 9: SANCTIONS & AML SCREENING\n\nExplanations: Integrate multi-vendor sanctions/PEP/adverse media screening with explainable hits and IP/geo controls; provide reviewer-visible rationales and audit logging of hits.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 9\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Vendor APIs integrated; hit explainability available to reviewers and audit logs; IP/geo controls enabled.",
-        "done": true
-      },
-      {
-        "text": "PHASE 10: VENDOR ORCHESTRATOR (RELIABILITY & FAILOVER)\n\nExplanations: Implement timeouts/retries/backoff; circuit breakers; PRIMARY→SECONDARY failover; hedged requests; SLA and cost/latency budgets; Prometheus metrics for vendor health and orchestration paths.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 10\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Availability ≥ 99.9% under failover_sim primary_outage_30pct; circuit breakers open on error_rate >5% over 2 min or p95 > 3× baseline; support half-open recovery; metrics visible in /metrics.",
-        "done": true
-      },
-      {
-        "text": "PHASE 11: ISSUER REGISTRY & ADAPTERS\n\nExplanations: Build adapters and a router that aggregate proofs and route per issuer; define contracts (request/response pydantic models; limits; evidence fields); tests with simulators and golden JSON artifacts.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 11\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Include proofs {ref_id, signature/hash, timestamp, adapter_name} when adapter available.",
-        "done": true
-      },
-      {
-        "text": "PHASE 12: HUMAN REVIEW CONSOLE\n\nExplanations: Minimal reviewer console with PII redaction toggle, ELA/noise heatmaps, face-timeline; dual-approval on high-risk; audit links and action logs for accountability.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 12\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Two-person approval enforced for high-risk queues; all actions auditable.",
-        "done": true
-      },
-      {
-        "text": "PHASE 13: API SERVICE (FASTAPI)\n\nExplanations: Implement endpoints /validate, /extract, /score, /decide, /issuer/verify, /aml/screen, /audit/export, /compliance/generate, /metrics, /ready, /health with JSON contracts and OpenAPI spec; include examples in codebase.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 13\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Endpoints follow JSON contracts with examples; /metrics exposes orchestrator and pipeline metrics.",
-        "done": true
-      },
-      {
-        "text": "PHASE 14: AUDIT EXPORT\n\nExplanations: WORM/append-only JSONL bundle + manifest with SHA-256 hash chain; verification script; S3/GCS/local targets; API returns a signed bundle for the given time range.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 14\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Verify tool passes; bundles are tamper-evident and signed; WORM links referenced in decision records.",
-        "done": true
-      },
-      {
-        "text": "PHASE 15: COMPLIANCE ARTIFACTS\n\nExplanations: Generators for DPIA, ROPA, and retention matrix using templates and code inventory; produce artifacts into ./artifacts/ with complete data flows and minimization map.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 15\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] DPIA.md, ROPA.csv, and retention_matrix.csv are generated and populated.",
-        "done": true
-      },
-      {
-        "text": "PHASE 16: CONFIGS & ISSUER TEMPLATES (PH)\n\nExplanations: Ship policy_pack.yaml, vendors.yaml, and PH issuer templates (PhilID, UMID, driver’s license, passport, PRC) with ROIs, fonts, tolerances, checksum rules, and security features (incl. UV/hologram zones).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 16\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Centralized thresholds in configs; templates define ROI boxes, fonts, tolerances, security features, and checksums.",
-        "done": true
-      },
-      {
-        "text": "PHASE 17: DATASETS (SYNTHETIC & RED-TEAM)\n\nExplanations: Provide generator for legit and fraud splits; red-team variants (reprint, screenshot-of-screenshot, font-edit, field-swap, barcode/MRZ mismatch, resample, copy-move, GAN face swap); benchmark via bench_metrics.py and store metrics with timestamps.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 17\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] ≥95% fraud catch on attack set; log FPR/FNR per ID type and overall; timestamps ISO +08:00.",
-        "done": true
-      },
-      {
-        "text": "PHASE 18: SCRIPTS & CLIs\n\nExplanations: Provide run_pipeline.py, bench_metrics.py, vendor_healthcheck.py, failover_sim.py, generate_artifacts.py, redact_dataset.py with documented CLI examples for end-to-end, benchmarking, vendor health, failover simulation, artifact generation, and PII redaction.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 18\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Commands function end-to-end locally with synthetic data; failover sims assert continuity and SLOs.",
+        "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\n- Scope: Close gaps to reach fintech/bank-grade parity after Phase 22.\n- Protocol: No direct writes to queue/state files; use env vars; redact PII in logs; timestamps ISO8601 +08:00; reproducible runs; config-driven thresholds.\n- Tools: Use read-only analyzers before marking done; map actions to a specific phase index.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Enforce SLOs (decision p50<20s, p95<60s) and ≥99.9% availability during work; never hardcode secrets; guard monotonic completion.",
         "done": false
       },
       {
-        "text": "PHASE 19: TESTS & QA\n\nExplanations: Pytest unit and integration tests; contract tests for issuer adapters; circuit breaker state transitions; red-team regression suite; bias/fairness checks documented and verified periodically.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 19\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Red-team regression ensures ≥95% fraud catch; tests cover adapters/contracts and breaker transitions.",
+        "text": "PHASE 1: PAD (Liveness) ISO 30107-3\n\n**Explanations:**\n- Implement PAD L1/L2 (anti-spoof), passive and/or challenge-response; add metrics (e.g., kyc_liveness_far, kyc_liveness_fnmr); document evaluation and certification evidence.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 1\n```\n\nIMPORTANT NOTE: Face TAR@FAR1% ≥ 0.98; PAD FMR ≤ 1%, FNMR ≤ 3%. Provide certification or equivalent validation evidence and dashboards.",
         "done": false
       },
       {
-        "text": "PHASE 20: DOCUMENTATION\n\nExplanations: docs/README.md (setup, running, configs, KPIs, dashboards, SLOs, failover patterns, reviewer SOPs, data minimization & retention), RUNBOOK_oncall.md, and GOVERNANCE.md (model registry, lineage, canary, sign-off gates, fairness audit schedule).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 20\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Governance includes registry/lineage/canary/sign-off and fairness audit cadence.",
+        "text": "PHASE 2: NFC eMRTD Passive Authentication (PA)\n\n**Explanations:**\n- Extend NFC path to read EF.SOD, verify DSC/CSCA chain, validate DG hash integrity; emit kyc_nfc_pa_verified gauge; persist verification artifacts.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 2\n```\n\nIMPORTANT NOTE: Verify PA on sample eMRTDs; failures must not block non-NFC IDs; reasons and metrics logged.",
         "done": false
       },
       {
-        "text": "PHASE 21: DOCKER & DEV TOOLING\n\nExplanations: Dockerfile (GPU-optional) + docker-compose with healthchecks (/ready, /live), resource limits, tmpfs for PII staging; .env.example; .pre-commit-config.yaml (black/isort/ruff/mypy; secrets scan; large file guard); Makefile targets for dev/test/bench/compose/artifacts.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 21\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Pre-commit enforces formatting and secret scanning; containers pass healthchecks; Makefile targets present.",
+        "text": "PHASE 3: PH Issuer Adapters (PhilID, LTO, PRC, Passport) + Proofs\n\n**Explanations:**\n- Build live adapters with rate-limits/retries/backoff; persist proofs {ref_id, signature/hash, timestamp, adapter_name}; add contract tests and golden JSON fixtures per adapter.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 3\n```\n\nIMPORTANT NOTE: Availability ≥ 99.9% under failover; no PII leakage on errors; proofs are queryable and included in decisions when available.",
         "done": false
       },
       {
-        "text": "PHASE 22: OPERATIONS, OBSERVABILITY, AND MODEL LIFECYCLE\n\nExplanations: Implement observability (metrics, traces, risk distributions, FPR), SLOs, on-call alerts, AB tests, drift monitoring, periodic re-training, and fairness/bias audits; error budget policy documented; DR checklist maintained.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 22\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Decision p50 < 20s and p95 < 60s; availability 99.9% under vendor issues; dashboards show risk distributions and FPR; drift alarms and fairness audits scheduled.",
+        "text": "PHASE 4: Risk Model Governance (Registry, Versioning, Challenger, Fairness)\n\n**Explanations:**\n- Introduce model registry with lineage; challenger (A/B) deployments; fairness dashboards; approvals and rollback SOPs in docs/GOVERNANCE.md; config-driven thresholds only.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 4\n```\n\nIMPORTANT NOTE: No silent model upgrades; document approvals; schedule periodic bias/fairness audits with metrics.",
+        "done": false
+      },
+      {
+        "text": "PHASE 5: AML/PEP/Adverse Media Re-screening (Ongoing CDD)\n\n**Explanations:**\n- Integrate vendor(s), schedule periodic re-screens, handle deltas, auto case creation with SLAs; emit per-source hit metrics and evidence storage links.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 5\n```\n\nIMPORTANT NOTE: Hits must be explainable; secrets via env; backoff/breaker thresholds enforced; observability coverage present.",
+        "done": false
+      },
+      {
+        "text": "PHASE 6: Transaction Monitoring (Foundational Rules)\n\n**Explanations:**\n- Add basic TM: velocity, geovelocity, structuring patterns; route alerts to case management; link events to KYC identities; dashboards for alert volumes and SLAs.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 6\n```\n\nIMPORTANT NOTE: Event schema versioned; thresholds configurable; alert rules validated via simulations.",
+        "done": false
+      },
+      {
+        "text": "PHASE 7: Human Review Console & Case Management\n\n**Explanations:**\n- Reviewer UI with RBAC, dual control for high-risk queues, audit trails, evidence links, assignments and SLAs, queue metrics and reviewer calibration checks (IRR κ≥0.8 target).\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 7\n```\n\nIMPORTANT NOTE: Enforce two-person approval per configs/policy_pack.yaml; PII redaction toggle defaults to safe; all actions audit-logged.",
+        "done": false
+      },
+      {
+        "text": "PHASE 8: Security & Privacy Hardening\n\n**Explanations:**\n- Secrets management (Vault/KMS), encryption at rest for DB/files, tokenization of PII, key rotation, SIEM integration, DLP checks and access least-privilege enforcement with audits.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 8\n```\n\nIMPORTANT NOTE: No secrets in code; at-rest encryption proven; security events exported to SIEM; periodic key rotation and access reviews.",
+        "done": false
+      },
+      {
+        "text": "PHASE 9: Data Retention & WORM/Tamper-Evidence\n\n**Explanations:**\n- Implement immutable storage (object lock), hash-chained JSONL bundles, automated retention purge with proofs and reports; verify /audit/export tool passes on bundles.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 9\n```\n\nIMPORTANT NOTE: Retention schedules match retention_matrix; purge jobs logged with evidence; verification script passes on samples.",
+        "done": false
+      },
+      {
+        "text": "PHASE 10: Observability — Alerts & Dashboards\n\n**Explanations:**\n- Convert Prometheus metrics into alert rules (latency p50/p95, breaker open rate, availability), Grafana dashboards, synthetic checks; enable OTEL spans around external/vendor calls end-to-end.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 10\n```\n\nIMPORTANT NOTE: Avoid alert fatigue with proper thresholds; attach runbook links; validate alerts by simulation drills.",
+        "done": false
+      },
+      {
+        "text": "PHASE 11: Deployment & Resilience (K8s, Canary, Chaos)\n\n**Explanations:**\n- Add K8s manifests (HPA, readiness/liveness), canary/blue-green strategies, chaos tests integrated with scripts/failover_sim.py; document RTO/RPO drills and rollback playbooks.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 11\n```\n\nIMPORTANT NOTE: Health endpoints /live and /ready must be wired; define error budgets and rollback procedures; measure during drills.",
+        "done": false
+      },
+      {
+        "text": "PHASE 12: Compliance Mapping (BSP/AMLC/PDPA) & SMR Hooks\n\n**Explanations:**\n- Create a control matrix mapping implemented controls to regulations; implement SMR/SAR submission hooks; schedule KYC refresh by risk rating with evidence and metrics.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 12\n```\n\nIMPORTANT NOTE: Controls auditable with owners; cadence scheduled; privacy and regulatory artifacts updated.",
+        "done": false
+      },
+      {
+        "text": "PHASE 13: API Contract Versioning & CI Gates\n\n**Explanations:**\n- Version the API; schema diff checks; deprecation policy with timelines; contract tests and compatibility checks in CI/CD to prevent breaking clients.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 13\n```\n\nIMPORTANT NOTE: Backward compatibility honored; publish deprecation windows; no breaking changes without a major version and migration doc.",
+        "done": false
+      },
+      {
+        "text": "PHASE 14: Data Quality & Test Matrices\n\n**Explanations:**\n- Golden tests per issuer/template; PAD/NFC/adapter integration tests; fairness regression suites; extend scripts/bench_metrics.py to store FPR/FNR/TAR with +08:00 timestamps.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 14\n```\n\nIMPORTANT NOTE: Deterministic seeds for reproducibility; track per-ID-type and overall metrics; store artifacts for audit.",
+        "done": false
+      },
+      {
+        "text": "PHASE 15: Operational UX (Rate-limits, Idempotency, Quotas)\n\n**Explanations:**\n- Add gateway/API rate-limits, per-tenant quotas, idempotency keys, retry/hedging policies; expose related metrics and error budgets by tenant.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 15\n```\n\nIMPORTANT NOTE: Prevent abuse without breaching SLOs; all limits/configs centrally tunable and observable.",
+        "done": false
+      },
+      {
+        "text": "PHASE 16: Build Hygiene & Supply-chain Security\n\n**Explanations:**\n- SBOM generation (Syft), image scanning (Trivy), signing (Sigstore), provenance attestations; fix Docker path issue (`--app-dir \"KYC VERIFICATION\"` or rename directory) to ensure reliable runtime.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 16\n```\n\nIMPORTANT NOTE: CI must fail on critical vulnerabilities; publish SBOM with releases; maintain reproducible builds.",
         "done": false
       }
     ]

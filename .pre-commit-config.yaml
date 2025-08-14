@@ -1,0 +1,80 @@
+repos:
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        language_version: python3
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.0
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.10.0
+    hooks:
+      - id: mypy
+        args: ["--ignore-missing-imports"]
+
+  - repo: https://github.com/zricethezav/gitleaks
+    rev: v8.18.2
+    hooks:
+      - id: gitleaks
+
+  - repo: local
+    hooks:
+      - id: large-file-guard
+        name: Large file guard (>= 10 MB)
+        entry: bash -c 'git diff --cached --name-only | xargs -I{} bash -c "[ -f {} ] && [ $(stat -c%s \"{}\") -ge 10485760 ] && echo Large file: {} && exit 1 || true"'
+        language: system
+        pass_filenames: false
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-ast
+      - id: check-yaml
+      - id: check-toml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: detect-private-key
+
+  - repo: https://github.com/psf/black
+    rev: 23.11.0
+    hooks:
+      - id: black
+        language_version: python3.10
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.5.6
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.4.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: |
+          (?x)^(\
+            .*\.png|\
+            .*\.jpg|\
+            .*\.jpeg|\
+            .*\.bmp|\
+            .*\.ppm|\
+            artifacts/.*|\
+            outputs/.*|\
+            tmp/.*\
+          )$

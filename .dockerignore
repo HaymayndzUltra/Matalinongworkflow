@@ -1,0 +1,35 @@
+# VCS and editors
+.git
+.gitignore
+*.swp
+*.swo
+*.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.eggs/
+
+# Environments
+.venv/
+.env
+
+# Local outputs and caches
+outputs/
+tmp/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Large artifacts
+artifacts/
+obsidian_1.8.10_amd64.deb
+
+# Node / web (if any)
+node_modules/
+.dist/
+.build/

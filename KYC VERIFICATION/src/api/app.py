@@ -13,8 +13,22 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, status, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse
+from fastapi.responses import JSONResponse, FileResponse, Response
 import uvicorn
+
+from .metrics import (
+    REQUEST_COUNTER,
+    REQUEST_LATENCY,
+    DECISION_COUNTER,
+    RISK_SCORE_HIST,
+    RISK_DRIFT_SCORE,
+    FAIRNESS_AUDIT_DUE,
+    update_vendor_metrics,
+)
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from src.observability.otel import setup_tracing
+import asyncio
+from collections import deque
 
 from .contracts import (
     # Request/Response models
@@ -33,21 +47,7 @@ from .contracts import (
     DocumentType, DecisionType, RiskLevel, HealthStatus
 )
 
-# Import existing modules from previous phases
-from src.capture.quality_analyzer import CaptureQualityAnalyzer
-from src.classification.document_classifier import DocumentClassifier
-from src.extraction.ocr_extractor import OCRExtractor
-from src.extraction.mrz_parser import MRZParser
-from src.extraction.barcode_reader import BarcodeReader
-from src.biometrics.face_matcher import FaceMatcher
-from src.forensics.authenticity_checker import AuthenticityChecker
-from src.risk.risk_scorer import RiskScorer
-from src.scoring.decision_engine import DecisionEngine
-from src.screening.aml_screener import AMLScreener
-from src.audit.audit_logger import AuditLogger
-from src.compliance.artifact_generator import ComplianceArtifactGenerator
-from src.orchestrator.vendor_orchestrator import VendorOrchestrator
-from src.device_intel.device_analyzer import DeviceAnalyzer
+# Components are imported lazily inside get_component to avoid heavy deps at startup
 
 # Application metadata
 API_VERSION = "1.0.0"
@@ -74,36 +74,54 @@ APP_START_TIME = time.time()
 # Initialize components (singleton pattern)
 _components = {}
 
+# Rolling windows for drift monitoring
+RISK_SCORES_RECENT = deque(maxlen=100)
+RISK_SCORES_LONG = deque(maxlen=1000)
+
 def get_component(component_name: str):
     """Get or initialize a component"""
     if component_name not in _components:
         if component_name == "quality_analyzer":
+            from src.capture.quality_analyzer import CaptureQualityAnalyzer
             _components[component_name] = CaptureQualityAnalyzer()
         elif component_name == "document_classifier":
+            from src.classification.document_classifier import DocumentClassifier
             _components[component_name] = DocumentClassifier()
         elif component_name == "ocr_extractor":
+            from src.extraction.ocr_extractor import OCRExtractor
             _components[component_name] = OCRExtractor()
         elif component_name == "mrz_parser":
+            from src.extraction.mrz_parser import MRZParser
             _components[component_name] = MRZParser()
         elif component_name == "barcode_reader":
+            from src.extraction.barcode_reader import BarcodeReader
             _components[component_name] = BarcodeReader()
         elif component_name == "face_matcher":
+            from src.biometrics.face_matcher import FaceMatcher
             _components[component_name] = FaceMatcher()
         elif component_name == "authenticity_checker":
+            from src.forensics.authenticity_checker import AuthenticityChecker
             _components[component_name] = AuthenticityChecker()
         elif component_name == "risk_scorer":
+            from src.risk.risk_scorer import RiskScorer
             _components[component_name] = RiskScorer()
         elif component_name == "decision_engine":
+            from src.scoring.decision_engine import DecisionEngine
             _components[component_name] = DecisionEngine()
         elif component_name == "aml_screener":
+            from src.screening.aml_screener import AMLScreener
             _components[component_name] = AMLScreener()
         elif component_name == "audit_logger":
+            from src.audit.audit_logger import AuditLogger
             _components[component_name] = AuditLogger()
         elif component_name == "compliance_generator":
+            from src.compliance.artifact_generator import ComplianceArtifactGenerator
             _components[component_name] = ComplianceArtifactGenerator()
         elif component_name == "vendor_orchestrator":
+            from src.orchestrator.vendor_orchestrator import VendorOrchestrator
             _components[component_name] = VendorOrchestrator()
         elif component_name == "device_analyzer":
+            from src.device_intel.device_analyzer import DeviceAnalyzer
             _components[component_name] = DeviceAnalyzer()
     return _components.get(component_name)
 
@@ -144,9 +162,47 @@ def get_application() -> FastAPI:
         start_time = time.time()
         response = await call_next(request)
         process_time = time.time() - start_time
+
+        # Prometheus instrumentation (skip metrics endpoints to avoid scrape noise)
+        path = request.url.path
+        method = request.method
+        if not path.startswith("/metrics"):
+            try:
+                REQUEST_LATENCY.labels(endpoint=path, method=method).observe(process_time)
+                REQUEST_COUNTER.labels(endpoint=path, method=method, status=str(response.status_code)).inc()
+            except Exception:
+                # Never let metrics break request handling
+                pass
+
         response.headers["X-Process-Time"] = str(process_time)
         return response
     
+    @app.on_event("startup")
+    async def _obs_startup():
+        # Tracing (no-op if OTEL not configured)
+        try:
+            setup_tracing(app)
+        except Exception:
+            pass
+        # Background observability loop
+        async def _obs_loop():
+            while True:
+                try:
+                    # Compute simple drift: |mean_recent - mean_long| scaled 0..100
+                    if len(RISK_SCORES_RECENT) >= 20 and len(RISK_SCORES_LONG) >= 50:
+                        mean_recent = sum(RISK_SCORES_RECENT) / len(RISK_SCORES_RECENT)
+                        mean_long = sum(RISK_SCORES_LONG) / len(RISK_SCORES_LONG)
+                        drift = abs(mean_recent - mean_long)
+                        RISK_DRIFT_SCORE.set(drift)
+                    # Fairness audit due: 1st or 15th of month in PH timezone
+                    now = datetime.now(get_ph_timezone())
+                    FAIRNESS_AUDIT_DUE.set(1 if now.day in (1, 15) else 0)
+                except Exception:
+                    # Never crash loop
+                    pass
+                await asyncio.sleep(60)
+        asyncio.create_task(_obs_loop())
+     
     return app
 
 
@@ -210,7 +266,8 @@ async def root():
             "openapi": "/openapi.json",
             "health": "/health",
             "ready": "/ready",
-            "metrics": "/metrics"
+            "metrics": "/metrics",
+            "metrics_prometheus": "/metrics/prometheus"
         }
     }
 
@@ -263,11 +320,22 @@ async def validate_document(request: ValidateRequest):
         if not auth_result.get("authentic", False):
             issues.extend(auth_result.get("issues", []))
         
+        # Map classifier enum → API enum
+        _map = {
+            "PhilID": "PHILIPPINE_ID",
+            "UMID": "UMID",
+            "Driver License": "DRIVERS_LICENSE",
+            "Passport": "PASSPORT",
+            "PRC": "PRC_LICENSE",
+            "Unknown": "UNKNOWN",
+        }
+        api_doc_type_str = _map.get(str(classification.document_type.value), "UNKNOWN")
+
         # Prepare response
         response = ValidateResponse(
             valid=valid,
             confidence=classification.confidence,
-            document_type=DocumentType(classification.document_type.value),
+            document_type=DocumentType(api_doc_type_str),
             quality_score=quality_metrics.overall_score,
             issues=issues,
             suggestions=suggestions,
@@ -278,6 +346,12 @@ async def validate_document(request: ValidateRequest):
                 "authenticity_score": auth_result.get("confidence", 0)
             }
         )
+        
+        # Record decision metric
+        try:
+            DECISION_COUNTER.labels(decision=response.decision.value).inc()
+        except Exception:
+            pass
         
         return response
         
@@ -301,60 +375,66 @@ async def extract_data(request: ExtractRequest):
     """
     try:
         start_time = time.time()
-        
         # Decode image
         image = decode_base64_image(request.image_base64)
-        
-        # Get components
-        ocr_extractor = get_component("ocr_extractor")
-        mrz_parser = get_component("mrz_parser")
-        barcode_reader = get_component("barcode_reader")
-        document_classifier = get_component("document_classifier")
-        
-        # Classify document if not provided
+
+        # Determine document type
         if request.document_type:
             doc_type = request.document_type
         else:
+            document_classifier = get_component("document_classifier")
             classification = document_classifier.classify(image)
-            doc_type = DocumentType(classification.document_type.value)
-        
-        # Extract OCR text
-        ocr_result = ocr_extractor.extract_text(image)
-        
-        # Parse MRZ if requested
-        mrz_data = None
-        if request.extract_mrz:
-            mrz_result = mrz_parser.parse_mrz(image)
-            if mrz_result.get("success"):
-                mrz_data = mrz_result.get("data")
-        
-        # Read barcode if requested
+            _map = {
+                "PhilID": "PHILIPPINE_ID",
+                "UMID": "UMID",
+                "Driver License": "DRIVERS_LICENSE",
+                "Passport": "PASSPORT",
+                "PRC": "PRC_LICENSE",
+                "Unknown": "UNKNOWN",
+            }
+            api_doc_type_str = _map.get(str(classification.document_type.value), "UNKNOWN")
+            doc_type = DocumentType(api_doc_type_str)
+
+        # Use unified extractor
+        from src.extraction.evidence_extractor import EvidenceExtractor
+        extractor = EvidenceExtractor()
+        result = extractor.extract_all(image, doc_type.value)
+
+        # Summarize OCR
+        ocr_text = {}
+        if isinstance(result.ocr_text, dict):
+            if "full_text" in result.ocr_text:
+                ocr_text["full_text"] = str(result.ocr_text.get("full_text", ""))
+            if "total_words" in result.ocr_text:
+                ocr_text["total_words"] = str(result.ocr_text.get("total_words", 0))
+            if "avg_confidence" in result.ocr_text:
+                ocr_text["avg_confidence"] = str(result.ocr_text.get("avg_confidence", 0.0))
+
+        # MRZ
+        mrz_data = result.mrz_data.__dict__ if result.mrz_data is not None else None
+
+        # Barcode (first only)
         barcode_data = None
-        if request.extract_barcode:
-            barcode_result = barcode_reader.read_barcode(image)
-            if barcode_result.get("success"):
-                barcode_data = barcode_result.get("data")
-        
-        # Extract face if requested
+        if result.barcodes:
+            b0 = result.barcodes[0]
+            barcode_data = {"type": b0.get("type"), "data": b0.get("data")}
+
+        # Face bbox (first)
         face_image = None
         face_bbox = None
-        if request.extract_face:
-            # Simple face detection (would use proper face detection in production)
-            # For now, return placeholder
-            face_image = "data:image/jpeg;base64,placeholder"
-            face_bbox = [100, 100, 150, 150]
-        
-        # Prepare extracted data
+        if result.faces:
+            f0 = result.faces[0]
+            face_bbox = list(f0.bbox)
+
         extracted_data = ExtractedData(
-            ocr_text=ocr_result.get("fields", {}),
+            ocr_text=ocr_text,
             mrz_data=mrz_data,
             barcode_data=barcode_data,
             face_image=face_image,
             face_bbox=face_bbox,
-            confidence_scores=ocr_result.get("confidence_scores", {})
+            confidence_scores=result.ocr_text.get("confidence_scores", {}) if isinstance(result.ocr_text, dict) else {}
         )
-        
-        # Prepare response
+
         response = ExtractResponse(
             success=True,
             document_type=doc_type,
@@ -365,7 +445,7 @@ async def extract_data(request: ExtractRequest):
                 "extraction_timestamp": get_timestamp()
             }
         )
-        
+
         return response
         
     except Exception as e:
@@ -410,6 +490,14 @@ async def calculate_risk_score(request: ScoreRequest):
             risk_level = RiskLevel.HIGH
         else:
             risk_level = RiskLevel.CRITICAL
+        
+        # Observe risk score distribution and update drift windows
+        try:
+            RISK_SCORE_HIST.observe(float(risk_score))
+            RISK_SCORES_RECENT.append(float(risk_score))
+            RISK_SCORES_LONG.append(float(risk_score))
+        except Exception:
+            pass
         
         # Prepare response
         response = ScoreResponse(
@@ -708,6 +796,16 @@ async def health_check():
     )
 
 
+@app.get("/live", tags=["Health"])
+async def liveness_check():
+    """Simple liveness endpoint (no dependency checks)."""
+    return {
+        "status": "alive",
+        "uptime_seconds": time.time() - APP_START_TIME,
+        "timestamp": get_timestamp(),
+    }
+
+
 @app.get("/ready", response_model=ReadyResponse, tags=["Health"])
 async def readiness_check():
     """
@@ -779,6 +877,22 @@ async def get_metrics():
         metrics=metrics,
         timestamp=datetime.now(get_ph_timezone())
     )
+
+
+@app.get("/metrics/prometheus", tags=["Health"])
+async def prometheus_metrics():
+    """
+    Prometheus scrape endpoint (text format)
+    """
+    # Update vendor gauges from orchestrator state
+    try:
+        orchestrator = get_component("vendor_orchestrator")
+        update_vendor_metrics(orchestrator)
+    except Exception:
+        # Best-effort; avoid blocking scrape
+        pass
+    data = generate_latest()
+    return Response(content=data, media_type=CONTENT_TYPE_LATEST)
 
 
 @app.post("/complete", response_model=CompleteKYCResponse, tags=["Complete Flow"])

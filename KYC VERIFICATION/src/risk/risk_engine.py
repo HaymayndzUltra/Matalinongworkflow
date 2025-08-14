@@ -15,7 +15,12 @@ from pathlib import Path
 import pickle
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.preprocessing import StandardScaler
-import xgboost as xgb
+try:
+    import xgboost as xgb  # type: ignore
+    XGB_AVAILABLE = True
+except Exception:
+    xgb = None  # type: ignore
+    XGB_AVAILABLE = False
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -233,13 +238,14 @@ class RiskEngine:
                 random_state=42
             )
             
-            # XGBoost
-            models["xgboost"] = xgb.XGBClassifier(
-                n_estimators=100,
-                max_depth=6,
-                learning_rate=0.1,
-                random_state=42
-            )
+            # XGBoost (optional)
+            if XGB_AVAILABLE:
+                models["xgboost"] = xgb.XGBClassifier(
+                    n_estimators=100,
+                    max_depth=6,
+                    learning_rate=0.1,
+                    random_state=42
+                )
             
             # Gradient Boosting
             models["gradient_boost"] = GradientBoostingClassifier(

@@ -14,13 +14,32 @@ import re
 import logging
 from pathlib import Path
 import json
-from pyzbar import pyzbar
-from pyzbar.pyzbar import ZBarSymbol
 import hashlib
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Optional dependencies detection (system binaries may be missing)
+try:
+    # Ensure Tesseract binary is callable; this may raise if not installed
+    _ = pytesseract.get_tesseract_version()
+    TESSERACT_AVAILABLE = True
+except Exception as e:
+    TESSERACT_AVAILABLE = False
+    logger.warning(f"Tesseract not available or not on PATH; OCR will be skipped. Details: {e}")
+
+try:
+    from pyzbar import pyzbar as _pyzbar  # type: ignore
+    from pyzbar.pyzbar import ZBarSymbol as _ZBarSymbol  # type: ignore
+    pyzbar = _pyzbar
+    ZBarSymbol = _ZBarSymbol
+    ZBAR_AVAILABLE = True
+except Exception as e:
+    pyzbar = None  # type: ignore
+    ZBarSymbol = None  # type: ignore
+    ZBAR_AVAILABLE = False
+    logger.warning(f"ZBar/pyzbar not available; barcode decoding will be skipped. Details: {e}")
 
 class ExtractionType(Enum):
     """Types of evidence extraction"""
@@ -94,6 +113,12 @@ class EvidenceExtractor:
         self.config = self._load_config(config_path)
         self.face_cascade = self._load_face_detector()
         self.mrz_validator = MRZValidator()
+        # Optional NFC support
+        try:
+            from src.extraction.nfc_reader import NFCReader  # local import to avoid hard dep
+            self.nfc_reader = NFCReader()
+        except Exception:
+            self.nfc_reader = None
         
     def _load_config(self, config_path: Optional[str]) -> Dict:
         """Load extraction configuration"""
@@ -115,13 +140,16 @@ class EvidenceExtractor:
                 "strict_mode": False
             },
             "barcode": {
-                "symbologies": [
-                    ZBarSymbol.QRCODE,
-                    ZBarSymbol.PDF417,
-                    ZBarSymbol.CODE128,
-                    ZBarSymbol.CODE39,
-                    ZBarSymbol.EAN13
-                ]
+                # Use ZBar symbologies only if pyzbar/zbar is available
+                "symbologies": (
+                    [
+                        ZBarSymbol.QRCODE,
+                        ZBarSymbol.PDF417,
+                        ZBarSymbol.CODE128,
+                        ZBarSymbol.CODE39,
+                        ZBarSymbol.EAN13,
+                    ] if ("ZBAR_AVAILABLE" in globals() and ZBAR_AVAILABLE and ZBarSymbol is not None) else []
+                )
             }
         }
         
@@ -184,6 +212,23 @@ class EvidenceExtractor:
         if faces:
             logger.info(f"✅ Detected {len(faces)} face(s)")
         
+        # NFC (DG1/DG2) if reader available
+        nfc_metadata: Dict[str, Any] = {}
+        if self.nfc_reader is not None:
+            try:
+                dg1 = self.nfc_reader.read_dg1()
+                dg2 = self.nfc_reader.read_dg2()
+                if dg1:
+                    nfc_metadata["dg1"] = {
+                        "document_number": getattr(dg1, "document_number", None),
+                        "name": getattr(dg1, "name", None),
+                        "expiry_date": getattr(dg1, "expiry_date", None),
+                    }
+                if dg2:
+                    nfc_metadata["dg2_present"] = True
+            except Exception as e:
+                logger.warning(f"NFC read failed: {e}")
+
         # Validate extracted data
         validation_passed = self._validate_extraction(
             extracted_fields, mrz_data, document_type
@@ -203,7 +248,8 @@ class EvidenceExtractor:
                 "total_fields": len(extracted_fields),
                 "has_mrz": mrz_data is not None,
                 "has_faces": len(faces) > 0,
-                "has_barcodes": len(barcodes) > 0
+                "has_barcodes": len(barcodes) > 0,
+                "nfc": nfc_metadata or None
             },
             validation_passed=validation_passed,
             extraction_time_ms=extraction_time_ms
@@ -219,6 +265,16 @@ class EvidenceExtractor:
         Returns:
             OCR extraction results
         """
+        # Graceful fallback if Tesseract is not present
+        if not TESSERACT_AVAILABLE or pytesseract is None:
+            logger.warning("Skipping OCR: Tesseract not available.")
+            return {
+                "fields": [],
+                "full_text": "",
+                "lines": [],
+                "total_words": 0,
+                "avg_confidence": 0.0,
+            }
         # Preprocess image for better OCR
         processed = self._preprocess_for_ocr(image)
         
@@ -229,12 +285,22 @@ class EvidenceExtractor:
         )
         
         # Get detailed OCR data
-        ocr_data = pytesseract.image_to_data(
-            processed, 
-            lang=self.config['ocr_config']['lang'],
-            config=custom_config,
-            output_type=pytesseract.Output.DICT
-        )
+        try:
+            ocr_data = pytesseract.image_to_data(
+                processed,
+                lang=self.config['ocr_config']['lang'],
+                config=custom_config,
+                output_type=pytesseract.Output.DICT,
+            )
+        except Exception as e:
+            logger.warning(f"OCR failed, returning empty result. Details: {e}")
+            return {
+                "fields": [],
+                "full_text": "",
+                "lines": [],
+                "total_words": 0,
+                "avg_confidence": 0.0,
+            }
         
         # Extract fields with confidence
         fields = []
@@ -462,14 +528,22 @@ class EvidenceExtractor:
         """Extract text from MRZ region"""
         # Preprocess for MRZ OCR
         gray = cv2.cvtColor(mrz_region, cv2.COLOR_BGR2GRAY) if len(mrz_region.shape) == 3 else mrz_region
-        
+
         # Enhance contrast
         enhanced = cv2.equalizeHist(gray)
-        
+
         # Use specific OCR settings for MRZ
         custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<'
-        
-        text = pytesseract.image_to_string(enhanced, config=custom_config)
+        # If Tesseract is unavailable, skip MRZ OCR
+        if not TESSERACT_AVAILABLE or pytesseract is None:
+            logger.warning("Skipping MRZ OCR: Tesseract not available.")
+            return []
+
+        try:
+            text = pytesseract.image_to_string(enhanced, config=custom_config)
+        except Exception as e:
+            logger.warning(f"MRZ OCR failed, skipping. Details: {e}")
+            return []
         
         # Split into lines and clean
         lines = []
@@ -580,12 +654,20 @@ class EvidenceExtractor:
             List of decoded barcodes
         """
         barcodes = []
-        
+
         # Convert to grayscale if needed
         gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY) if len(image.shape) == 3 else image
-        
-        # Detect and decode barcodes
-        detected = pyzbar.decode(gray)
+
+        # Detect and decode barcodes (graceful fallback if ZBar not present)
+        if not ZBAR_AVAILABLE or pyzbar is None:
+            logger.warning("Skipping barcode detection: ZBar/pyzbar not available.")
+            return barcodes
+
+        try:
+            detected = pyzbar.decode(gray)
+        except Exception as e:
+            logger.warning(f"Barcode decoding failed, skipping. Details: {e}")
+            return barcodes
         
         for barcode in detected:
             # Extract barcode data

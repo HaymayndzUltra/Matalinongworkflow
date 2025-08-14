@@ -12,10 +12,26 @@ from enum import Enum
 import json
 import logging
 from pathlib import Path
-import torch
-import torch.nn as nn
-import torchvision.transforms as transforms
-from PIL import Image
+try:
+    import torch  # type: ignore
+    import torch.nn as nn  # type: ignore
+    TORCH_AVAILABLE = True
+except Exception:
+    torch = None  # type: ignore
+    nn = None  # type: ignore
+    TORCH_AVAILABLE = False
+
+try:
+    import torchvision.transforms as transforms  # type: ignore
+    TRANSFORMS_AVAILABLE = True
+except Exception:
+    transforms = None  # type: ignore
+    TRANSFORMS_AVAILABLE = False
+
+try:
+    from PIL import Image
+except Exception:
+    Image = None  # type: ignore
 import re
 
 # Configure logging
@@ -214,8 +230,10 @@ class DocumentClassifier:
         
         return custom_templates
     
-    def _load_model(self, model_path: Optional[str]) -> nn.Module:
+    def _load_model(self, model_path: Optional[str]):
         """Load or create classification model"""
+        if not TORCH_AVAILABLE:
+            return None
         class DocumentCNN(nn.Module):
             """Simple CNN for document classification"""
             def __init__(self, num_classes=6):
@@ -255,9 +273,11 @@ class DocumentClassifier:
         
         return model
     
-    def _setup_transforms(self) -> transforms.Compose:
-        """Setup image transforms for model input"""
-        return transforms.Compose([
+    def _setup_transforms(self):
+        """Setup image transforms for model input (or None if unavailable)."""
+        if not TRANSFORMS_AVAILABLE:
+            return None
+        return transforms.Compose([  # type: ignore
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
@@ -384,17 +404,19 @@ class DocumentClassifier:
         # Convert to RGB for color analysis
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
-        # Calculate dominant colors using k-means
+        # Calculate dominant colors using k-means when available
         pixels = rgb.reshape(-1, 3)
-        
-        # Simple color quantization
-        from sklearn.cluster import MiniBatchKMeans
-        n_colors = 5
-        kmeans = MiniBatchKMeans(n_clusters=n_colors, random_state=42, n_init=3)
-        kmeans.fit(pixels)
-        
-        dominant_colors = kmeans.cluster_centers_.astype(int)
-        features["dominant_colors"] = [tuple(color) for color in dominant_colors]
+        try:
+            from sklearn.cluster import MiniBatchKMeans  # type: ignore
+            n_colors = 5
+            kmeans = MiniBatchKMeans(n_clusters=n_colors, random_state=42, n_init=3)
+            kmeans.fit(pixels)
+            dominant_colors = kmeans.cluster_centers_.astype(int)
+            features["dominant_colors"] = [tuple(color) for color in dominant_colors]
+        except Exception:
+            # Fallback: subsample approximation
+            step = max(1, len(pixels)//1000)
+            features["dominant_colors"] = [tuple(map(int, p)) for p in pixels[::step][:5]]
         
         # Calculate color histogram
         hist_r = cv2.calcHist([rgb], [0], None, [256], [0, 256])
@@ -471,27 +493,20 @@ class DocumentClassifier:
     
     def _get_model_predictions(self, image: np.ndarray) -> Dict[str, float]:
         """Get CNN model predictions"""
-        # Convert to PIL Image
-        pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        
-        # Apply transforms
-        input_tensor = self.transform(pil_image)
+        if not TORCH_AVAILABLE or self.model is None or not TRANSFORMS_AVAILABLE or Image is None:
+            return {}
+        pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))  # type: ignore
+        input_tensor = self.transform(pil_image)  # type: ignore
         input_batch = input_tensor.unsqueeze(0)
-        
-        # Get predictions
-        with torch.no_grad():
+        with torch.no_grad():  # type: ignore
             output = self.model(input_batch)
-            probabilities = torch.nn.functional.softmax(output, dim=1)
-        
-        # Map to document types
+            probabilities = torch.nn.functional.softmax(output, dim=1)  # type: ignore
         probs = probabilities[0].numpy()
         doc_types = list(DocumentType)
-        
         predictions = {}
         for i, doc_type in enumerate(doc_types):
             if i < len(probs):
                 predictions[doc_type.value] = float(probs[i])
-        
         return predictions
     
     def _match_templates(self, features: Dict[str, Any]) -> Dict[str, float]:
