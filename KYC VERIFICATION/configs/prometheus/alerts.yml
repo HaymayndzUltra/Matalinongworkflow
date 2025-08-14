@@ -1,0 +1,232 @@
+groups:
+  - name: kyc_slo_alerts
+    interval: 30s
+    rules:
+      # Latency Alerts
+      - alert: KYCDecisionLatencyP50High
+        expr: histogram_quantile(0.5, rate(kyc_decision_duration_seconds_bucket[5m])) > 20
+        for: 5m
+        labels:
+          severity: warning
+          team: kyc
+          slo: latency_p50
+        annotations:
+          summary: "KYC decision P50 latency exceeds 20s SLO"
+          description: "P50 latency {{ $value }}s exceeds 20s SLO (current: {{ $value }}s)"
+          runbook_url: "https://wiki.internal/runbooks/kyc-latency"
+      
+      - alert: KYCDecisionLatencyP95Critical
+        expr: histogram_quantile(0.95, rate(kyc_decision_duration_seconds_bucket[5m])) > 60
+        for: 3m
+        labels:
+          severity: critical
+          team: kyc
+          slo: latency_p95
+          page: true
+        annotations:
+          summary: "KYC decision P95 latency exceeds 60s SLO"
+          description: "P95 latency {{ $value }}s exceeds 60s SLO - immediate action required"
+          runbook_url: "https://wiki.internal/runbooks/kyc-latency"
+      
+      # Availability Alerts
+      - alert: KYCAvailabilityLow
+        expr: (1 - (rate(kyc_errors_total[5m]) / rate(kyc_requests_total[5m]))) < 0.999
+        for: 5m
+        labels:
+          severity: critical
+          team: kyc
+          slo: availability
+          page: true
+        annotations:
+          summary: "KYC availability below 99.9% SLO"
+          description: "Availability {{ $value | humanizePercentage }} is below 99.9% SLO"
+          runbook_url: "https://wiki.internal/runbooks/kyc-availability"
+      
+      # Circuit Breaker Alerts
+      - alert: CircuitBreakerOpen
+        expr: kyc_circuit_breaker_state == 2  # 2 = open state
+        for: 1m
+        labels:
+          severity: warning
+          team: kyc
+        annotations:
+          summary: "Circuit breaker {{ $labels.service }} is open"
+          description: "Circuit breaker for {{ $labels.service }} has been open for > 1 minute"
+          runbook_url: "https://wiki.internal/runbooks/circuit-breaker"
+      
+      # PAD/Liveness Alerts
+      - alert: PADFalseAcceptRateHigh
+        expr: kyc_pad_far > 0.01
+        for: 10m
+        labels:
+          severity: critical
+          team: kyc
+          compliance: true
+        annotations:
+          summary: "PAD False Accept Rate exceeds 1% threshold"
+          description: "FAR is {{ $value | humanizePercentage }}, exceeds 1% compliance limit"
+          runbook_url: "https://wiki.internal/runbooks/pad-far"
+      
+      - alert: PADFalseRejectRateHigh
+        expr: kyc_pad_frr > 0.03
+        for: 10m
+        labels:
+          severity: warning
+          team: kyc
+        annotations:
+          summary: "PAD False Reject Rate exceeds 3% threshold"
+          description: "FRR is {{ $value | humanizePercentage }}, exceeds 3% operational limit"
+      
+      # NFC eMRTD Alerts
+      - alert: NFCVerificationFailureHigh
+        expr: rate(kyc_nfc_pa_attempts_total{result="failure"}[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+          team: kyc
+        annotations:
+          summary: "High NFC passive authentication failure rate"
+          description: "NFC PA failure rate {{ $value | humanizePercentage }} in last 5 minutes"
+      
+      # AML Screening Alerts
+      - alert: AMLScreeningBacklog
+        expr: kyc_aml_screening_queue_size > 1000
+        for: 10m
+        labels:
+          severity: warning
+          team: compliance
+        annotations:
+          summary: "AML screening queue backlog detected"
+          description: "{{ $value }} cases pending in AML screening queue"
+      
+      - alert: AMLAPIDown
+        expr: up{job="aml_provider"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          team: kyc
+          external: true
+        annotations:
+          summary: "AML screening provider API is down"
+          description: "Cannot reach AML provider API for > 2 minutes"
+      
+      # Review Console Alerts
+      - alert: ReviewQueueSLABreach
+        expr: kyc_review_cases_overdue > 50
+        for: 5m
+        labels:
+          severity: warning
+          team: operations
+        annotations:
+          summary: "High number of overdue review cases"
+          description: "{{ $value }} cases have breached SLA in review queue"
+      
+      - alert: DualControlPending
+        expr: kyc_dual_control_pending > 10
+        for: 30m
+        labels:
+          severity: warning
+          team: operations
+        annotations:
+          summary: "Dual control approvals pending"
+          description: "{{ $value }} high-risk decisions awaiting dual control approval"
+      
+      # Transaction Monitoring Alerts  
+      - alert: HighRiskTransactionSpike
+        expr: rate(kyc_tm_alerts_total{risk_score="critical"}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          team: compliance
+          page: true
+        annotations:
+          summary: "Spike in critical risk transactions detected"
+          description: "Critical risk alert rate: {{ $value | humanizePercentage }}"
+      
+      # Security Alerts
+      - alert: KeyRotationOverdue
+        expr: (time() - kyc_key_last_rotation_timestamp) > 7776000  # 90 days
+        for: 1h
+        labels:
+          severity: warning
+          team: security
+          compliance: true
+        annotations:
+          summary: "Encryption key rotation overdue"
+          description: "Key {{ $labels.key_id }} has not been rotated in > 90 days"
+      
+      - alert: DLPViolationDetected
+        expr: increase(kyc_dlp_violations_total[1h]) > 10
+        for: 5m
+        labels:
+          severity: critical
+          team: security
+          page: true
+        annotations:
+          summary: "Multiple DLP violations detected"
+          description: "{{ $value }} DLP violations in the last hour"
+      
+      # Data Retention Alerts
+      - alert: RetentionPurgeFailure
+        expr: kyc_retention_last_purge_success == 0
+        for: 24h
+        labels:
+          severity: warning
+          team: operations
+          compliance: true
+        annotations:
+          summary: "Data retention purge has not run successfully"
+          description: "Retention purge has failed for > 24 hours"
+      
+      # Infrastructure Alerts
+      - alert: HighMemoryUsage
+        expr: (container_memory_usage_bytes{pod=~"kyc-.*"} / container_spec_memory_limit_bytes) > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          team: platform
+        annotations:
+          summary: "High memory usage in KYC pod"
+          description: "Pod {{ $labels.pod }} memory usage is {{ $value | humanizePercentage }}"
+      
+      - alert: PodCrashLooping
+        expr: rate(kube_pod_container_status_restarts_total{namespace="kyc"}[15m]) > 0.5
+        for: 5m
+        labels:
+          severity: critical
+          team: platform
+          page: true
+        annotations:
+          summary: "KYC pod crash looping"
+          description: "Pod {{ $labels.pod }} has restarted {{ $value }} times in 15 minutes"
+
+  - name: kyc_error_budget_alerts
+    interval: 1m
+    rules:
+      - alert: ErrorBudgetBurnRateHigh
+        expr: |
+          (
+            1 - (
+              (sum(rate(kyc_requests_total{status="success"}[1h]))) /
+              (sum(rate(kyc_requests_total[1h])))
+            )
+          ) > (1 - 0.999) * 10  # 10x burn rate
+        for: 5m
+        labels:
+          severity: warning
+          team: kyc
+          slo: error_budget
+        annotations:
+          summary: "Error budget burn rate is too high"
+          description: "At current burn rate, monthly error budget will be exhausted in {{ $value }} hours"
+      
+      - alert: ErrorBudgetExhausted
+        expr: kyc_error_budget_remaining < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          team: kyc
+          page: true
+        annotations:
+          summary: "Monthly error budget nearly exhausted"
+          description: "Only {{ $value | humanizePercentage }} of error budget remaining"

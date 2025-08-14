@@ -4,7 +4,7 @@
     "description": "Actionable phases to close bank-grade parity gaps (source: memory-bank/plan/organize.md).",
     "status": "in_progress",
     "created": "2025-08-14T18:36:37+08:00",
-    "updated": "2025-08-14T21:47:48.485370+08:00",
+    "updated": "2025-08-14T21:58:25.102311+08:00",
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\n- Scope: Close gaps to reach fintech/bank-grade parity after Phase 22.\n- Protocol: No direct writes to queue/state files; use env vars; redact PII in logs; timestamps ISO8601 +08:00; reproducible runs; config-driven thresholds.\n- Tools: Use read-only analyzers before marking done; map actions to a specific phase index.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 0\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Enforce SLOs (decision p50<20s, p95<60s) and ≥99.9% availability during work; never hardcode secrets; guard monotonic completion.",
@@ -36,23 +36,23 @@
       },
       {
         "text": "PHASE 7: Human Review Console & Case Management\n\n**Explanations:**\n- Reviewer UI with RBAC, dual control for high-risk queues, audit trails, evidence links, assignments and SLAs, queue metrics and reviewer calibration checks (IRR κ≥0.8 target).\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 7\n```\n\nIMPORTANT NOTE: Enforce two-person approval per configs/policy_pack.yaml; PII redaction toggle defaults to safe; all actions audit-logged.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 8: Security & Privacy Hardening\n\n**Explanations:**\n- Secrets management (Vault/KMS), encryption at rest for DB/files, tokenization of PII, key rotation, SIEM integration, DLP checks and access least-privilege enforcement with audits.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 8\n```\n\nIMPORTANT NOTE: No secrets in code; at-rest encryption proven; security events exported to SIEM; periodic key rotation and access reviews.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 9: Data Retention & WORM/Tamper-Evidence\n\n**Explanations:**\n- Implement immutable storage (object lock), hash-chained JSONL bundles, automated retention purge with proofs and reports; verify /audit/export tool passes on bundles.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 9\n```\n\nIMPORTANT NOTE: Retention schedules match retention_matrix; purge jobs logged with evidence; verification script passes on samples.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 10: Observability — Alerts & Dashboards\n\n**Explanations:**\n- Convert Prometheus metrics into alert rules (latency p50/p95, breaker open rate, availability), Grafana dashboards, synthetic checks; enable OTEL spans around external/vendor calls end-to-end.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 10\n```\n\nIMPORTANT NOTE: Avoid alert fatigue with proper thresholds; attach runbook links; validate alerts by simulation drills.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 11: Deployment & Resilience (K8s, Canary, Chaos)\n\n**Explanations:**\n- Add K8s manifests (HPA, readiness/liveness), canary/blue-green strategies, chaos tests integrated with scripts/failover_sim.py; document RTO/RPO drills and rollback playbooks.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 11\n```\n\nIMPORTANT NOTE: Health endpoints /live and /ready must be wired; define error budgets and rollback procedures; measure during drills.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 12: Compliance Mapping (BSP/AMLC/PDPA) & SMR Hooks\n\n**Explanations:**\n- Create a control matrix mapping implemented controls to regulations; implement SMR/SAR submission hooks; schedule KYC refresh by risk rating with evidence and metrics.\n\n**Concluding Step: Phase Completion Protocol**\n```\npython3 todo_manager.py show <TASK_ID>\npython3 todo_manager.py done <TASK_ID> 12\n```\n\nIMPORTANT NOTE: Controls auditable with owners; cadence scheduled; privacy and regulatory artifacts updated.",
