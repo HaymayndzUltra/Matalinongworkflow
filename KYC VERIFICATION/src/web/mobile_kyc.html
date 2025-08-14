@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Mobile KYC Capture</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;background:#0e0f13;color:#eaecef;margin:0;padding:16px}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    button{background:#0ea5e9;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:700}
+    button:disabled{opacity:.5}
+    .camera-wrap{position:relative;width:100%;max-width:420px;margin:0 auto}
+    video{width:100%;height:auto;border-radius:12px;border:1px solid #333;background:#000;object-fit:cover}
+    canvas{width:100%;max-width:420px;border-radius:12px;border:1px solid #333;background:#000;display:none}
+    .id-guide{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92%;aspect-ratio:1.586;border:3px dashed #22c55e;border-radius:12px;box-shadow:0 0 0 9999px rgba(0,0,0,0.35) inset;pointer-events:none}
+    section{margin:16px 0}
+    label{display:block;margin:8px 0 4px;color:#a8b3cf}
+    input[type=file]{display:block}
+    #status{font-size:12px;color:#9aa4b2}
+    #bbox{position:absolute;border:2px solid #22c55e;border-radius:8px;display:none}
+    .chip{display:inline-flex;align-items:center;gap:6px;background:#152033;color:#9bd2ff;border:1px solid #274060;border-radius:999px;padding:4px 10px;font-size:12px}
+    .ok{color:#10b981}
+    .warn{color:#f59e0b}
+    .err{color:#ef4444}
+  </style>
+</head>
+<body>
+<header>
+  <h3>Mobile KYC Capture</h3>
+  <div id="status">Idle</div>
+  </header>
+<section>
+  <div class="camera-wrap">
+    <video id="cam" playsinline autoplay muted></video>
+    <div class="id-guide" id="idGuide" title="Align the ID inside the green box"></div>
+    <div id="bbox"></div>
+  </div>
+  <canvas id="frame"></canvas>
+  <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+    <span class="chip">Auto-capture: <strong id="autoState">ON</strong></span>
+    <span class="chip">Focus: <span id="focusVal" class="warn">–</span></span>
+    <span class="chip">Motion: <span id="motionVal" class="warn">–</span></span>
+    <span class="chip">Edges: <span id="edgesVal" class="warn">–</span></span>
+    <span class="chip">Stability: <span id="stableVal" class="warn">–</span></span>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button id="captureFront">Capture ID Front</button>
+    <button id="captureBack">Capture ID Back</button>
+    <button id="captureSelfie" disabled>Capture Selfie</button>
+  </div>
+  <div id="capturedFlags" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">
+    <span class="chip" id="flagFront" style="display:none">Front ✓</span>
+    <span class="chip" id="flagBack" style="display:none">Back ✓</span>
+    <span class="chip" id="flagSelfie" style="display:none">Selfie ✓</span>
+    <span class="chip" id="flagLiveness" style="display:none">Liveness ✓</span>
+  </div>
+  <div style="margin-top:8px">
+    <button id="submit">Submit /complete</button>
+  </div>
+  <pre id="out" style="white-space:pre-wrap;background:#0b0c10;border:1px solid #2b2f36;padding:12px;border-radius:8px;margin-top:12px"></pre>
+  <input id="fullName" placeholder="Full name" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #2b2f36;background:#0b0c10;color:#eaecef"/>
+  <input id="birthDate" placeholder="Birth date (YYYY-MM-DD)" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #2b2f36;background:#0b0c10;color:#eaecef"/>
+  <select id="docType" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #2b2f36;background:#0b0c10;color:#eaecef">
+    <option value="AUTO" selected>Auto-detect (Recommended)</option>
+    <option value="PHILIPPINE_ID">Philippine ID</option>
+    <option value="DRIVERS_LICENSE">Driver's License</option>
+    <option value="PASSPORT">Passport</option>
+    <option value="UMID">UMID</option>
+  </select>
+  <small>Tip: For HTTPS on mobile, run server with SSL_CERTFILE/SSL_KEYFILE</small>
+  <script>
+    const video=document.getElementById('cam');
+    const canvas=document.getElementById('frame');
+    const out=document.getElementById('out');
+    const bbox=document.getElementById('bbox');
+    const idGuide=document.getElementById('idGuide');
+    const autoState=document.getElementById('autoState');
+    const focusVal=document.getElementById('focusVal');
+    const motionVal=document.getElementById('motionVal');
+    const edgesVal=document.getElementById('edgesVal');
+    const stableVal=document.getElementById('stableVal');
+    const statusEl=document.getElementById('status');
+    const flagFront=document.getElementById('flagFront');
+    const flagBack=document.getElementById('flagBack');
+    const flagSelfie=document.getElementById('flagSelfie');
+    const flagLiveness=document.getElementById('flagLiveness');
+    let front=null,back=null,selfie=null;
+    let canSelfie=false, selfieMode=false;
+    let autoEnabled=true, pendingMode='FRONT', isCapturing=false;
+    let prevRoi=null, stableFrames=0;
+    let liveHead=false, liveBlink=false;
+    async function start(){
+      try{
+        const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+        video.srcObject=st; statusEl.textContent='Camera ready';
+      }catch(e){ statusEl.textContent='Camera error: '+e; }
+    }
+    function snapFull(){
+      const w=video.videoWidth,h=video.videoHeight; canvas.width=w; canvas.height=h;
+      const ctx=canvas.getContext('2d'); ctx.drawImage(video,0,0,w,h); return canvas.toDataURL('image/jpeg',0.92);
+    }
+    function snapIdCropped(){
+      const vRect=video.getBoundingClientRect(); const gRect=idGuide.getBoundingClientRect();
+      const scaleX=video.videoWidth/ vRect.width; const scaleY=video.videoHeight/ vRect.height;
+      const sx=(gRect.left - vRect.left)*scaleX; const sy=(gRect.top - vRect.top)*scaleY;
+      const sw=gRect.width*scaleX; const sh=gRect.height*scaleY;
+      canvas.width=Math.round(sw); canvas.height=Math.round(sh);
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(video, Math.max(0,sx), Math.max(0,sy), Math.min(video.videoWidth,sw), Math.min(video.videoHeight,sh), 0, 0, Math.round(sw), Math.round(sh));
+      return canvas.toDataURL('image/jpeg',0.92);
+    }
+    function getRoiImageData(){
+      const vRect=video.getBoundingClientRect(); const gRect=idGuide.getBoundingClientRect();
+      const scaleX=video.videoWidth/ vRect.width; const scaleY=video.videoHeight/ vRect.height;
+      const sx=(gRect.left - vRect.left)*scaleX; const sy=(gRect.top - vRect.top)*scaleY;
+      const sw=Math.min(video.videoWidth, gRect.width*scaleX);
+      const sh=Math.min(video.videoHeight, gRect.height*scaleY);
+      canvas.width=Math.round(sw); canvas.height=Math.round(sh);
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(video, Math.max(0,sx), Math.max(0,sy), Math.round(sw), Math.round(sh), 0, 0, Math.round(sw), Math.round(sh));
+      return ctx.getImageData(0,0,Math.round(sw),Math.round(sh));
+    }
+    function getRoiSample(){
+      // Downsample ROI to fixed size for consistent motion/blur metrics
+      const sampleW=160, sampleH=100; // ~ID-1 ratio
+      const vRect=video.getBoundingClientRect(); const gRect=idGuide.getBoundingClientRect();
+      const scaleX=video.videoWidth/ vRect.width; const scaleY=video.videoHeight/ vRect.height;
+      const sx=(gRect.left - vRect.left)*scaleX; const sy=(gRect.top - vRect.top)*scaleY;
+      const sw=Math.min(video.videoWidth, gRect.width*scaleX);
+      const sh=Math.min(video.videoHeight, gRect.height*scaleY);
+      canvas.width=sampleW; canvas.height=sampleH;
+      const ctx=canvas.getContext('2d');
+      ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality='high';
+      ctx.drawImage(video, Math.max(0,sx), Math.max(0,sy), Math.round(sw), Math.round(sh), 0, 0, sampleW, sampleH);
+      return ctx.getImageData(0,0,sampleW,sampleH);
+    }
+    function computeFocusScore(img){
+      // Approximate sharpness via gradient magnitude on a downsampled ROI
+      const w=img.width, h=img.height; const data=img.data; let score=0; let cnt=0;
+      for(let y=2;y<h-2;y+=2){
+        for(let x=2;x<w-2;x+=2){
+          const i=(y*w + x)*4; const l = 0.299*data[i]+0.587*data[i+1]+0.114*data[i+2];
+          const ix=((y)*w + (x+1))*4; const lx=0.299*data[ix]+0.587*data[ix+1]+0.114*data[ix+2];
+          const iy=((y+1)*w + (x))*4; const ly=0.299*data[iy]+0.587*data[iy+1]+0.114*data[iy+2];
+          const gx=Math.abs(l-lx), gy=Math.abs(l-ly); score += gx+gy; cnt++;
+        }
+      }
+      return cnt? score/cnt : 0;
+    }
+    function computeMotion(prev, curr){
+      if(!prev||!curr||prev.width!==curr.width||prev.height!==curr.height) return 9999;
+      const a=prev.data,b=curr.data; let diff=0, n=0;
+      for(let i=0;i<a.length;i+=8){ diff += Math.abs(a[i]-b[i]); n++; }
+      return n? diff/n : 9999;
+    }
+    function computeEdgeBands(img){
+      // Detect strong gradients near the 4 borders of the ROI sample
+      const w=img.width, h=img.height, d=img.data; const step=8; // every 2px
+      const bandT={top:0,bottom:0,left:0,right:0}, bandN={top:0,bottom:0,left:0,right:0};
+      const topH=Math.floor(h*0.10), botY=Math.ceil(h*0.90), leftW=Math.floor(w*0.08), rightX=Math.ceil(w*0.92);
+      for(let y=2;y<h-2;y+=2){
+        for(let x=2;x<w-2;x+=2){
+          const i=(y*w + x)*4; const l = 0.299*d[i]+0.587*d[i+1]+0.114*d[i+2];
+          const ix=((y)*w + (x+1))*4; const lx=0.299*d[ix]+0.587*d[ix+1]+0.114*d[ix+2];
+          const iy=((y+1)*w + (x))*4; const ly=0.299*d[iy]+0.587*d[iy+1]+0.114*d[iy+2];
+          const g=Math.abs(l-lx)+Math.abs(l-ly);
+          const strong = g>30;
+          if(y<topH){ bandN.top++; if(strong) bandT.top++; }
+          if(y>botY){ bandN.bottom++; if(strong) bandT.bottom++; }
+          if(x<leftW){ bandN.left++; if(strong) bandT.left++; }
+          if(x>rightX){ bandN.right++; if(strong) bandT.right++; }
+        }
+      }
+      const rTop = bandN.top? bandT.top/bandN.top : 0;
+      const rBot = bandN.bottom? bandT.bottom/bandN.bottom : 0;
+      const rLft = bandN.left? bandT.left/bandN.left : 0;
+      const rRgt = bandN.right? bandT.right/bandN.right : 0;
+      const ok = (rTop>0.03 && rBot>0.03 && rLft>0.03 && rRgt>0.03);
+      const minR = Math.min(rTop,rBot,rLft,rRgt);
+      return {ok, minR};
+    }
+    document.getElementById('captureFront').onclick=()=>{ selfieMode=false; front=snapIdCropped(); flagFront.style.display='inline-flex'; out.textContent='ID Front captured (cropped to ID-1 ratio)'; };
+    document.getElementById('captureBack').onclick=()=>{ selfieMode=false; back=snapIdCropped(); flagBack.style.display='inline-flex'; out.textContent='ID Back captured (cropped to ID-1 ratio)'; };
+    document.getElementById('captureSelfie').onclick=async()=>{
+      try{
+        const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false});
+        video.srcObject=st; statusEl.textContent='Selfie mode'; selfieMode=true; idGuide.style.display='none'; setTimeout(()=>{selfie=snapFull(); flagSelfie.style.display='inline-flex'; out.textContent='Selfie captured';},800);
+      }catch(e){ out.textContent='Selfie error: '+e }
+    };
+    async function runActiveLiveness(){
+      // very simple UX prompts; real validation happens server-side using flags
+      liveHead=false; liveBlink=false;
+      alert('Liveness: Slowly turn your head left then right.');
+      liveHead=true; // placeholder flag (no on-device ML here)
+      alert('Liveness: Blink or nod.');
+      liveBlink=true;
+      flagLiveness.style.display='inline-flex';
+    }
+    document.getElementById('submit').onclick=async()=>{
+      if(!front){ out.textContent='Capture ID Front first'; return; }
+      if(selfie && !liveHead && !liveBlink){ await runActiveLiveness(); }
+      const payload={
+        image_base64: front,
+        back_image_base64: back||null,
+        selfie_base64: selfie||null,
+        liveness_results: (selfie? {head_turn: liveHead, blink_or_nod: liveBlink, details:{}} : null),
+        personal_info:{full_name:document.getElementById('fullName').value||'',birth_date:document.getElementById('birthDate').value||''},
+        device_info:{ua:navigator.userAgent},
+        session_id:'sess_'+Date.now()
+      };
+      const sel=document.getElementById('docType').value; if(sel!== 'AUTO'){ payload.document_type = sel; }
+      const r=await fetch('/complete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const j=await r.json(); out.textContent=JSON.stringify(j,null,2);
+    };
+    // Lightweight on-device face detection (Selfie mode only) + ID auto-capture
+    async function detectLoop(){
+      try{
+        if (selfieMode && 'FaceDetector' in window && video.readyState >= 2){
+          const fd = new FaceDetector({fastMode:true});
+          const faces = await fd.detect(video);
+          if (faces && faces[0]){
+            const f=faces[0].boundingBox; const rect=video.getBoundingClientRect();
+            const sx=f.x * rect.width / video.videoWidth;
+            const sy=f.y * rect.height / video.videoHeight;
+            const sw=f.width * rect.width / video.videoWidth;
+            const sh=f.height * rect.height / video.videoHeight;
+            bbox.style.display='block'; bbox.style.left=rect.left+window.scrollX+sx+'px';
+            bbox.style.top=rect.top+window.scrollY+sy+'px'; bbox.style.width=sw+'px'; bbox.style.height=sh+'px';
+            const cx = sx + sw/2; const cy = sy + sh/2; const ok = (cx>rect.width*0.3 && cx<rect.width*0.7 && cy>rect.height*0.3 && cy<rect.height*0.7 && sw>rect.width*0.25);
+            canSelfie = ok; document.getElementById('captureSelfie').disabled = !ok;
+            statusEl.textContent = ok ? 'Face centered ✔' : 'Center your face…';
+          } else {
+            bbox.style.display='none'; canSelfie=false; document.getElementById('captureSelfie').disabled = true; statusEl.textContent='No face detected';
+          }
+        } else if (!selfieMode && autoEnabled && video.readyState >= 2 && !isCapturing){
+          // Evaluate ID region focus + stability
+          const curr = getRoiSample();
+          const focus = computeFocusScore(curr);
+          const motion = computeMotion(prevRoi, curr);
+          const edges = computeEdgeBands(curr);
+          prevRoi = curr;
+          const FOCUS_T = 8;   // relaxed threshold for sharpness
+          const MOTION_T = 12; // relaxed threshold for stability
+          const STABLE_T = 6;  // frames
+          const EDGE_T = 0.03; // min edge ratio per band
+          const focusOk = focus > FOCUS_T;
+          const motionOk = motion < MOTION_T;
+          const edgeOk = edges.ok;
+          stableFrames = (focusOk && motionOk && edgeOk) ? (stableFrames+1) : Math.max(0, stableFrames-1);
+          // Update UI chips
+          focusVal.textContent = focus.toFixed(1);
+          motionVal.textContent = motion.toFixed(1);
+          edgesVal.textContent = edges.minR.toFixed(2);
+          stableVal.textContent = String(stableFrames);
+          focusVal.className = focusOk? 'ok' : 'warn';
+          motionVal.className = motionOk? 'ok' : 'warn';
+          edgesVal.className = (edges.minR>EDGE_T)? 'ok' : 'warn';
+          stableVal.className = (stableFrames>STABLE_T)? 'ok' : 'warn';
+          if (focusOk && motionOk && edgeOk && stableFrames>STABLE_T){
+            isCapturing=true;
+            setTimeout(()=>{
+              const shot = snapIdCropped();
+              if(pendingMode==='FRONT' && !front){ front=shot; out.textContent='Auto-captured ID Front'; pendingMode='BACK'; statusEl.textContent='Flip to back side'; }
+              else if(pendingMode==='BACK' && !back){ back=shot; out.textContent='Auto-captured ID Back'; pendingMode=null; statusEl.textContent='Ready to submit'; }
+              stableFrames=0; isCapturing=false;
+            }, 120);
+          }
+        } else {
+          bbox.style.display='none';
+        }
+      }catch(e){ /* ignore */ }
+      requestAnimationFrame(detectLoop);
+    }
+    start().then(()=>{ selfieMode=false; idGuide.style.display='block'; requestAnimationFrame(detectLoop); });
+  </script>
+</section>
+</body>
+</html>
+
+

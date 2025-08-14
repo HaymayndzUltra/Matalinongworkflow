@@ -440,7 +440,9 @@ class MetricsResponse(BaseModel):
 class CompleteKYCRequest(BaseModel):
     """Complete KYC verification request (combines all steps)"""
     image_base64: str = Field(..., description="Base64 encoded document image")
+    back_image_base64: Optional[str] = Field(None, description="Base64 encoded back side image")
     selfie_base64: Optional[str] = Field(None, description="Base64 encoded selfie for face match")
+    liveness_results: Optional[Dict[str, Any]] = Field(None, description="Client-side active liveness challenge results")
     document_type: Optional[DocumentType] = Field(None, description="Expected document type")
     personal_info: Optional[Dict[str, Any]] = Field(None, description="Personal info for verification")
     device_info: Optional[Dict[str, Any]] = Field(None, description="Device intelligence data")
@@ -450,7 +452,9 @@ class CompleteKYCRequest(BaseModel):
         schema_extra = {
             "example": {
                 "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+                "back_image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
                 "selfie_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+                "liveness_results": {"head_turn": true, "blink_or_nod": true, "details": {"focus_avg": 12.3}},  # type: ignore[reportGeneralTypeIssues]
                 "document_type": "PHILIPPINE_ID",
                 "personal_info": {
                     "full_name": "JUAN DELA CRUZ",

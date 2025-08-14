@@ -45,30 +45,35 @@ def main():
     print(f"   Score: POST http://localhost:{port}/score")
     print(f"   Decide: POST http://localhost:{port}/decide")
     print(f"   Complete: POST http://localhost:{port}/complete")
+    print(f"   Mobile KYC Page: http://localhost:{port}/web/mobile_kyc.html")
     
     print("\n" + "-"*60)
     print("Starting server...")
     print("-"*60 + "\n")
     
+    # TLS support for mobile getUserMedia (HTTPS required on non-localhost)
+    certfile = os.getenv("SSL_CERTFILE")
+    keyfile = os.getenv("SSL_KEYFILE")
+    if certfile and keyfile:
+        print(f"\n🔒 TLS enabled")
+        print(f"   Cert: {certfile}")
+        print(f"   Key : {keyfile}")
+
     # Run server
+    run_kwargs = {
+        "app": "src.api.app:app",
+        "host": host,
+        "port": port,
+        "log_level": log_level,
+    }
+    if certfile and keyfile:
+        run_kwargs.update({"ssl_certfile": certfile, "ssl_keyfile": keyfile})
     if reload:
-        # Development mode with auto-reload
-        uvicorn.run(
-            "src.api.app:app",
-            host=host,
-            port=port,
-            reload=reload,
-            log_level=log_level
-        )
+        run_kwargs.update({"reload": reload})
     else:
-        # Production mode with multiple workers
-        uvicorn.run(
-            "src.api.app:app",
-            host=host,
-            port=port,
-            workers=workers,
-            log_level=log_level
-        )
+        run_kwargs.update({"workers": workers})
+
+    uvicorn.run(**run_kwargs)
 
 if __name__ == "__main__":
     try:

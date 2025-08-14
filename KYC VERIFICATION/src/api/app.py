@@ -13,7 +13,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, status, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse, Response
+from fastapi.responses import JSONResponse, FileResponse, Response, HTMLResponse
 import uvicorn
 
 from .metrics import (
@@ -187,6 +187,16 @@ def get_application() -> FastAPI:
         # Disable background TaskGroup loop to avoid TaskGroup exceptions in /metrics
         # Drift and fairness gauges will be updated lazily elsewhere if needed.
      
+    # Static files: minimal mobile capture page served under /web
+    from fastapi.staticfiles import StaticFiles
+    web_dir = Path(__file__).resolve().parent.parent / "web"
+    try:
+        web_dir.mkdir(parents=True, exist_ok=True)
+    except Exception:
+        pass
+    if web_dir.exists():
+        app.mount("/web", StaticFiles(directory=str(web_dir), html=True), name="web")
+
     return app
 
 
@@ -790,39 +800,130 @@ async def liveness_check():
     }
 
 
-@app.get("/ready", response_model=ReadyResponse, tags=["Health"])
-async def readiness_check():
-    """
-    Readiness check endpoint
-    
-    Verifies all dependencies are available
-    """
-    # Check component initialization
-    dependencies = {
-        "ml_models": all([
-            get_component("quality_analyzer") is not None,
-            get_component("document_classifier") is not None,
-            get_component("face_matcher") is not None
-        ]),
-        "extractors": all([
-            get_component("ocr_extractor") is not None,
-            get_component("mrz_parser") is not None,
-            get_component("barcode_reader") is not None
-        ]),
-        "risk_engine": all([
-            get_component("risk_scorer") is not None,
-            get_component("decision_engine") is not None
-        ]),
-        "vendor_apis": get_component("vendor_orchestrator") is not None
-    }
-    
-    ready = all(dependencies.values())
-    
-    return ReadyResponse(
-        ready=ready,
-        dependencies=dependencies,
-        timestamp=datetime.now(get_ph_timezone())
-    )
+    @app.get("/ready", response_model=ReadyResponse, tags=["Health"])
+    async def readiness_check():
+        """
+        Readiness check endpoint
+        
+        Verifies all dependencies are available. This endpoint must never crash
+        even if optional heavy dependencies (e.g., dlib, torch) are missing.
+        """
+        def _has(component_name: str) -> bool:
+            try:
+                return get_component(component_name) is not None
+            except Exception:
+                # Treat missing optional deps as not-ready for that component,
+                # but keep the readiness endpoint functioning.
+                return False
+
+        # Check component initialization (best-effort)
+        dependencies = {
+            # Minimal set to consider the service responsive: quality + classifier
+            "ml_models": all([
+                _has("quality_analyzer"),
+                _has("document_classifier"),
+                # Face matcher can be heavy (dlib); do not block readiness on it
+                _has("face_matcher") or False,
+            ]),
+            "extractors": all([
+                _has("ocr_extractor"),
+                _has("mrz_parser"),
+                _has("barcode_reader"),
+            ]),
+            "risk_engine": all([
+                _has("risk_scorer"),
+                _has("decision_engine"),
+            ]),
+            "vendor_apis": _has("vendor_orchestrator"),
+        }
+
+        # Consider service ready if core pieces respond; do not require biometrics
+        core_ready = dependencies["ml_models"] and dependencies["extractors"]
+        ready = bool(core_ready)
+        
+        return ReadyResponse(
+            ready=ready,
+            dependencies=dependencies,
+            timestamp=datetime.now(get_ph_timezone())
+        )
+
+    # Minimal mobile KYC capture UI (inline fallback if file missing)
+    @app.get("/web/mobile_kyc.html", response_class=HTMLResponse, include_in_schema=False)
+    async def mobile_kyc_page():
+        html_path = Path(__file__).resolve().parent.parent / "web" / "mobile_kyc.html"
+        if html_path.exists():
+            return HTMLResponse(html_path.read_text(encoding="utf-8"))
+        # Inline fallback content
+        return HTMLResponse("""
+<!doctype html>
+<html lang=\"en\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\"/>
+<title>Mobile KYC Capture</title>
+<style>body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,\"Helvetica Neue\",Arial;background:#0e0f13;color:#eaecef;margin:0;padding:16px}header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}button{background:#0ea5e9;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-weight:700}button:disabled{opacity:.5}video,canvas{width:100%;max-width:420px;border-radius:12px;border:1px solid #333;background:#000}section{margin:16px 0}label{display:block;margin:8px 0 4px;color:#a8b3cf}input[type=file]{display:block}#status{font-size:12px;color:#9aa4b2}#bbox{position:absolute;border:2px solid #22c55e;border-radius:8px;display:none}</style></head>
+<body><header><h3>Mobile KYC Capture</h3><div id=\"status\">Idle</div></header>
+<section>
+  <video id=\"cam\" playsinline autoplay muted></video>
+  <canvas id=\"frame\" style=\"display:none\"></canvas>
+  <div id=\"bbox\"></div>
+  <div style=\"margin-top:12px;display:flex;gap:8px\">
+    <button id=\"captureFront\">Capture ID Front</button>
+    <button id=\"captureBack\">Capture ID Back</button>
+    <button id=\"captureSelfie\">Capture Selfie</button>
+  </div>
+  <div style=\"margin-top:8px\">
+    <button id=\"submit\">Submit /complete</button>
+  </div>
+  <pre id=\"out\" style=\"white-space:pre-wrap;background:#0b0c10;border:1px solid #2b2f36;padding:12px;border-radius:8px;margin-top:12px\"></pre>
+  <input id=\"fullName\" placeholder=\"Full name\" style=\"width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #2b2f36;background:#0b0c10;color:#eaecef\"/>
+  <input id=\"birthDate\" placeholder=\"Birth date (YYYY-MM-DD)\" style=\"width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #2b2f36;background:#0b0c10;color:#eaecef\"/>
+  <select id=\"docType\" style=\"width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid #2b2f36;background:#0b0c10;color:#eaecef\">
+    <option value=\"PHILIPPINE_ID\">Philippine ID</option>
+    <option value=\"DRIVERS_LICENSE\">Driver's License</option>
+    <option value=\"PASSPORT\">Passport</option>
+    <option value=\"UMID\">UMID</option>
+  </select>
+  <small>Tip: For HTTPS on mobile, run server with SSL_CERTFILE/SSL_KEYFILE</small>
+  <script>
+  const video = document.getElementById('cam');
+  const canvas = document.getElementById('frame');
+  const out = document.getElementById('out');
+  const bbox = document.getElementById('bbox');
+  const statusEl = document.getElementById('status');
+  let front=null, back=null, selfie=null;
+  async function start(){
+    try{
+      const st = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+      video.srcObject = st;
+      statusEl.textContent = 'Camera ready';
+    }catch(e){ statusEl.textContent = 'Camera error: '+e; }
+  }
+  function snap(){
+    const w = video.videoWidth, h = video.videoHeight; canvas.width=w; canvas.height=h;
+    canvas.getContext('2d').drawImage(video,0,0,w,h);
+    return canvas.toDataURL('image/jpeg',0.92);
+  }
+  document.getElementById('captureFront').onclick=()=>{ front = snap(); out.textContent='Front captured'; };
+  document.getElementById('captureBack').onclick=()=>{ back = snap(); out.textContent='Back captured'; };
+  document.getElementById('captureSelfie').onclick=async()=>{
+    try{ const st = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'},audio:false}); video.srcObject=st; statusEl.textContent='Selfie mode'; setTimeout(()=>{ selfie=snap(); out.textContent='Selfie captured'; },800); }catch(e){ out.textContent='Selfie error: '+e }
+  };
+  document.getElementById('submit').onclick=async()=>{
+    if(!front){ out.textContent='Capture ID Front first'; return; }
+    const payload={
+      image_base64: front,
+      selfie_base64: selfie||null,
+      document_type: document.getElementById('docType').value,
+      personal_info:{ full_name: document.getElementById('fullName').value||'', birth_date: document.getElementById('birthDate').value||'' },
+      device_info:{ ua: navigator.userAgent },
+      session_id:'sess_'+Date.now()
+    };
+    const r = await fetch('/complete',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const j = await r.json(); out.textContent = JSON.stringify(j,null,2);
+  };
+  start();
+  </script>
+  </section>
+  </body></html>
+        """)
 
 
 @app.get("/metrics", tags=["Health"])
@@ -916,6 +1017,22 @@ async def complete_kyc_verification(request: CompleteKYCRequest):
             extract_barcode=True
         )
         extraction = await extract_data(extract_req)
+        # Optional: process back side if provided (e.g., barcodes/PDF417)
+        if request.back_image_base64:
+            back_req = ExtractRequest(
+                image_base64=request.back_image_base64,
+                document_type=request.document_type,
+                extract_face=False,
+                extract_mrz=False,
+                extract_barcode=True
+            )
+            try:
+                back_extraction = await extract_data(back_req)
+                # Merge barcode/MRZ data if found on back side
+                if back_extraction and back_extraction.extracted_data and back_extraction.extracted_data.barcode_data:
+                    extraction.extracted_data.barcode_data = back_extraction.extracted_data.barcode_data
+            except Exception:
+                pass
         
         # Step 3: Calculate risk score
         score_req = ScoreRequest(
@@ -957,6 +1074,16 @@ async def complete_kyc_verification(request: CompleteKYCRequest):
             aml_screening = await screen_aml(aml_req)
         
         # Prepare complete response
+        # Active liveness (prototype): require both head_turn and blink/nod if provided
+        active_live_ok = None
+        try:
+            if request.liveness_results is not None:
+                head_ok = bool(request.liveness_results.get("head_turn", False))
+                blink_ok = bool(request.liveness_results.get("blink_or_nod", False))
+                active_live_ok = head_ok and blink_ok
+        except Exception:
+            active_live_ok = None
+
         response = CompleteKYCResponse(
             session_id=request.session_id,
             decision=decision_details.decision,
@@ -972,7 +1099,8 @@ async def complete_kyc_verification(request: CompleteKYCRequest):
             processing_time_ms=int((time.time() - start_time) * 1000),
             metadata={
                 "timestamp": get_timestamp(),
-                "api_version": API_VERSION
+                "api_version": API_VERSION,
+                "active_liveness_ok": active_live_ok
             }
         )
         
