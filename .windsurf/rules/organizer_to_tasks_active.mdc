@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Canonical mapping from organizer.md → tasks_active.json (content-only)
-globs:
+alwaysApply: true
 ---
 
 ## Canonical Organizer → tasks_active Mapping

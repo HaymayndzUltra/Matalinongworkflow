@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Allowed execution scope for agent
-globs:
+alwaysApply: true
 ---
 ## EXECUTION-ONLY SCOPE
 - Allowed:

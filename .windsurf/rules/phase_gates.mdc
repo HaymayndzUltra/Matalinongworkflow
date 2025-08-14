@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Phase gates using read-only analyzers
-globs:
+alwaysApply: true
 ---
 ## Phase Gates (Pre-Execution Checks)
 

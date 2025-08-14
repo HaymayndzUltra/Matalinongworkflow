@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: IMPORTANT NOTE compliance
-globs:
+alwaysApply: true
 ---
 ## IMPORTANT NOTE POLICY
 - Before executing a phase or marking it done:

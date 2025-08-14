@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: tasks_active.json canonical schema and formatting
-globs:
+alwaysApply: true
 ---
 ## tasks_active.json Schema (Canonical)
 

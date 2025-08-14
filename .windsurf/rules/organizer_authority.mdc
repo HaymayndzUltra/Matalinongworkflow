@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Background Agent is the sole author of organizer.md; agent-mode must obey it
-globs:
+alwaysApply: true
 ---
 
 ## Organizer Authority (Background Agent Source of Truth)

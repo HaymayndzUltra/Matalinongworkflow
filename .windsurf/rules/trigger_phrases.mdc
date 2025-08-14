@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Natural-language trigger phrases and intents → agent actions
-globs:
+alwaysApply: true
 ---
 ## Natural-Language Triggers → Agent Actions
 

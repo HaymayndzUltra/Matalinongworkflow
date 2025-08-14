@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Read-only plan analysis tools (plain_hier.py, plan_next.py)
-globs:
+alwaysApply: true
 ---
 ## Read-only Plan Analysis Tools
 

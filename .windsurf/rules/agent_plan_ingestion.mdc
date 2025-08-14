@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Agent-only plan ingestion protocol (no scripts)
-globs:
+alwaysApply: true
 ---
 ## Agent Plan Ingestion (No Scripts)
 

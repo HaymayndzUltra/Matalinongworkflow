@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: todo_manager.py task execution command
-globs:
+alwaysApply: true
 ---
 ### **1. TASK EXECUTION COMMANDS:**
 

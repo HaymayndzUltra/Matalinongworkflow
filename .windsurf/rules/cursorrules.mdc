@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: TASK , MEMORY , NEW SESSION
-globs:
+alwaysApply: true
 ---
 ## **⚡ TASK EXECUTION PROTOCOL**
 

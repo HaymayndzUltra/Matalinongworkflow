@@ -1,7 +1,6 @@
 ---
-trigger: always_on
 description: Global master toggle for .cursor rules with disambiguated triggers (user-message only)
-globs:
+alwaysApply: true
 ---
 
 ## Global Rules Master Toggle (v2)
