@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Simple non-interactive autopilot wrapper
+# - Honors MAX_LOOPS environment variable (default: 5)
+# - Runs read-only analyzers over active tasks
+# - Exits early if all tasks' phases are complete
+
+LOOP_LIMIT="${MAX_LOOPS:-5}"
+SLEEP_SECONDS="${SLEEP_SECONDS:-1}"
+
+# Detect repo root
+if [[ -f "./memory-bank/queue-system/tasks_active.json" ]]; then
+	REPO_ROOT="$(pwd)"
+elif [[ -f "/workspace/memory-bank/queue-system/tasks_active.json" ]]; then
+	REPO_ROOT="/workspace"
+else
+	echo "❌ tasks_active.json not found in expected locations" >&2
+	exit 2
+fi
+
+ACTIVE="${REPO_ROOT}/memory-bank/queue-system/tasks_active.json"
+
+all_done() {
+	python3 - "$ACTIVE" <<'PY'
+import sys, json
+p = sys.argv[1]
+try:
+	with open(p, 'r', encoding='utf-8') as f:
+		data = json.load(f)
+	if isinstance(data, dict) and 'tasks' in data:
+		data = data['tasks']
+	for t in data:
+		if any(not td.get('done', False) for td in t.get('todos', [])):
+			raise SystemExit(1)
+	raise SystemExit(0)
+except Exception as e:
+	print(f"ERROR: {e}", file=sys.stderr)
+	raise SystemExit(2)
+PY
+}
+
+list_ids() {
+	python3 - "$ACTIVE" <<'PY'
+import sys, json
+p = sys.argv[1]
+with open(p, 'r', encoding='utf-8') as f:
+	data = json.load(f)
+if isinstance(data, dict) and 'tasks' in data:
+	data = data['tasks']
+for t in data:
+	print(t.get('id',''))
+PY
+}
+
+if [[ ! -f "$ACTIVE" ]]; then
+	echo "❌ Missing: $ACTIVE" >&2
+	exit 2
+fi
+
+for ((i=1; i<=LOOP_LIMIT; i++)); do
+	echo "== Autopilot loop $i/$LOOP_LIMIT =="
+	python3 "${REPO_ROOT}/plan_next.py" | sed 's/^/  /' || true
+
+	# Show per-task hierarchy
+	while IFS= read -r tid; do
+		[[ -n "$tid" ]] || continue
+		echo "  -- Hierarchy: $tid"
+		python3 "${REPO_ROOT}/plain_hier.py" "$tid" | sed 's/^/    /' || true
+	done < <(list_ids)
+
+	if all_done; then
+		echo "✅ All tasks complete. Exiting early."
+		exit 0
+	fi
+
+	sleep "$SLEEP_SECONDS"
+done
+
+echo "ℹ️ Reached loop limit ($LOOP_LIMIT)."
