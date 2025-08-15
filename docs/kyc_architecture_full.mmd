@@ -1,0 +1,217 @@
+flowchart TD
+  U["User (Web/Mobile)"] --> API["FastAPI Service (src/api/main.py)"]
+
+  %% API Layer
+  subgraph "API Layer"
+    API --> QEP["POST /quality/analyze → CaptureQualityAnalyzer"]
+    API --> CEP["POST /classify → DocumentClassifier"]
+    API --> EEP["POST /extract → EvidenceExtractor"]
+    API --> FEP["POST /forensics → AuthenticityVerifier"]
+    API --> BEP["POST /biometrics/selfie-match → FaceMatcher"]
+    API --> VEP["POST /validate → IssuerRegistry/Adapters"]
+    API --> REP["POST /risk/score → RiskEngine"]
+    API --> AEP["POST /aml/screen → AMLScreener"]
+    API --> HEP["GET /health | /ready | /metrics"]
+    API --> APPC["src/api/contracts.py"]
+    API --> APPCV["src/api/contract_versioning.py"]
+    API --> APPEX["src/api/examples.py"]
+    API --> APIMET["src/api/metrics.py"]
+    API --> APIAPP["src/api/app.py"]
+    API --> RUNAPI["run_api.py"]
+  end
+
+  %% Capture
+  subgraph "Capture"
+    QA["CaptureQualityAnalyzer (src/capture/quality_analyzer.py)"]
+  end
+  QEP --> QA
+
+  %% Classification
+  subgraph "Classification"
+    DC["DocumentClassifier (src/classification/document_classifier.py)"]
+  end
+  CEP --> DC
+
+  %% Extraction
+  subgraph "Extraction"
+    EX["EvidenceExtractor (src/extraction/evidence_extractor.py)"]
+    NFCEX["NFCReader (src/extraction/nfc_reader.py)"]
+  end
+  EEP --> EX
+  EX -. optional .-> NFCEX
+
+  %% Forensics
+  subgraph "Forensics"
+    AV["AuthenticityVerifier (src/forensics/authenticity_verifier.py)"]
+    AC["AuthenticityChecker (src/forensics/authenticity_checker.py)"]
+  end
+  FEP --> AV
+
+  %% Biometrics & Liveness
+  subgraph "Biometrics / Liveness"
+    FM["FaceMatcher (src/biometrics/face_matcher.py)"]
+    PAD["PAD Detector (src/liveness/pad_detector.py)"]
+    LIVEN["Liveness Metrics (src/liveness/metrics.py)"]
+  end
+  BEP --> FM
+  FM --> PAD
+  FM --> LIVEN
+
+  %% Registry / Validation
+  subgraph "Registry / Validation"
+    IR["IssuerRegistry (src/registry/issuer_registry.py)"]
+    IVA["IssuerValidator (src/validators/issuer_validator.py)"]
+    ADP["PH Issuer Adapters (src/adapters/ph_issuer_adapters.py)"]
+  end
+  VEP --> IR
+  IR --> ADP
+  IR --> IVA
+
+  %% NFC / Passive Auth
+  subgraph "NFC / Passive Auth"
+    NFCR["NFC Reader (src/nfc/nfc_reader.py)"]
+    PASSA["Passive Auth (src/nfc/passive_auth.py)"]
+  end
+  EX --> NFCR
+  NFCR --> PASSA
+
+  %% AML / Screening
+  subgraph "AML / Screening"
+    AMLSCN["AMLScreener (src/screening/aml_screener.py)"]
+    AMLSYS["AML System (src/aml/screening_system.py)"]
+    CASEM["Case Manager (in AML System)"]
+    SCHED["Screening Scheduler (in AML System)"]
+  end
+  AEP --> AMLSCN
+  AMLSCN --> AMLSYS
+  AMLSYS --> CASEM
+  AMLSYS --> SCHED
+
+  %% Risk / Decisioning
+  subgraph "Risk / Decisioning"
+    RISK["RiskEngine (src/risk/risk_engine.py)"]
+    RSCR["RiskScorer (src/risk/risk_scorer.py)"]
+    DE["DecisionEngine (src/scoring/decision_engine.py)"]
+    TMR["Transaction Monitor (src/monitoring/transaction_monitor.py)"]
+    TMENG["TM Engine (src/transaction_monitoring/tm_engine.py)"]
+    DEVINT["Device Analyzer (src/device_intel/device_analyzer.py)"]
+  end
+  REP --> RISK
+  QA --> RISK
+  DC --> RISK
+  EX --> RISK
+  AV --> RISK
+  FM --> RISK
+  IR --> RISK
+  AMLSYS --> RISK
+  DEVINT --> RISK
+  TMR --> RISK
+  TMENG --> TMR
+  RISK --> DE
+
+  %% Orchestration
+  subgraph "Orchestration"
+    VORCH["Vendor Orchestrator (src/orchestrator/vendor_orchestrator.py)"]
+  end
+  DC --> VORCH
+  EX --> VORCH
+  AV --> VORCH
+  FM --> VORCH
+
+  %% Compliance / Artifacts
+  subgraph "Compliance / Artifacts"
+    REGMAP["Regulatory Mapping (src/compliance/regulatory_mapping.py)"]
+    ARTGEN["Artifact Generator (src/compliance/artifact_generator.py)"]
+  end
+  RISK --> REGMAP
+  REGMAP --> ARTGEN
+
+  %% Audit / Retention
+  subgraph "Audit / Retention"
+    AUDL["Audit Logger (src/audit/audit_logger.py)"]
+    AUDST["Storage Adapters (src/audit/storage_adapters.py)"]
+    AUDV["Verify Audit (src/audit/verify_audit.py)"]
+    WORM["WORM Storage (src/retention/worm_storage.py)"]
+  end
+  API --> AUDL
+  RISK --> AUDL
+  AMLSYS --> AUDL
+  AUDL --> AUDST
+  AUDST --> WORM
+  AUDV --> AUDST
+
+  %% Review Console
+  subgraph "Review Console"
+    RCON["Review Console (src/review_console/review_console.py)"]
+    RBACK["Console Backend (src/review_console/console_backend.py)"]
+  end
+  DE --> RCON
+  RCON --> RBACK
+
+  %% Observability / Security
+  subgraph "Observability / Security"
+    OTEL["OpenTelemetry (src/observability/otel.py)"]
+    HARD["Security Hardening (src/security/hardening.py)"]
+    METR["API Metrics (src/api/metrics.py)"]
+  end
+  API --> OTEL
+  API --> METR
+  RISK --> OTEL
+  AMLSYS --> OTEL
+  HARD -. applies to .-> API
+  HARD -. applies to .-> RISK
+  HARD -. applies to .-> AMLSYS
+
+  %% Config
+  subgraph "Config"
+    THM["Threshold Manager (src/config/threshold_manager.py)"]
+  end
+  THM -. config .-> QA
+  THM -. config .-> RISK
+  THM -. config .-> AMLSYS
+  THM -. config .-> FM
+
+  %% Prototypes / Demos
+  subgraph "Prototypes / Demos (kyc/*)"
+    KCAP["kyc/capture_validation.py"]
+    KEXT["kyc/evidence_extraction.py"]
+    KMRZ["kyc/generate_valid_mrz.py"]
+    KD1["kyc/demo_phase1_validate.py"]
+    KD2["kyc/demo_phase2_extract.py"]
+    KE1["kyc/eval_phase1_dataset.py"]
+    KE2["kyc/eval_phase2_classifier.py"]
+  end
+  U --> KCAP
+  U --> KEXT
+  KEXT --> KMRZ
+
+  %% Requirements
+  subgraph "Requirements"
+    REQM["kyc_requirements_manifest.py"]
+  end
+  REQM --> API
+  REQM --> QA
+  REQM --> EX
+  REQM --> AV
+  REQM --> FM
+  REQM --> RISK
+  REQM --> AMLSYS
+
+  %% Top-Level Entrypoints / Scripts
+  subgraph "Top-Level Entrypoints"
+    KYCL["KYC VERIFICATION/main.py"]
+    KYCL2["KYC VERIFICATION/kyc_latest.py"]
+    SCRIPTS["KYC VERIFICATION/scripts/* (run_pipeline.py, generate_datasets*.py, bench_*.py, vendor_healthcheck.py, failover_sim.py, redact_dataset.py, generate_artifacts.py)"]
+  end
+  KYCL --> API
+  KYCL2 --> API
+  SCRIPTS --> API
+  SCRIPTS --> RISK
+  SCRIPTS --> AMLSYS
+  SCRIPTS --> EX
+  SCRIPTS --> AV
+  SCRIPTS --> FM
+
+  DE --> OUT["Outcome: approve / review / deny / escalate"]
+
+

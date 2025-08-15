@@ -1,8 +1,8 @@
 {
-  "current_task_id": "kyc_bank_grade_parity_actionable_20250814",
-  "current_task_description": "Actionable phases to close bank-grade parity gaps (source: memory-bank/plan/organize.md).",
-  "status": "completed",
-  "last_updated": "2025-08-14T22:08:53.979436+08:00",
-  "todos_count": 17,
-  "completed_todos": 17
+  "current_task_id": "face_backend_actionable_20250815",
+  "current_task_description": "AI-2 Face Backend plan (endpoints, thresholds, PAD, burst/consensus, decision, telemetry, privacy) compiled from organizer.",
+  "status": "in_progress",
+  "last_updated": "2025-08-15T06:30:00+08:00",
+  "todos_count": 13,
+  "completed_todos": 0
 }

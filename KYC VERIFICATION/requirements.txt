@@ -91,8 +91,6 @@ pyarrow==14.0.1
 # Security & Cryptography
 cryptography==41.0.7
 pycryptodome==3.19.0
-hashlib
-hmac
 
 # Validation & Parsing
 jsonschema==4.20.0
@@ -121,7 +119,7 @@ pendulum==3.0.0
 
 # Networking & Device Detection
 user-agents==2.2.0
-device-detector==5.1.1
+device-detector==5.0.1
 maxminddb==2.4.0
 
 # Document Generation
