@@ -193,6 +193,19 @@ class EnhancedSessionState:
     lock_attempt_count: int = 0
     capture_count: int = 0
     
+    # Additional fields for handlers.py compatibility
+    stability_tracker: Optional[Any] = None  # StabilityTracker from geometry.py
+    lock_achieved_at: Optional[float] = None
+    pad_scores: List[float] = field(default_factory=list)
+    challenge_script: Optional[Dict] = None
+    challenge_completed: bool = False
+    burst_frames: Optional[List[Dict]] = None
+    
+    def __post_init__(self):
+        """Initialize mutable default values"""
+        if self.burst_frames is None:
+            self.burst_frames = []
+    
     def generate_lock_token(self) -> LockToken:
         """Generate new lock token with countdown"""
         token_data = f"{self.session_id}:{time.time()}:{secrets.token_hex(16)}"

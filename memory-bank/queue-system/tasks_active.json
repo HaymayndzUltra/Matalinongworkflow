@@ -5,7 +5,7 @@
     "todos": [
       {
         "text": "PHASE 0: SETUP & CONFLICT RESOLUTION\n\n**Explanations:** Fix the two identified conflicts before starting implementation. Remove duplicate `/metrics` endpoint at line 1464 in app.py (keep line 943 version). Remove basic `SessionState` from handlers.py and use only `EnhancedSessionState` from session_manager.py. Document all UX requirements (A-H) and create backup of current working implementation.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 0\n```\n\nIMPORTANT NOTE: These conflicts must be resolved first to prevent runtime errors. The duplicate endpoint will cause FastAPI to fail on startup.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 1: STATE MACHINE IMPLEMENTATION\n\n**Explanations:** Implement document capture state machine in EnhancedSessionState supporting SEARCHING→LOCKED→COUNTDOWN→CAPTURED→CONFIRM→FLIP-TO-BACK→BACK-SEARCHING→COMPLETE states. Add current_side tracking (front/back), front_captured/back_captured flags, and state transition methods. Ensure each state change emits proper telemetry events.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 1\n```\n\nIMPORTANT NOTE: State machine is the foundation for all UX flows. Must support both front and back document capture with proper transitions.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-01-16T16:45:00+08:00"
+    "updated": "2025-08-16T07:02:59.798002+08:00"
   }
 ]

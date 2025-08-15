@@ -46,7 +46,8 @@ from .session_manager import (
     get_session_manager,
     StatusCode,
     ReasonCode,
-    QUALITY_GATES
+    QUALITY_GATES,
+    EnhancedSessionState
 )
 from ..config.threshold_manager import ThresholdManager
 
@@ -54,27 +55,6 @@ logger = logging.getLogger(__name__)
 
 
 # ============= DATA STRUCTURES =============
-
-@dataclass
-class SessionState:
-    """Maintains state for a face scan session"""
-    session_id: str
-    created_at: float
-    last_update: float
-    stability_tracker: StabilityTracker
-    lock_achieved_at: Optional[float] = None
-    pad_scores: List[float] = None
-    challenge_script: Optional[Dict] = None
-    challenge_completed: bool = False
-    burst_frames: List[Dict] = None
-    decision: Optional[str] = None
-    
-    def __post_init__(self):
-        if self.pad_scores is None:
-            self.pad_scores = []
-        if self.burst_frames is None:
-            self.burst_frames = []
-
 
 class ChallengeType(Enum):
     """Types of liveness challenges"""
@@ -86,22 +66,21 @@ class ChallengeType(Enum):
 
 
 # Global session storage (in production, use Redis or similar)
-_sessions: Dict[str, SessionState] = {}
+_sessions: Dict[str, EnhancedSessionState] = {}
 
 
-def get_or_create_session(session_id: Optional[str] = None) -> SessionState:
+def get_or_create_session(session_id: Optional[str] = None) -> EnhancedSessionState:
     """Get existing session or create new one"""
     if session_id and session_id in _sessions:
         session = _sessions[session_id]
-        session.last_update = time.time()
+        # Track activity via request_count increment
+        session.request_count += 1
         return session
     
     # Create new session
     new_id = session_id or str(uuid.uuid4())
-    session = SessionState(
+    session = EnhancedSessionState(
         session_id=new_id,
-        created_at=time.time(),
-        last_update=time.time(),
         stability_tracker=StabilityTracker(history=[])
     )
     _sessions[new_id] = session
@@ -110,7 +89,7 @@ def get_or_create_session(session_id: Optional[str] = None) -> SessionState:
     current_time = time.time()
     expired = [
         sid for sid, s in _sessions.items()
-        if current_time - s.last_update > 300
+        if current_time - s.created_at > 300
     ]
     for sid in expired:
         del _sessions[sid]

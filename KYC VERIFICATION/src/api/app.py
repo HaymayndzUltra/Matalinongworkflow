@@ -1458,51 +1458,6 @@ async def get_face_metrics():
             detail={"error": str(e), "error_code": "METRICS_ERROR"}
         )
 
-
-# ============= PROMETHEUS METRICS ENDPOINT =============
-
-@app.get("/metrics", response_class=Response)
-async def get_prometheus_metrics():
-    """
-    Get metrics in Prometheus text format
-    
-    This endpoint exposes all system metrics in Prometheus-compatible format
-    for scraping by monitoring systems.
-    
-    Metrics include:
-    - facescan_decisions_total{decision="approve|review|deny"}
-    - facescan_time_to_lock_ms (histogram)
-    - facescan_match_score (histogram)
-    - facescan_challenge_duration_ms (histogram)
-    - facescan_challenge_success_rate (gauge)
-    - facescan_pad_fmr / facescan_pad_fnmr (gauges)
-    - And more...
-    
-    Returns:
-        text/plain response with Prometheus metrics
-    """
-    try:
-        from src.face.metrics_exporter import get_prometheus_metrics
-        
-        metrics_text = get_prometheus_metrics()
-        
-        return Response(
-            content=metrics_text,
-            media_type="text/plain; version=0.0.4; charset=utf-8",
-            headers={
-                "Cache-Control": "no-cache, no-store, must-revalidate",
-                "Pragma": "no-cache"
-            }
-        )
-    except Exception as e:
-        # Return empty metrics on error (Prometheus expects valid format)
-        logger.error(f"Error generating metrics: {e}")
-        return Response(
-            content="# Error generating metrics\n",
-            media_type="text/plain; version=0.0.4; charset=utf-8"
-        )
-
-
 # Exception handlers
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
