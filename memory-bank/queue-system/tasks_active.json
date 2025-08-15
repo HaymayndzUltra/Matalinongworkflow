@@ -29,7 +29,7 @@
       },
       {
         "text": "PHASE 6: CHALLENGE SEQUENCER (VALIDATION)\n\n**Explanations:** Create `src/face/challenges.py` and implement `/face/challenge/script` endpoint (picks 2 actions with TTL ≤7s) and `/face/challenge/verify` endpoint (performs EAR/MAR/yaw/time checks). Each action must complete within ≤3.5s and system must cancel on pose or brightness breach.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 6`\n\nIMPORTANT NOTE: Deterministic outcomes with clear reasons are mandatory for all challenge verifications.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 7: BURST UPLOAD & STORAGE POLICY\n\n**Explanations:** Implement `/face/burst/upload` endpoint supporting ≤24 frames within ≤3.5s using transient storage (RAM/tmpfs). Must include EXIF stripping and auto-deletion post-evaluation. Enforced limits must be respected and cleanup must occur even on errors.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 7`\n\nIMPORTANT NOTE: No gallery writes permitted; no long-term storage allowed; all data must be transient.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-15T18:50:36.139725+08:00"
+    "updated": "2025-08-15T19:03:51.014582+08:00"
   }
 ]

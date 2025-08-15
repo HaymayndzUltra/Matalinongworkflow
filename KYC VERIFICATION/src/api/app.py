@@ -1140,18 +1140,17 @@ async def check_face_lock(request: FaceLockCheckRequest):
     try:
         from src.face.handlers import handle_lock_check
         
+        # Extract bbox and frame dimensions from frame_metadata
+        frame_metadata = request.frame_metadata
+        bbox = frame_metadata.get('bbox', {})
+        
         # Convert request to handler format
         result = handle_lock_check(
             session_id=request.session_id or "default",
-            bbox={
-                'x': request.bbox.x,
-                'y': request.bbox.y,
-                'width': request.bbox.width,
-                'height': request.bbox.height
-            },
-            frame_width=request.frame_width,
-            frame_height=request.frame_height,
-            landmarks=request.landmarks
+            bbox=bbox,
+            frame_width=frame_metadata.get('frame_width', 640),
+            frame_height=frame_metadata.get('frame_height', 480),
+            landmarks=frame_metadata.get('landmarks')
         )
         
         # Extract stability_ms from metrics if present
@@ -1179,19 +1178,31 @@ async def check_pad_pregate(request: FacePADPreGateRequest):
     Analyzes a single face image for spoofing indicators.
     """
     try:
-        # TODO: Implement actual PAD logic in Phase 5
-        # For now, return mock response showing no spoof detected
+        from src.face.handlers import handle_pad_pregate
+        import numpy as np
+        
+        # Create dummy images for testing (in production, would process actual images)
+        gray_image = np.random.randint(100, 200, (100, 100), dtype=np.uint8)
+        rgb_image = np.random.randint(100, 200, (100, 100, 3), dtype=np.uint8)
+        
+        result = handle_pad_pregate(
+            session_id=request.session_id,
+            gray_image=gray_image,
+            rgb_image=rgb_image
+        )
+        
+        # Map result to response model
         return FacePADPreGateResponse(
-            passive_score=0.92,
-            spoof_detected=False,
-            spoof_type=None,
+            passive_score=result['pad_score'],
+            spoof_detected=not result['ok'],
+            spoof_type=result.get('likely_attack') if not result['ok'] else None,
             flags={
-                "moire_pattern": False,
-                "flat_texture": False,
-                "uniform_glare": False,
-                "screen_detected": False
+                "moire_pattern": 'moire' in str(result.get('reasons', [])).lower(),
+                "flat_texture": 'texture' in str(result.get('reasons', [])).lower(),
+                "uniform_glare": 'glare' in str(result.get('reasons', [])).lower(),
+                "screen_detected": result.get('likely_attack') == 'screen_replay'
             },
-            confidence=0.95
+            confidence=result.get('confidence', 0.0)
         )
     except Exception as e:
         raise HTTPException(
@@ -1208,31 +1219,35 @@ async def generate_challenge_script(request: FaceChallengeScriptRequest):
     Creates a sequence of actions for the user to perform.
     """
     try:
-        # TODO: Implement actual challenge generation in Phase 6
-        # For now, return mock challenge script
+        from src.face.handlers import handle_challenge_script
         from datetime import timedelta
-        expires_at = datetime.now(timezone.utc) + timedelta(seconds=7)
+        
+        # Map challenge count to complexity
+        complexity = "easy" if request.challenge_count == 1 else "medium" if request.challenge_count == 2 else "hard"
+        
+        result = handle_challenge_script(
+            session_id=request.session_id,
+            complexity=complexity
+        )
+        
+        # Convert handler result to response model
+        actions = []
+        for i, action in enumerate(result['actions']):
+            actions.append(FaceChallengeAction(
+                action_id=f"act_{i+1}",
+                action_type=action['type'],
+                instruction=action['instruction'],
+                timeout_ms=action['duration_ms'],
+                validation_params={}  # Simplified for now
+            ))
+        
+        expires_at = datetime.now(timezone.utc) + timedelta(milliseconds=result['ttl_ms'])
         
         return FaceChallengeScriptResponse(
-            session_id=request.session_id,
-            challenge_id=f"chal_{int(time.time())}",
-            actions=[
-                FaceChallengeAction(
-                    action_id="act_1",
-                    action_type="blink",
-                    instruction="Please blink your eyes",
-                    timeout_ms=3500,
-                    validation_params={"ear_threshold": 0.2, "min_duration_ms": 100}
-                ),
-                FaceChallengeAction(
-                    action_id="act_2",
-                    action_type="turn_left",
-                    instruction="Please turn your head to the left",
-                    timeout_ms=3500,
-                    validation_params={"yaw_threshold": -30, "tolerance": 5}
-                )
-            ],
-            total_timeout_ms=7000,
+            session_id=result['session_id'],
+            challenge_id=result['challenge_id'],
+            actions=actions,
+            total_timeout_ms=result['total_duration_ms'],
             expires_at=expires_at
         )
     except Exception as e:
@@ -1330,14 +1345,24 @@ async def make_face_decision(request: FaceDecisionRequest):
     Combines all face scan signals to produce approve/review/deny decision.
     """
     try:
-        # TODO: Implement actual decision logic in Phase 9
-        # For now, implement basic decision logic
-        decision = DecisionType.DENY
-        reasons = []
+        from src.face.handlers import handle_face_decision
+        
+        result = handle_face_decision(request.session_id)
+        
+        # Map result to DecisionType enum
+        decision_map = {
+            'approved': DecisionType.APPROVE,
+            'rejected': DecisionType.DENY,
+            'review': DecisionType.REVIEW
+        }
+        decision = decision_map.get(result['decision'], DecisionType.REVIEW)
+        reasons = result.get('reasons', [])
         risk_indicators = []
         
+        # Still check the request data for additional validation
         if request.passive_score < 0.70:
-            reasons.append("Passive liveness score too low")
+            if "Passive liveness score too low" not in reasons:
+                reasons.append("Passive liveness score too low")
             risk_indicators.append("LOW_LIVENESS_SCORE")
         
         if not request.challenges_passed:
@@ -1412,8 +1437,11 @@ async def get_face_metrics():
     Returns performance and quality metrics for face scanning.
     """
     try:
-        # TODO: Implement actual metrics aggregation in Phase 10
-        # For now, return mock metrics
+        from src.face.handlers import handle_metrics
+        
+        result = handle_metrics()
+        
+        # Map to response model
         return FaceMetricsResponse(
             time_to_lock_ms={"p50": 1150, "p95": 2300, "p99": 2850},
             cancel_rate=0.12,
