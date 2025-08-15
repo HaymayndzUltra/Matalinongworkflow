@@ -9,11 +9,11 @@
       },
       {
         "text": "PHASE 1: CONTRACTS & STATIC MOUNT SCAFFOLDING\n\n**Explanations:** Add Pydantic models for face scan APIs; define contracts; mount `/web` path (no UI changes). DoD: Contracts compile; OpenAPI exposes new endpoints; `/web` mounted.\n\n**Concluding Step: Phase Completion Protocol**\npython3 todo_manager.py show\npython3 todo_manager.py done 1\n\nIMPORTANT NOTE: No breaking changes to existing endpoints.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 2: THRESHOLD MANAGER (STRICT FACE GATES)\n\n**Explanations:** Add thresholds (bbox_fill, centering, pose, Tenengrad@640w, brightness mean/p05/p95, stability ms, PAD min, burst caps, match thresholds). DoD: Values validated; env overrides documented.\n\n**Concluding Step: Phase Completion Protocol**\npython3 todo_manager.py show\npython3 todo_manager.py done 2\n\nIMPORTANT NOTE: Explicit names; validation and bounds enforced.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 3: GEOMETRY & GATING LIBRARY\n\n**Explanations:** Implement src/face/geometry.py for occupancy, centering, pose, brightness, Tenengrad, stability; return reasoned failures. DoD: Pure functions with unit tests; deterministic outputs.\n\n**Concluding Step: Phase Completion Protocol**\npython3 todo_manager.py show\npython3 todo_manager.py done 3\n\nIMPORTANT NOTE: No I/O side-effects.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-08-15T00:00:00+08:00",
-    "updated": "2025-08-15T00:00:00+08:00"
+    "updated": "2025-08-15T08:31:27.216782+08:00"
   }
 ]
