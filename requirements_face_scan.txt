@@ -1,0 +1,36 @@
+# Face Scan Implementation Requirements
+# Install with: pip install -r requirements_face_scan.txt
+
+# Core Web Framework
+fastapi>=0.104.1
+uvicorn>=0.24.0
+python-multipart>=0.0.6
+
+# Data Validation
+pydantic>=2.0.0
+pydantic-core>=2.0.0
+typing-extensions>=4.8.0
+
+# Numerical Computing
+numpy>=1.24.0
+
+# Monitoring & Metrics
+prometheus-client>=0.19.0
+
+# CORS Support (if not already installed)
+flask-cors>=4.0.0
+flask>=3.0.0
+
+# Additional dependencies that might be needed
+starlette>=0.27.0
+annotated-types>=0.6.0
+typing-inspect>=0.9.0
+click>=8.1.0
+h11>=0.14.0
+anyio>=4.0.0
+idna>=3.4
+sniffio>=1.3.0
+
+# For development/testing (optional)
+httpx>=0.25.0  # For testing API endpoints
+pytest>=7.4.0  # For running tests (optional)
