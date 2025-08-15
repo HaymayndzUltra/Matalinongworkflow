@@ -1138,18 +1138,31 @@ async def check_face_lock(request: FaceLockCheckRequest):
     It checks geometry, centering, pose, brightness, and stability.
     """
     try:
-        # TODO: Implement actual face lock logic in Phase 4
-        # For now, return mock response showing successful lock
-        return FaceLockCheckResponse(
-            ok=True,
-            lock=True,
-            reasons=[],
-            thresholds={
-                "bbox_fill_min": 0.3,
-                "centering_tolerance": 0.15,
-                "stability_min_ms": 900
+        from src.face.handlers import handle_lock_check
+        
+        # Convert request to handler format
+        result = handle_lock_check(
+            session_id=request.session_id or "default",
+            bbox={
+                'x': request.bbox.x,
+                'y': request.bbox.y,
+                'width': request.bbox.width,
+                'height': request.bbox.height
             },
-            stability_ms=950
+            frame_width=request.frame_width,
+            frame_height=request.frame_height,
+            landmarks=request.landmarks
+        )
+        
+        # Extract stability_ms from metrics if present
+        stability_ms = result.get('metrics', {}).get('stable_duration_ms', 0)
+        
+        return FaceLockCheckResponse(
+            ok=result['ok'],
+            lock=result['lock'],
+            reasons=result.get('reasons', []),
+            thresholds=result.get('thresholds', {}),
+            stability_ms=stability_ms
         )
     except Exception as e:
         raise HTTPException(

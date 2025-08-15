@@ -25,7 +25,7 @@
       },
       {
         "text": "PHASE 5: PASSIVE PAD PRE-GATE\n\n**Explanations:** Implement `POST /face/pad/pre` endpoint using PAD (Presentation Attack Detection) detector with spoof heuristics including moiré pattern detection, flat texture analysis, and uniform glare detection. The system must block when score <0.70 or when spoof_high flag is triggered. Returns passive_score and spoof flags that must be respected by the UI.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 5`\n\nIMPORTANT NOTE: Images must be handled transiently with no persistence; all image data must be cleared from memory after processing.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 6: CHALLENGE SEQUENCER (VALIDATION)\n\n**Explanations:** Create `src/face/challenges.py` and implement `/face/challenge/script` endpoint (picks 2 actions with TTL ≤7s) and `/face/challenge/verify` endpoint (performs EAR/MAR/yaw/time checks). Each action must complete within ≤3.5s and system must cancel on pose or brightness breach.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 6`\n\nIMPORTANT NOTE: Deterministic outcomes with clear reasons are mandatory for all challenge verifications.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-15T18:43:31.816402+08:00"
+    "updated": "2025-08-15T18:50:36.139725+08:00"
   }
 ]
