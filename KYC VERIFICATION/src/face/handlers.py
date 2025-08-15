@@ -763,12 +763,25 @@ def handle_face_decision(
         track_event(EventType.DECISION_REVIEW, session_id,
                    {'reasons': decision_result['reasons']})
     
-    # Record metrics
+    # Record metrics for telemetry
     record_metric('face_decision_confidence', decision_result['confidence'])
     if match_score:
         record_metric('face_match_score', match_score)
     if passive_score:
         record_metric('face_passive_score', passive_score)
+    
+    # Record metrics for Prometheus
+    from .metrics_exporter import record_decision as record_prometheus_decision
+    from .metrics_exporter import record_match_score as record_prometheus_match
+    from .metrics_exporter import record_pad_result
+    
+    record_prometheus_decision(decision_result['decision'], decision_result['confidence'], decision_result['reasons'])
+    if match_score:
+        record_prometheus_match(match_score)
+    if passive_score:
+        # Assume genuine for now (would need ground truth in production)
+        detected_genuine = passive_score >= 0.70
+        record_pad_result(passive_score, is_genuine=True, detected_genuine=detected_genuine)
     
     logger.info(f"Face decision: session={session_id}, decision={decision_result['decision']}, confidence={decision_result['confidence']:.2f}")
     

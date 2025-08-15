@@ -45,7 +45,7 @@
       },
       {
         "text": "PHASE 10: TELEMETRY & /metrics\n\n**Explanations:** Implement `POST /face/telemetry` for tracking FACE_SEARCHING, FACE_LOCK, COUNTDOWN_START/STOP, BURST_START/END, CHALLENGE_ISSUED/PASSED/FAILED, LIVENESS_PASS/FAIL, MATCH_SCORE, CONSENSUS_OK, and FACE_DONE events. Create `/metrics` endpoint exposing time_to_lock_ms, cancel_rate, challenge_success_rate, median_match_score, and passive_pad_fmr/fnmr aggregates.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 10`\n\nIMPORTANT NOTE: Respect privacy requirements; no raw images in telemetry; aggregates only with device model if available.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 11: PRIVACY & WORM AUDIT\n\n**Explanations:** Enforce comprehensive privacy measures including no gallery storage, EXIF stripping, and redacted logs. Implement WORM (Write Once Read Many) audit snapshot system capturing thresholds used and decision rationale. Audit entries must be written with documented retention policy.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 11`\n\nIMPORTANT NOTE: Store policy snapshot and metrics only; no raw biometric data in audit logs.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-15T19:39:20.416980+08:00"
+    "updated": "2025-08-16T01:51:22.491989+08:00"
   }
 ]
