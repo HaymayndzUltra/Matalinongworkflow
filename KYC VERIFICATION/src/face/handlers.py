@@ -21,6 +21,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 
 import numpy as np
+from fastapi import HTTPException, status
 
 from .geometry import (
     BoundingBox,
@@ -40,6 +41,12 @@ from .telemetry import (
     EventType,
     EventSeverity,
     get_telemetry_collector
+)
+from .session_manager import (
+    get_session_manager,
+    StatusCode,
+    ReasonCode,
+    QUALITY_GATES
 )
 from ..config.threshold_manager import ThresholdManager
 
@@ -119,7 +126,9 @@ def handle_lock_check(
     frame_width: int,
     frame_height: int,
     landmarks: Optional[Dict[str, Tuple[float, float]]] = None,
-    gray_face_region: Optional[np.ndarray] = None
+    gray_face_region: Optional[np.ndarray] = None,
+    metrics: Optional[Dict[str, Any]] = None,
+    lock_token: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Handle /face/lock/check endpoint
@@ -141,18 +150,79 @@ def handle_lock_check(
         Response with lock status and feedback
     """
     start_time = time.time()
+    session_mgr = get_session_manager()
+    
+    # Check rate limit first
+    allowed, retry_after_ms = session_mgr.check_rate_limit(session_id)
+    if not allowed:
+        raise HTTPException(
+            status_code=StatusCode.TOO_MANY_REQUESTS,
+            detail={
+                'error': 'Rate limit exceeded',
+                'reason': 'RATE_LIMIT_EXCEEDED',
+                'retry_after_ms': retry_after_ms
+            }
+        )
+    
+    # Get enhanced session
+    session = session_mgr.get_or_create_session(session_id)
+    session.lock_attempt_count += 1
     
     # Track lock attempt
     track_event(EventType.LOCK_ATTEMPT, session_id)
     
-    # Get session
-    session = get_or_create_session(session_id)
+    # If lock_token provided, validate it
+    if lock_token:
+        valid, reason, retry_after = session_mgr.validate_lock_token(lock_token, session_id)
+        if not valid:
+            if reason == ReasonCode.COUNTDOWN_NOT_ELAPSED:
+                # Return 425 Too Early
+                response = {
+                    'ok': False,
+                    'error': 'Too early',
+                    'reason': reason,
+                    'retry_after_ms': retry_after
+                }
+                response['status_code'] = StatusCode.TOO_EARLY
+                return response
+            else:
+                raise HTTPException(
+                    status_code=StatusCode.BAD_REQUEST,
+                    detail={'error': 'Invalid token', 'reason': reason}
+                )
     
-    # Get thresholds
-    tm = ThresholdManager()
-    geometry_thresholds = tm.get_face_geometry_thresholds()
+    # Check timing gates (cooldown, anti-double capture)
+    status_code, reason, retry_after = session.check_timing_gates()
+    if status_code != StatusCode.OK:
+        if status_code == StatusCode.CONFLICT:
+            response = {
+                'ok': False,
+                'error': 'Timing conflict',
+                'reason': reason,
+                'retry_after_ms': retry_after
+            }
+            response['status_code'] = status_code
+            return response
     
-    # Convert bbox to BoundingBox
+    # Check quality gates if metrics provided
+    quality_ok = True
+    quality_reasons = []
+    
+    if metrics:
+        # Check hard quality gates
+        quality_ok, quality_reasons = session.check_quality_gates(metrics)
+        
+        # If quality gates fail, return immediately
+        if not quality_ok:
+            return {
+                'ok': False,
+                'lock': False,
+                'session_id': session.session_id,
+                'reasons': quality_reasons,
+                'metrics': metrics
+            }
+    
+    # Basic geometry checks (existing logic)
     face_bbox = BoundingBox(
         x=bbox['x'],
         y=bbox['y'],
@@ -160,65 +230,36 @@ def handle_lock_check(
         height=bbox['height']
     )
     
-    # Create dummy gray image if not provided (for testing)
-    if gray_face_region is None:
-        gray_face_region = np.random.randint(100, 200, (100, 100), dtype=np.uint8)
+    # Calculate fill ratio for ID check
+    fill_ratio = (face_bbox.width * face_bbox.height) / (frame_width * frame_height)
     
-    # Analyze geometry
-    geometry_result = analyze_face_geometry(
-        face_bbox=face_bbox,
-        frame_width=frame_width,
-        frame_height=frame_height,
-        gray_face_region=gray_face_region,
-        landmarks=landmarks,
-        thresholds={
-            'min_occupancy': geometry_thresholds['bbox_fill_min'],
-            'max_occupancy': 0.8,  # Fixed max
-            'centering_tolerance': geometry_thresholds['centering_tolerance'],
-            'max_pose_angle': geometry_thresholds['pose_max_angle'],
-            'brightness_mean_min': geometry_thresholds['brightness_mean_min'],
-            'brightness_mean_max': geometry_thresholds['brightness_mean_max'],
-            'brightness_p05_min': geometry_thresholds['brightness_p05_min'],
-            'brightness_p95_max': geometry_thresholds['brightness_p95_max'],
-            'min_sharpness': geometry_thresholds['tenengrad_min_640w']
+    # Check ID fill requirements (0.88-0.94)
+    if fill_ratio < QUALITY_GATES['id_fill_min'] or fill_ratio > QUALITY_GATES['id_fill_max']:
+        quality_reasons.append(ReasonCode.FILL_OUT_OF_RANGE)
+        quality_ok = False
+    
+    # Check ROI size
+    roi_pixels = int(face_bbox.width * face_bbox.height)
+    if roi_pixels < QUALITY_GATES['roi_min_px']:
+        quality_reasons.append(ReasonCode.ROI_TOO_SMALL)
+        quality_ok = False
+    
+    # If all quality checks pass, generate lock token
+    lock_token_response = {}
+    if quality_ok:
+        # Generate new lock token
+        new_token = session.generate_lock_token()
+        lock_token_response = {
+            'lock_token': new_token.token,
+            'not_before_ms': new_token.not_before_ms,
+            'expires_at': new_token.expires_at
         }
-    )
-    
-    # Format feedback
-    feedback = format_geometry_feedback(geometry_result)
-    
-    # Update stability tracker
-    current_time = time.time() * 1000  # Convert to milliseconds
-    session.stability_tracker.add_frame(current_time, face_bbox)
-    
-    # Check stability
-    stability_min_ms = geometry_thresholds['stability_min_ms']
-    is_stable, stable_duration = session.stability_tracker.calculate_stability(
-        window_ms=stability_min_ms
-    )
-    
-    # Determine lock status
-    geometry_ok = len(geometry_result.issues) == 0
-    lock_achieved = geometry_ok and is_stable
-    
-    if lock_achieved and session.lock_achieved_at is None:
-        session.lock_achieved_at = time.time()
-        track_event(EventType.LOCK_ACHIEVED, session_id, 
-                   {'stable_duration_ms': stable_duration})
-    elif not lock_achieved:
-        if session.lock_achieved_at is not None:
-            track_event(EventType.LOCK_LOST, session_id)
-        session.lock_achieved_at = None
         
-        # Track specific errors
-        if not geometry_ok:
-            for issue in geometry_result.issues:
-                if issue == QualityIssue.OFF_CENTER or issue == QualityIssue.FACE_TOO_SMALL:
-                    track_event(EventType.ERROR_GEOMETRY, session_id, 
-                               {'issue': issue.value}, EventSeverity.WARNING)
-                elif issue in [QualityIssue.TOO_DARK, QualityIssue.TOO_BRIGHT]:
-                    track_event(EventType.ERROR_BRIGHTNESS, session_id,
-                               {'issue': issue.value}, EventSeverity.WARNING)
+        # Mark lock achieved
+        session.lock_open_ts = time.time()
+        track_event(EventType.LOCK_ACHIEVED, session_id)
+        
+        logger.info(f"Lock achieved: session={session_id}, token={new_token.token[:8]}...")
     
     # Calculate response time
     response_time_ms = (time.time() - start_time) * 1000
@@ -226,28 +267,20 @@ def handle_lock_check(
     
     # Build response
     response = {
-        'ok': geometry_ok,
-        'lock': lock_achieved,
+        'ok': quality_ok,
+        'lock': quality_ok,
         'session_id': session.session_id,
-        'reasons': feedback['suggestions'] if not geometry_ok else [],
+        'reasons': quality_reasons if not quality_ok else [],
         'metrics': {
-            **feedback['metrics'],
-            'stable_duration_ms': stable_duration,
-            'response_time_ms': round(response_time_ms, 1)
+            'fill_ratio': round(fill_ratio, 3),
+            'roi_pixels': roi_pixels,
+            'response_time_ms': round(response_time_ms, 1),
+            **(metrics or {})
         },
-        'thresholds': {
-            'stability_min_ms': stability_min_ms,
-            'bbox_fill_min': geometry_thresholds['bbox_fill_min'],
-            'centering_tolerance': geometry_thresholds['centering_tolerance'],
-            'pose_max_angle': geometry_thresholds['pose_max_angle']
-        }
+        **lock_token_response  # Include token info if lock achieved
     }
     
-    # Add debug info if issues present
-    if geometry_result.issues:
-        response['issues'] = [issue.value for issue in geometry_result.issues]
-    
-    logger.info(f"Lock check: session={session_id}, lock={lock_achieved}, time={response_time_ms:.1f}ms")
+    logger.info(f"Lock check: session={session_id}, lock={quality_ok}, time={response_time_ms:.1f}ms")
     
     return response
 
@@ -685,74 +718,64 @@ def handle_burst_eval(
 # ============= DECISION ENDPOINT =============
 
 def handle_face_decision(
-    session_id: str
+    session_id: str,
+    passive_score: Optional[float] = None,
+    match_score: Optional[float] = None,
+    spoof_score: Optional[float] = None
 ) -> Dict[str, Any]:
     """
     Handle /face/decision endpoint
     
-    Makes final decision based on all collected data.
+    Makes final decision based on all collected data per AI spec.
     
     Args:
         session_id: Session identifier
+        passive_score: Passive liveness score
+        match_score: Face match score
+        spoof_score: Spoof detection score
     
     Returns:
         Final decision with confidence and reasons
     """
-    # Get session
-    session = get_or_create_session(session_id)
+    # Get enhanced session
+    session_mgr = get_session_manager()
+    session = session_mgr.get_or_create_session(session_id)
     
-    # Collect all signals
-    has_lock = session.lock_achieved_at is not None
-    pad_passed = any(score >= 0.7 for score in session.pad_scores) if session.pad_scores else False
-    challenge_passed = session.challenge_completed
-    has_burst = len(session.burst_frames) > 0
+    # Update scores if provided
+    if passive_score is not None:
+        session.passive_score = passive_score
+    if match_score is not None:
+        session.match_score = match_score
+    if spoof_score is not None:
+        session.spoof_score = spoof_score
     
-    # Calculate overall confidence
-    confidence_factors = []
-    if has_lock:
-        confidence_factors.append(0.25)
-    if pad_passed:
-        confidence_factors.append(0.35)
-    if challenge_passed:
-        confidence_factors.append(0.25)
-    if has_burst:
-        confidence_factors.append(0.15)
+    # Make decision using enhanced logic
+    decision_result = session.make_decision()
     
-    confidence = sum(confidence_factors)
+    # Track decision event
+    if decision_result['decision'] == 'approve_face':
+        track_event(EventType.DECISION_APPROVED, session_id, 
+                   {'confidence': decision_result['confidence']})
+    elif decision_result['decision'] == 'deny_face':
+        track_event(EventType.DECISION_REJECTED, session_id,
+                   {'reasons': decision_result['reasons']})
+    else:  # review_face
+        track_event(EventType.DECISION_REVIEW, session_id,
+                   {'reasons': decision_result['reasons']})
     
-    # Make decision
-    min_confidence = 0.6
-    decision = 'approved' if confidence >= min_confidence else 'rejected'
+    # Record metrics
+    record_metric('face_decision_confidence', decision_result['confidence'])
+    if match_score:
+        record_metric('face_match_score', match_score)
+    if passive_score:
+        record_metric('face_passive_score', passive_score)
     
-    # Generate reasons
-    reasons = []
-    if not has_lock:
-        reasons.append("Face lock not achieved")
-    if not pad_passed:
-        reasons.append("Passive liveness check failed")
-    if not challenge_passed:
-        reasons.append("Challenge verification incomplete")
-    
-    if not reasons and decision == 'approved':
-        reasons.append("All verification checks passed")
-    
-    # Store decision
-    session.decision = decision
-    
-    logger.info(f"Face decision: session={session_id}, decision={decision}, confidence={confidence:.2f}")
+    logger.info(f"Face decision: session={session_id}, decision={decision_result['decision']}, confidence={decision_result['confidence']:.2f}")
     
     return {
         'ok': True,
         'session_id': session.session_id,
-        'decision': decision,
-        'confidence': round(confidence, 2),
-        'reasons': reasons,
-        'signals': {
-            'lock_achieved': has_lock,
-            'pad_passed': pad_passed,
-            'challenge_completed': challenge_passed,
-            'burst_captured': has_burst
-        },
+        **decision_result,
         'timestamp': datetime.utcnow().isoformat()
     }
 
