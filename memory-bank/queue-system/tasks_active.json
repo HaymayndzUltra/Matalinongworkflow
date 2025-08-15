@@ -5,7 +5,7 @@
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:** This phase establishes the foundational understanding and constraints for the backend-only face scan implementation. We will set up the development environment, review all protocol directives, and ensure we understand the scope constraints: backend-only modifications, no edits to `src/web/mobile_kyc.html`, creation/modification limited to specific modules (`src/api/app.py`, `src/api/contracts.py`, `src/config/threshold_manager.py`, and new `src/face/*` modules). We'll also review privacy requirements (no raw PII/images in logs unless DEBUG explicitly enabled) and CORS/HTTPS exposure requirements.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 0`\n\nIMPORTANT NOTE: Backend-only edits are enforced; feature flags are allowed; all phase gates must pass before proceeding to next phase. Documentation must be created for post-review/pre-analysis stages.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 1: CONTRACTS & STATIC MOUNT SCAFFOLDING\n\n**Explanations:** In this phase, we add Pydantic models for face scan APIs, define all necessary contracts for the face scanning endpoints, and mount the `/web` path for static file serving without making any UI changes. This establishes the API structure and ensures OpenAPI documentation properly exposes the new endpoints.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 1`\n\nIMPORTANT NOTE: No breaking changes to existing endpoints are permitted. All new contracts must compile successfully and OpenAPI must properly expose all new endpoints.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-01-16T14:30:00+08:00"
+    "updated": "2025-08-15T18:10:24.009374+08:00"
   }
 ]
