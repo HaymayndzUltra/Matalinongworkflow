@@ -17,7 +17,7 @@
       },
       {
         "text": "PHASE 3: GEOMETRY & GATING LIBRARY\n\n**Explanations:** Create `src/face/geometry.py` containing pure functions for occupancy calculation, centering evaluation, pose assessment, brightness analysis, Tenengrad sharpness computation, and stability measurements. All functions must provide reasoned failures with deterministic outputs and comprehensive unit tests.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 3`\n\nIMPORTANT NOTE: No I/O side effects are allowed in any geometry functions. All functions must be pure with deterministic outputs.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 4: /face/lock/check ENDPOINT\n\n**Explanations:** Implement the `/face/lock/check` endpoint that evaluates lock conditions using geometry calculations and thresholds. The endpoint must require continuous pass for at least 900ms (UI runs 600ms countdown after lock). Response format must include {ok, lock, reasons[], thresholds{}} with performance target of ≤20ms typical response time.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 4`\n\nIMPORTANT NOTE: No images are accepted by this endpoint; implementation must be rate limit safe.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-15T18:29:49.625998+08:00"
+    "updated": "2025-08-15T18:36:15.368822+08:00"
   }
 ]
