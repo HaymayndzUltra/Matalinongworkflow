@@ -9,7 +9,7 @@
       },
       {
         "text": "PHASE 1: CONTRACTS & STATIC MOUNT SCAFFOLDING\n\n**Explanations:** In this phase, we add Pydantic models for face scan APIs, define all necessary contracts for the face scanning endpoints, and mount the `/web` path for static file serving without making any UI changes. This establishes the API structure and ensures OpenAPI documentation properly exposes the new endpoints.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 1`\n\nIMPORTANT NOTE: No breaking changes to existing endpoints are permitted. All new contracts must compile successfully and OpenAPI must properly expose all new endpoints.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 2: THRESHOLD MANAGER (STRICT FACE GATES)\n\n**Explanations:** Implementation of the threshold management system with strict face gates. We'll add comprehensive thresholds including bbox_fill, centering, pose, Tenengrad@640w, brightness (mean/p05/p95), stability milliseconds, PAD minimum, burst caps, and match thresholds. All values must be validated and environment overrides must be properly documented.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 2`\n\nIMPORTANT NOTE: Explicit names are required for all thresholds; validation and bounds must be strictly enforced with no exceptions.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-15T18:10:24.009374+08:00"
+    "updated": "2025-08-15T18:23:17.084900+08:00"
   }
 ]

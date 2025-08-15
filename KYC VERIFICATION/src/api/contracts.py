@@ -438,15 +438,15 @@ class MetricsResponse(BaseModel):
 
 # ============= Complete KYC Flow Request/Response =============
 class CompleteKYCRequest(BaseModel):
-    """Complete KYC verification request (combines all steps)"""
-    image_base64: str = Field(..., description="Base64 encoded document image")
-    back_image_base64: Optional[str] = Field(None, description="Base64 encoded back side image")
-    selfie_base64: Optional[str] = Field(None, description="Base64 encoded selfie for face match")
-    liveness_results: Optional[Dict[str, Any]] = Field(None, description="Client-side active liveness challenge results")
+    """Complete KYC verification request (all-in-one)"""
+    image_base64: str = Field(..., description="Front document image (base64)")
+    back_image_base64: Optional[str] = Field(None, description="Back document image (base64)")
+    selfie_base64: Optional[str] = Field(None, description="Selfie image (base64)")
+    liveness_results: Optional[Dict[str, Any]] = Field(None, description="Liveness check results")
     document_type: Optional[DocumentType] = Field(None, description="Expected document type")
-    personal_info: Optional[Dict[str, Any]] = Field(None, description="Personal info for verification")
-    device_info: Optional[Dict[str, Any]] = Field(None, description="Device intelligence data")
-    session_id: str = Field(..., description="Session ID for tracking")
+    personal_info: Optional[Dict[str, Any]] = Field(None, description="Personal information")
+    device_info: Optional[Dict[str, Any]] = Field(None, description="Device information")
+    session_id: Optional[str] = Field(None, description="Session ID")
     
     class Config:
         schema_extra = {
@@ -454,7 +454,7 @@ class CompleteKYCRequest(BaseModel):
                 "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
                 "back_image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
                 "selfie_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
-                "liveness_results": {"head_turn": true, "blink_or_nod": true, "details": {"focus_avg": 12.3}},  # type: ignore[reportGeneralTypeIssues]
+                "liveness_results": {"head_turn": True, "blink_or_nod": True, "details": {"focus_avg": 12.3}},  # type: ignore[reportGeneralTypeIssues]
                 "document_type": "PHILIPPINE_ID",
                 "personal_info": {
                     "full_name": "JUAN DELA CRUZ",
@@ -466,6 +466,414 @@ class CompleteKYCRequest(BaseModel):
                     "device_id": "dev_123"
                 },
                 "session_id": "sess_abc123"
+            }
+        }
+
+
+# ============= Face Scan Endpoints =============
+class FaceLockCheckRequest(BaseModel):
+    """Request for face lock detection"""
+    session_id: str = Field(..., description="Session identifier")
+    frame_metadata: Dict[str, Any] = Field(..., description="Frame metadata (dimensions, face bbox, etc)")
+    timestamp_ms: int = Field(..., description="Client timestamp in milliseconds")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "frame_metadata": {
+                    "width": 640,
+                    "height": 480,
+                    "face_bbox": {"x": 200, "y": 150, "width": 240, "height": 280},
+                    "brightness": {"mean": 128, "p05": 45, "p95": 210},
+                    "sharpness": 0.85
+                },
+                "timestamp_ms": 1642345678901
+            }
+        }
+
+
+class FaceLockCheckResponse(BaseModel):
+    """Response for face lock detection"""
+    ok: bool = Field(..., description="Whether face position is acceptable")
+    lock: bool = Field(..., description="Whether face lock is achieved (stable for required duration)")
+    reasons: List[str] = Field(default_factory=list, description="Reasons for not achieving lock")
+    thresholds: Dict[str, Any] = Field(..., description="Applied thresholds")
+    stability_ms: int = Field(..., description="Current stability duration in milliseconds")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "ok": True,
+                "lock": True,
+                "reasons": [],
+                "thresholds": {
+                    "bbox_fill_min": 0.3,
+                    "centering_tolerance": 0.15,
+                    "stability_min_ms": 900
+                },
+                "stability_ms": 950
+            }
+        }
+
+
+class FacePADPreGateRequest(BaseModel):
+    """Request for passive PAD pre-gate check"""
+    session_id: str = Field(..., description="Session identifier")
+    image_base64: str = Field(..., description="Face image in base64")
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional metadata")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+                "metadata": {"device_id": "dev_123", "capture_source": "front_camera"}
+            }
+        }
+
+
+class FacePADPreGateResponse(BaseModel):
+    """Response for passive PAD pre-gate check"""
+    passive_score: float = Field(..., description="Passive liveness score (0-1)")
+    spoof_detected: bool = Field(..., description="Whether spoofing is detected")
+    spoof_type: Optional[str] = Field(None, description="Type of spoof detected if any")
+    flags: Dict[str, bool] = Field(..., description="Specific spoof detection flags")
+    confidence: float = Field(..., description="Overall confidence in the assessment")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "passive_score": 0.92,
+                "spoof_detected": False,
+                "spoof_type": None,
+                "flags": {
+                    "moire_pattern": False,
+                    "flat_texture": False,
+                    "uniform_glare": False,
+                    "screen_detected": False
+                },
+                "confidence": 0.95
+            }
+        }
+
+
+class FaceChallengeScriptRequest(BaseModel):
+    """Request for challenge script generation"""
+    session_id: str = Field(..., description="Session identifier")
+    challenge_count: Optional[int] = Field(2, description="Number of challenges to generate")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "challenge_count": 2
+            }
+        }
+
+
+class FaceChallengeAction(BaseModel):
+    """Individual challenge action"""
+    action_id: str = Field(..., description="Unique action identifier")
+    action_type: str = Field(..., description="Type of action (blink, smile, turn_left, turn_right, nod)")
+    instruction: str = Field(..., description="Human-readable instruction")
+    timeout_ms: int = Field(..., description="Maximum time allowed for this action")
+    validation_params: Dict[str, Any] = Field(..., description="Parameters for validating this action")
+
+
+class FaceChallengeScriptResponse(BaseModel):
+    """Response with challenge script"""
+    session_id: str = Field(..., description="Session identifier")
+    challenge_id: str = Field(..., description="Unique challenge identifier")
+    actions: List[FaceChallengeAction] = Field(..., description="Ordered list of actions to perform")
+    total_timeout_ms: int = Field(..., description="Total timeout for all actions")
+    expires_at: datetime = Field(..., description="When this challenge expires")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "challenge_id": "chal_xyz789",
+                "actions": [
+                    {
+                        "action_id": "act_1",
+                        "action_type": "blink",
+                        "instruction": "Please blink your eyes",
+                        "timeout_ms": 3500,
+                        "validation_params": {"ear_threshold": 0.2, "min_duration_ms": 100}
+                    },
+                    {
+                        "action_id": "act_2",
+                        "action_type": "turn_left",
+                        "instruction": "Please turn your head to the left",
+                        "timeout_ms": 3500,
+                        "validation_params": {"yaw_threshold": -30, "tolerance": 5}
+                    }
+                ],
+                "total_timeout_ms": 7000,
+                "expires_at": "2025-01-16T14:30:07+08:00"
+            }
+        }
+
+
+class FaceChallengeVerifyRequest(BaseModel):
+    """Request to verify challenge completion"""
+    session_id: str = Field(..., description="Session identifier")
+    challenge_id: str = Field(..., description="Challenge identifier from script")
+    action_results: List[Dict[str, Any]] = Field(..., description="Results for each action")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "challenge_id": "chal_xyz789",
+                "action_results": [
+                    {
+                        "action_id": "act_1",
+                        "completed": True,
+                        "metrics": {"ear_min": 0.15, "duration_ms": 150},
+                        "timestamp_ms": 1642345678901
+                    },
+                    {
+                        "action_id": "act_2",
+                        "completed": True,
+                        "metrics": {"yaw_angle": -32.5},
+                        "timestamp_ms": 1642345682401
+                    }
+                ]
+            }
+        }
+
+
+class FaceChallengeVerifyResponse(BaseModel):
+    """Response for challenge verification"""
+    verified: bool = Field(..., description="Whether all challenges passed")
+    challenge_results: List[Dict[str, Any]] = Field(..., description="Detailed results per action")
+    overall_score: float = Field(..., description="Overall challenge completion score (0-1)")
+    reasons: List[str] = Field(default_factory=list, description="Reasons for failure if any")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "verified": True,
+                "challenge_results": [
+                    {"action_id": "act_1", "passed": True, "score": 0.95},
+                    {"action_id": "act_2", "passed": True, "score": 0.88}
+                ],
+                "overall_score": 0.915,
+                "reasons": []
+            }
+        }
+
+
+class FaceBurstUploadRequest(BaseModel):
+    """Request for burst frame upload"""
+    session_id: str = Field(..., description="Session identifier")
+    frames: List[str] = Field(..., description="List of base64 encoded frames")
+    capture_duration_ms: int = Field(..., description="Total capture duration")
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Capture metadata")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "frames": [
+                    "data:image/jpeg;base64,/9j/4AAQSkZJRg...",
+                    "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+                ],
+                "capture_duration_ms": 3200,
+                "metadata": {"fps": 30, "resolution": "640x480"}
+            }
+        }
+
+
+class FaceBurstUploadResponse(BaseModel):
+    """Response for burst upload"""
+    session_id: str = Field(..., description="Session identifier")
+    burst_id: str = Field(..., description="Unique burst identifier")
+    frames_received: int = Field(..., description="Number of frames received")
+    frames_accepted: int = Field(..., description="Number of frames accepted after validation")
+    ready_for_eval: bool = Field(..., description="Whether burst is ready for evaluation")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "burst_id": "burst_def456",
+                "frames_received": 24,
+                "frames_accepted": 22,
+                "ready_for_eval": True
+            }
+        }
+
+
+class FaceBurstEvalRequest(BaseModel):
+    """Request for burst evaluation"""
+    session_id: str = Field(..., description="Session identifier")
+    burst_id: str = Field(..., description="Burst identifier from upload")
+    reference_image_base64: str = Field(..., description="Reference ID photo for matching")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "burst_id": "burst_def456",
+                "reference_image_base64": "data:image/jpeg;base64,/9j/4AAQSkZJRg..."
+            }
+        }
+
+
+class FaceBurstEvalResponse(BaseModel):
+    """Response for burst evaluation"""
+    match_score: float = Field(..., description="Overall match score (0-1)")
+    consensus_ok: bool = Field(..., description="Whether consensus criteria are met")
+    frames_used: int = Field(..., description="Number of frames used in evaluation")
+    topk_scores: List[float] = Field(..., description="Top-k individual frame scores")
+    median_score: float = Field(..., description="Median of top-k scores")
+    min_score: float = Field(..., description="Minimum score in top-k")
+    confidence: float = Field(..., description="Confidence in the evaluation")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "match_score": 0.68,
+                "consensus_ok": True,
+                "frames_used": 5,
+                "topk_scores": [0.72, 0.70, 0.68, 0.65, 0.63],
+                "median_score": 0.68,
+                "min_score": 0.63,
+                "confidence": 0.92
+            }
+        }
+
+
+class FaceDecisionRequest(BaseModel):
+    """Request for face verification decision"""
+    session_id: str = Field(..., description="Session identifier")
+    passive_score: float = Field(..., description="Passive PAD score")
+    challenges_passed: bool = Field(..., description="Whether challenges were passed")
+    consensus_ok: bool = Field(..., description="Whether consensus criteria met")
+    match_score: float = Field(..., description="Biometric match score")
+    metadata: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Additional context")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "passive_score": 0.85,
+                "challenges_passed": True,
+                "consensus_ok": True,
+                "match_score": 0.68,
+                "metadata": {"device_trust_score": 0.9}
+            }
+        }
+
+
+class FaceDecisionResponse(BaseModel):
+    """Response with face verification decision"""
+    decision: DecisionType = Field(..., description="Final decision")
+    reasons: List[str] = Field(..., description="Human-readable reasons for decision")
+    policy_version: str = Field(..., description="Policy version used")
+    thresholds_applied: Dict[str, Any] = Field(..., description="Thresholds used in decision")
+    risk_indicators: List[str] = Field(default_factory=list, description="Risk indicators if any")
+    confidence: float = Field(..., description="Confidence in decision")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "decision": "approve",
+                "reasons": ["All biometric checks passed", "High confidence match"],
+                "policy_version": "1.0.0",
+                "thresholds_applied": {
+                    "pad_min": 0.70,
+                    "match_min": 0.62,
+                    "consensus_frames_min": 3
+                },
+                "risk_indicators": [],
+                "confidence": 0.94
+            }
+        }
+
+
+class FaceTelemetryEvent(BaseModel):
+    """Face scan telemetry event"""
+    session_id: str = Field(..., description="Session identifier")
+    event_type: str = Field(..., description="Event type")
+    timestamp_ms: int = Field(..., description="Event timestamp in milliseconds")
+    data: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Event-specific data")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "session_id": "sess_abc123",
+                "event_type": "FACE_LOCK",
+                "timestamp_ms": 1642345678901,
+                "data": {"lock_time_ms": 1250, "attempts": 2}
+            }
+        }
+
+
+class FaceTelemetryRequest(BaseModel):
+    """Request to submit telemetry events"""
+    events: List[FaceTelemetryEvent] = Field(..., description="List of telemetry events")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "events": [
+                    {
+                        "session_id": "sess_abc123",
+                        "event_type": "FACE_SEARCHING",
+                        "timestamp_ms": 1642345677651,
+                        "data": {}
+                    },
+                    {
+                        "session_id": "sess_abc123",
+                        "event_type": "FACE_LOCK",
+                        "timestamp_ms": 1642345678901,
+                        "data": {"lock_time_ms": 1250}
+                    }
+                ]
+            }
+        }
+
+
+class FaceTelemetryResponse(BaseModel):
+    """Response for telemetry submission"""
+    received: int = Field(..., description="Number of events received")
+    processed: int = Field(..., description="Number of events processed")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "received": 2,
+                "processed": 2
+            }
+        }
+
+
+class FaceMetricsResponse(BaseModel):
+    """Face scan metrics response"""
+    time_to_lock_ms: Dict[str, float] = Field(..., description="Time to lock statistics")
+    cancel_rate: float = Field(..., description="Session cancellation rate")
+    challenge_success_rate: float = Field(..., description="Challenge completion rate")
+    median_match_score: float = Field(..., description="Median biometric match score")
+    passive_pad_fmr: float = Field(..., description="PAD False Match Rate")
+    passive_pad_fnmr: float = Field(..., description="PAD False Non-Match Rate")
+    total_sessions: int = Field(..., description="Total face scan sessions")
+    successful_sessions: int = Field(..., description="Successfully completed sessions")
+    
+    class Config:
+        schema_extra = {
+            "example": {
+                "time_to_lock_ms": {"p50": 1150, "p95": 2300, "p99": 2850},
+                "cancel_rate": 0.12,
+                "challenge_success_rate": 0.96,
+                "median_match_score": 0.71,
+                "passive_pad_fmr": 0.008,
+                "passive_pad_fnmr": 0.025,
+                "total_sessions": 10000,
+                "successful_sessions": 8800
             }
         }
 

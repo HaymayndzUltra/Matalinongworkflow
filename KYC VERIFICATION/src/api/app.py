@@ -7,13 +7,19 @@ import os
 import time
 import base64
 import json
+import logging
 from typing import Optional, Dict, Any, List
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 from fastapi import FastAPI, HTTPException, status, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse, Response, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 
 from .metrics import (
@@ -43,6 +49,16 @@ from .contracts import (
     CompleteKYCRequest, CompleteKYCResponse,
     HealthResponse, ReadyResponse, MetricsResponse,
     ErrorResponse,
+    # Face Scan models
+    FaceLockCheckRequest, FaceLockCheckResponse,
+    FacePADPreGateRequest, FacePADPreGateResponse,
+    FaceChallengeScriptRequest, FaceChallengeScriptResponse, FaceChallengeAction,
+    FaceChallengeVerifyRequest, FaceChallengeVerifyResponse,
+    FaceBurstUploadRequest, FaceBurstUploadResponse,
+    FaceBurstEvalRequest, FaceBurstEvalResponse,
+    FaceDecisionRequest, FaceDecisionResponse,
+    FaceTelemetryRequest, FaceTelemetryResponse, FaceTelemetryEvent,
+    FaceMetricsResponse,
     # Enums
     DocumentType, DecisionType, RiskLevel, HealthStatus
 )
@@ -147,6 +163,12 @@ def get_application() -> FastAPI:
         allow_headers=["*"],
     )
     
+    # Mount static files directory for /web path (if it exists)
+    static_dir = Path("/workspace/KYC VERIFICATION/src/web")
+    if static_dir.exists():
+        app.mount("/web", StaticFiles(directory=str(static_dir)), name="static")
+        logger.info(f"Mounted static files from {static_dir} at /web")
+    
     # Add request ID middleware
     @app.middleware("http")
     async def add_request_id(request: Request, call_next):
@@ -187,15 +209,7 @@ def get_application() -> FastAPI:
         # Disable background TaskGroup loop to avoid TaskGroup exceptions in /metrics
         # Drift and fairness gauges will be updated lazily elsewhere if needed.
      
-    # Static files: minimal mobile capture page served under /web
-    from fastapi.staticfiles import StaticFiles
-    web_dir = Path(__file__).resolve().parent.parent / "web"
-    try:
-        web_dir.mkdir(parents=True, exist_ok=True)
-    except Exception:
-        pass
-    if web_dir.exists():
-        app.mount("/web", StaticFiles(directory=str(web_dir), html=True), name="web")
+    # Static files are already mounted above at line 161-165
 
     return app
 
@@ -1110,6 +1124,297 @@ async def complete_kyc_verification(request: CompleteKYCRequest):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": str(e), "error_code": "COMPLETE_FLOW_ERROR"}
+        )
+
+
+# ============= Face Scan Endpoints =============
+
+@app.post("/face/lock/check", response_model=FaceLockCheckResponse)
+async def check_face_lock(request: FaceLockCheckRequest):
+    """
+    Check if face position meets lock criteria
+    
+    This endpoint evaluates face position without processing images.
+    It checks geometry, centering, pose, brightness, and stability.
+    """
+    try:
+        # TODO: Implement actual face lock logic in Phase 4
+        # For now, return mock response showing successful lock
+        return FaceLockCheckResponse(
+            ok=True,
+            lock=True,
+            reasons=[],
+            thresholds={
+                "bbox_fill_min": 0.3,
+                "centering_tolerance": 0.15,
+                "stability_min_ms": 900
+            },
+            stability_ms=950
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "FACE_LOCK_ERROR"}
+        )
+
+
+@app.post("/face/pad/pre", response_model=FacePADPreGateResponse)
+async def check_pad_pregate(request: FacePADPreGateRequest):
+    """
+    Passive PAD (Presentation Attack Detection) pre-gate check
+    
+    Analyzes a single face image for spoofing indicators.
+    """
+    try:
+        # TODO: Implement actual PAD logic in Phase 5
+        # For now, return mock response showing no spoof detected
+        return FacePADPreGateResponse(
+            passive_score=0.92,
+            spoof_detected=False,
+            spoof_type=None,
+            flags={
+                "moire_pattern": False,
+                "flat_texture": False,
+                "uniform_glare": False,
+                "screen_detected": False
+            },
+            confidence=0.95
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "PAD_CHECK_ERROR"}
+        )
+
+
+@app.post("/face/challenge/script", response_model=FaceChallengeScriptResponse)
+async def generate_challenge_script(request: FaceChallengeScriptRequest):
+    """
+    Generate a liveness challenge script
+    
+    Creates a sequence of actions for the user to perform.
+    """
+    try:
+        # TODO: Implement actual challenge generation in Phase 6
+        # For now, return mock challenge script
+        from datetime import timedelta
+        expires_at = datetime.now(timezone.utc) + timedelta(seconds=7)
+        
+        return FaceChallengeScriptResponse(
+            session_id=request.session_id,
+            challenge_id=f"chal_{int(time.time())}",
+            actions=[
+                FaceChallengeAction(
+                    action_id="act_1",
+                    action_type="blink",
+                    instruction="Please blink your eyes",
+                    timeout_ms=3500,
+                    validation_params={"ear_threshold": 0.2, "min_duration_ms": 100}
+                ),
+                FaceChallengeAction(
+                    action_id="act_2",
+                    action_type="turn_left",
+                    instruction="Please turn your head to the left",
+                    timeout_ms=3500,
+                    validation_params={"yaw_threshold": -30, "tolerance": 5}
+                )
+            ],
+            total_timeout_ms=7000,
+            expires_at=expires_at
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "CHALLENGE_GENERATION_ERROR"}
+        )
+
+
+@app.post("/face/challenge/verify", response_model=FaceChallengeVerifyResponse)
+async def verify_challenge(request: FaceChallengeVerifyRequest):
+    """
+    Verify challenge completion
+    
+    Validates that the user completed the challenge actions correctly.
+    """
+    try:
+        # TODO: Implement actual challenge verification in Phase 6
+        # For now, return mock verification result
+        return FaceChallengeVerifyResponse(
+            verified=True,
+            challenge_results=[
+                {"action_id": "act_1", "passed": True, "score": 0.95},
+                {"action_id": "act_2", "passed": True, "score": 0.88}
+            ],
+            overall_score=0.915,
+            reasons=[]
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "CHALLENGE_VERIFICATION_ERROR"}
+        )
+
+
+@app.post("/face/burst/upload", response_model=FaceBurstUploadResponse)
+async def upload_burst(request: FaceBurstUploadRequest):
+    """
+    Upload burst of face frames
+    
+    Receives multiple frames captured in quick succession.
+    Frames are stored transiently and auto-deleted after processing.
+    """
+    try:
+        # TODO: Implement actual burst upload in Phase 7
+        # For now, return mock upload response
+        frames_received = len(request.frames)
+        frames_accepted = max(0, frames_received - 2)  # Simulate some frames rejected
+        
+        return FaceBurstUploadResponse(
+            session_id=request.session_id,
+            burst_id=f"burst_{int(time.time())}",
+            frames_received=frames_received,
+            frames_accepted=frames_accepted,
+            ready_for_eval=frames_accepted >= 5
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "BURST_UPLOAD_ERROR"}
+        )
+
+
+@app.post("/face/burst/eval", response_model=FaceBurstEvalResponse)
+async def evaluate_burst(request: FaceBurstEvalRequest):
+    """
+    Evaluate burst frames for consensus
+    
+    Analyzes uploaded frames for quality and biometric matching.
+    """
+    try:
+        # TODO: Implement actual burst evaluation in Phase 8
+        # For now, return mock evaluation result
+        return FaceBurstEvalResponse(
+            match_score=0.68,
+            consensus_ok=True,
+            frames_used=5,
+            topk_scores=[0.72, 0.70, 0.68, 0.65, 0.63],
+            median_score=0.68,
+            min_score=0.63,
+            confidence=0.92
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "BURST_EVALUATION_ERROR"}
+        )
+
+
+@app.post("/face/decision", response_model=FaceDecisionResponse)
+async def make_face_decision(request: FaceDecisionRequest):
+    """
+    Make final face verification decision
+    
+    Combines all face scan signals to produce approve/review/deny decision.
+    """
+    try:
+        # TODO: Implement actual decision logic in Phase 9
+        # For now, implement basic decision logic
+        decision = DecisionType.DENY
+        reasons = []
+        risk_indicators = []
+        
+        if request.passive_score < 0.70:
+            reasons.append("Passive liveness score too low")
+            risk_indicators.append("LOW_LIVENESS_SCORE")
+        
+        if not request.challenges_passed:
+            reasons.append("Liveness challenges not passed")
+            risk_indicators.append("CHALLENGE_FAILURE")
+        
+        if not request.consensus_ok:
+            reasons.append("Consensus criteria not met")
+            risk_indicators.append("CONSENSUS_FAILURE")
+        
+        if request.match_score < 0.62:
+            reasons.append("Biometric match score too low")
+            risk_indicators.append("LOW_MATCH_SCORE")
+        
+        if len(reasons) == 0:
+            decision = DecisionType.APPROVE
+            reasons = ["All biometric checks passed", "High confidence match"]
+        elif len(reasons) <= 1:
+            decision = DecisionType.REVIEW
+        
+        return FaceDecisionResponse(
+            decision=decision,
+            reasons=reasons,
+            policy_version="1.0.0",
+            thresholds_applied={
+                "pad_min": 0.70,
+                "match_min": 0.62,
+                "consensus_frames_min": 3
+            },
+            risk_indicators=risk_indicators,
+            confidence=0.94 if decision == DecisionType.APPROVE else 0.60
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "FACE_DECISION_ERROR"}
+        )
+
+
+@app.post("/face/telemetry", response_model=FaceTelemetryResponse)
+async def submit_telemetry(request: FaceTelemetryRequest):
+    """
+    Submit face scan telemetry events
+    
+    Records events for monitoring and analytics.
+    """
+    try:
+        # TODO: Implement actual telemetry storage in Phase 10
+        # For now, just acknowledge receipt
+        events_received = len(request.events)
+        
+        # Log events (in production, would store in time-series DB)
+        for event in request.events:
+            logger.info(f"Face telemetry: {event.event_type} at {event.timestamp_ms}")
+        
+        return FaceTelemetryResponse(
+            received=events_received,
+            processed=events_received
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "TELEMETRY_ERROR"}
+        )
+
+
+@app.get("/face/metrics", response_model=FaceMetricsResponse)
+async def get_face_metrics():
+    """
+    Get aggregated face scan metrics
+    
+    Returns performance and quality metrics for face scanning.
+    """
+    try:
+        # TODO: Implement actual metrics aggregation in Phase 10
+        # For now, return mock metrics
+        return FaceMetricsResponse(
+            time_to_lock_ms={"p50": 1150, "p95": 2300, "p99": 2850},
+            cancel_rate=0.12,
+            challenge_success_rate=0.96,
+            median_match_score=0.71,
+            passive_pad_fmr=0.008,
+            passive_pad_fnmr=0.025,
+            total_sessions=10000,
+            successful_sessions=8800
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "METRICS_ERROR"}
         )
 
 

@@ -45,6 +45,7 @@ class ThresholdCategory(Enum):
     QUALITY = "quality"
     OPERATIONAL = "operational"
     BUILD = "build"
+    FACE = "face"  # Added for face scan thresholds
 
 
 @dataclass
@@ -136,6 +137,78 @@ class ThresholdManager:
             # Operational
             ThresholdConfig("rate_limit_per_minute", ThresholdCategory.OPERATIONAL, 1000, 10, 10000, "requests",
                           "API rate limit", "RATE_LIMIT_PER_MINUTE"),
+            
+            # Face Scan - Geometry Thresholds
+            ThresholdConfig("face_bbox_fill_min", ThresholdCategory.FACE, 0.3, 0.1, 0.8, "ratio",
+                          "Minimum face bounding box fill ratio", "FACE_BBOX_FILL_MIN"),
+            ThresholdConfig("face_centering_tolerance", ThresholdCategory.FACE, 0.15, 0.05, 0.3, "ratio",
+                          "Maximum deviation from center", "FACE_CENTERING_TOLERANCE"),
+            ThresholdConfig("face_pose_max_angle", ThresholdCategory.FACE, 30, 10, 45, "degrees",
+                          "Maximum allowed pose angles (yaw/pitch/roll)", "FACE_POSE_MAX_ANGLE"),
+            ThresholdConfig("face_tenengrad_min_640w", ThresholdCategory.FACE, 500, 100, 2000, "score",
+                          "Minimum sharpness at 640px width", "FACE_TENENGRAD_MIN_640W"),
+            ThresholdConfig("face_brightness_mean_min", ThresholdCategory.FACE, 60, 0, 255, "intensity",
+                          "Minimum acceptable brightness mean", "FACE_BRIGHTNESS_MEAN_MIN"),
+            ThresholdConfig("face_brightness_mean_max", ThresholdCategory.FACE, 200, 0, 255, "intensity",
+                          "Maximum acceptable brightness mean", "FACE_BRIGHTNESS_MEAN_MAX"),
+            ThresholdConfig("face_brightness_p05_min", ThresholdCategory.FACE, 20, 0, 255, "intensity",
+                          "5th percentile brightness minimum", "FACE_BRIGHTNESS_P05_MIN"),
+            ThresholdConfig("face_brightness_p95_max", ThresholdCategory.FACE, 235, 0, 255, "intensity",
+                          "95th percentile brightness maximum", "FACE_BRIGHTNESS_P95_MAX"),
+            ThresholdConfig("face_stability_min_ms", ThresholdCategory.FACE, 900, 500, 2000, "ms",
+                          "Minimum stable detection duration", "FACE_STABILITY_MIN_MS"),
+            
+            # Face Scan - PAD Thresholds
+            ThresholdConfig("face_pad_score_min", ThresholdCategory.FACE, 0.70, 0.5, 1.0, "score",
+                          "Minimum passive liveness score", "FACE_PAD_SCORE_MIN"),
+            ThresholdConfig("face_pad_spoof_threshold", ThresholdCategory.FACE, 0.30, 0.1, 0.5, "score",
+                          "Spoof detection threshold", "FACE_PAD_SPOOF_THRESHOLD"),
+            ThresholdConfig("face_pad_fmr_target", ThresholdCategory.FACE, 0.01, 0.001, 0.05, "ratio",
+                          "PAD False Match Rate target", "FACE_PAD_FMR_TARGET"),
+            ThresholdConfig("face_pad_fnmr_target", ThresholdCategory.FACE, 0.03, 0.01, 0.1, "ratio",
+                          "PAD False Non-Match Rate target", "FACE_PAD_FNMR_TARGET"),
+            
+            # Face Scan - Burst & Consensus
+            ThresholdConfig("face_burst_max_frames", ThresholdCategory.FACE, 24, 10, 60, "frames",
+                          "Maximum frames per burst", "FACE_BURST_MAX_FRAMES"),
+            ThresholdConfig("face_burst_max_duration_ms", ThresholdCategory.FACE, 3500, 2000, 5000, "ms",
+                          "Maximum burst duration", "FACE_BURST_MAX_DURATION_MS"),
+            ThresholdConfig("face_consensus_top_k", ThresholdCategory.FACE, 5, 3, 10, "frames",
+                          "Number of top frames to consider", "FACE_CONSENSUS_TOP_K"),
+            ThresholdConfig("face_consensus_median_min", ThresholdCategory.FACE, 0.62, 0.5, 0.8, "score",
+                          "Minimum median match score", "FACE_CONSENSUS_MEDIAN_MIN"),
+            ThresholdConfig("face_consensus_frame_min_count", ThresholdCategory.FACE, 3, 1, 10, "frames",
+                          "Minimum frames above threshold", "FACE_CONSENSUS_FRAME_MIN_COUNT"),
+            ThresholdConfig("face_consensus_frame_min_score", ThresholdCategory.FACE, 0.58, 0.4, 0.7, "score",
+                          "Per-frame minimum score", "FACE_CONSENSUS_FRAME_MIN_SCORE"),
+            
+            # Face Scan - Challenge Thresholds
+            ThresholdConfig("face_challenge_action_count", ThresholdCategory.FACE, 2, 1, 5, "actions",
+                          "Number of actions per challenge", "FACE_CHALLENGE_ACTION_COUNT"),
+            ThresholdConfig("face_challenge_ttl_ms", ThresholdCategory.FACE, 7000, 5000, 15000, "ms",
+                          "Challenge time-to-live", "FACE_CHALLENGE_TTL_MS"),
+            ThresholdConfig("face_challenge_action_max_ms", ThresholdCategory.FACE, 3500, 2000, 5000, "ms",
+                          "Maximum time per action", "FACE_CHALLENGE_ACTION_MAX_MS"),
+            ThresholdConfig("face_challenge_ear_threshold", ThresholdCategory.FACE, 0.2, 0.1, 0.4, "ratio",
+                          "Eye Aspect Ratio threshold", "FACE_CHALLENGE_EAR_THRESHOLD"),
+            ThresholdConfig("face_challenge_mar_threshold", ThresholdCategory.FACE, 0.5, 0.3, 0.8, "ratio",
+                          "Mouth Aspect Ratio threshold", "FACE_CHALLENGE_MAR_THRESHOLD"),
+            ThresholdConfig("face_challenge_yaw_threshold", ThresholdCategory.FACE, 30, 20, 45, "degrees",
+                          "Yaw angle threshold", "FACE_CHALLENGE_YAW_THRESHOLD"),
+            
+            # Face Scan - Performance Targets
+            ThresholdConfig("face_lock_p50_ms", ThresholdCategory.FACE, 1200, 500, 3000, "ms",
+                          "P50 time to achieve face lock", "FACE_LOCK_P50_MS"),
+            ThresholdConfig("face_lock_p95_ms", ThresholdCategory.FACE, 2500, 1000, 5000, "ms",
+                          "P95 time to achieve face lock", "FACE_LOCK_P95_MS"),
+            ThresholdConfig("face_countdown_min_ms", ThresholdCategory.FACE, 600, 300, 1500, "ms",
+                          "Minimum countdown duration after lock", "FACE_COUNTDOWN_MIN_MS"),
+            ThresholdConfig("face_cancel_jitter_max_ms", ThresholdCategory.FACE, 50, 10, 200, "ms",
+                          "Maximum cancel-on-jitter response time", "FACE_CANCEL_JITTER_MAX_MS"),
+            ThresholdConfig("face_challenge_pass_rate_target", ThresholdCategory.FACE, 0.95, 0.8, 1.0, "ratio",
+                          "Challenge pass rate target (good lighting)", "FACE_CHALLENGE_PASS_RATE_TARGET"),
+            ThresholdConfig("face_tar_at_far1_target", ThresholdCategory.FACE, 0.98, 0.9, 1.0, "ratio",
+                          "TAR@FAR1% target", "FACE_TAR_AT_FAR1_TARGET"),
         ]
         
         for config in defaults:
