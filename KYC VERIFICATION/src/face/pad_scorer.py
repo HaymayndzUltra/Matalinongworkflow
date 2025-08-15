@@ -27,6 +27,7 @@ class AttackType(Enum):
     PAPER_MASK = "paper_mask"
     VIDEO_REPLAY = "video_replay"
     GENUINE = "genuine"
+    UNKNOWN = "unknown"
 
 
 class TextureFeature(Enum):

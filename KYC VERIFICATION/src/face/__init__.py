@@ -5,6 +5,7 @@ Backend-only implementation for face verification
 Modules:
 - geometry: Pure functions for face geometry analysis
 - threshold_validator: Strict threshold validation
+- burst_processor: Multi-frame processing and consensus
 """
 
 from .geometry import (
@@ -41,6 +42,21 @@ from .threshold_validator import (
     ThresholdDefinition
 )
 
+from .burst_processor import (
+    FrameQualityLevel,
+    FrameMetadata,
+    FrameQualityScore,
+    ConsensusResult,
+    BurstAnalysisResult,
+    calculate_geometry_score,
+    calculate_frame_quality,
+    evaluate_temporal_consistency,
+    detect_attack_consensus,
+    evaluate_consensus,
+    process_burst,
+    format_burst_feedback
+)
+
 __all__ = [
     # Geometry exports
     'BoundingBox',
@@ -67,5 +83,19 @@ __all__ = [
     'get_validator',
     'ValidationResult',
     'ThresholdType',
-    'ThresholdDefinition'
+    'ThresholdDefinition',
+    
+    # Burst processor exports
+    'FrameQualityLevel',
+    'FrameMetadata',
+    'FrameQualityScore',
+    'ConsensusResult',
+    'BurstAnalysisResult',
+    'calculate_geometry_score',
+    'calculate_frame_quality',
+    'evaluate_temporal_consistency',
+    'detect_attack_consensus',
+    'evaluate_consensus',
+    'process_burst',
+    'format_burst_feedback'
 ]

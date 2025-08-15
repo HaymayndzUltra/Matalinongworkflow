@@ -554,6 +554,8 @@ def handle_burst_eval(
     Returns:
         Evaluation results with consensus scoring
     """
+    from .burst_processor import process_burst, format_burst_feedback
+    
     # Get session
     session = get_or_create_session(session_id)
     
@@ -568,53 +570,78 @@ def handle_burst_eval(
     tm = ThresholdManager()
     burst_thresholds = tm.get_face_burst_thresholds()
     
-    # Simulate frame scoring (in production, would analyze actual frames)
-    frame_scores = []
-    for i, frame in enumerate(session.burst_frames):
-        # Generate pseudo-random but deterministic score
-        seed = hash(f"{session_id}{burst_id}{i}")
-        score = 0.5 + (seed % 100) / 200  # Range 0.5-1.0
-        frame_scores.append({
-            'frame_index': i,
-            'timestamp_ms': frame.get('timestamp_ms', i * 100),
-            'quality_score': round(score, 3)
-        })
+    # Get geometry and PAD thresholds too
+    geometry_thresholds = tm.get_face_geometry_thresholds()
+    pad_thresholds = tm.get_face_pad_thresholds()
     
-    # Calculate consensus
-    scores_only = [f['quality_score'] for f in frame_scores]
-    top_k = min(int(burst_thresholds['consensus_top_k']), len(scores_only))
-    top_scores = sorted(scores_only, reverse=True)[:top_k]
-    
-    median_score = np.median(top_scores) if top_scores else 0
-    frames_above_threshold = sum(
-        1 for s in scores_only 
-        if s >= burst_thresholds['consensus_frame_min_score']
+    # Process burst with the new processor
+    burst_result = process_burst(
+        frames=session.burst_frames,
+        frame_width=640,
+        frame_height=480,
+        thresholds={
+            'burst_consensus_frame_min_count': burst_thresholds['consensus_frame_min_count'],
+            'burst_consensus_median_min': burst_thresholds['consensus_median_min'],
+            'burst_consensus_top_k': burst_thresholds['consensus_top_k'],
+            'burst_consensus_frame_min_score': burst_thresholds['consensus_frame_min_score'],
+            # Add geometry thresholds for frame quality scoring
+            'min_occupancy': geometry_thresholds['bbox_fill_min'],
+            'max_occupancy': 0.8,
+            'centering_tolerance': geometry_thresholds['centering_tolerance'],
+            'max_pose_angle': geometry_thresholds['pose_max_angle'],
+            'brightness_mean_min': geometry_thresholds['brightness_mean_min'],
+            'brightness_mean_max': geometry_thresholds['brightness_mean_max'],
+            'brightness_p05_min': geometry_thresholds['brightness_p05_min'],
+            'brightness_p95_max': geometry_thresholds['brightness_p95_max'],
+            'min_sharpness': geometry_thresholds['tenengrad_min_640w'],
+            # Add PAD thresholds
+            'pad_score_min': pad_thresholds['score_min'],
+            'spoof_threshold': pad_thresholds['spoof_threshold']
+        }
     )
     
-    consensus_passed = (
-        median_score >= burst_thresholds['consensus_median_min'] and
-        frames_above_threshold >= burst_thresholds['consensus_frame_min_count']
-    )
+    # Format feedback
+    feedback = format_burst_feedback(burst_result)
     
-    logger.info(f"Burst eval: session={session_id}, consensus={consensus_passed}, median={median_score:.3f}")
+    # Build response with detailed frame scores
+    frame_scores = [
+        {
+            'frame_index': f.frame_index,
+            'timestamp_ms': f.timestamp_ms,
+            'quality_score': f.overall_score,
+            'quality_level': f.quality_level.value,
+            'geometry_score': f.geometry_score,
+            'pad_score': f.pad_score
+        }
+        for f in burst_result.frame_scores
+    ]
+    
+    logger.info(f"Burst eval: session={session_id}, consensus={burst_result.consensus.passed}, median={burst_result.consensus.median_score:.3f}")
     
     return {
         'ok': True,
         'session_id': session.session_id,
-        'burst_id': burst_id,
+        'burst_id': burst_result.burst_id,
         'frame_scores': frame_scores,
         'consensus': {
-            'passed': consensus_passed,
-            'median_score': round(median_score, 3),
-            'top_k': top_k,
-            'frames_above_threshold': frames_above_threshold,
-            'min_frames_required': int(burst_thresholds['consensus_frame_min_count'])
+            'passed': burst_result.consensus.passed,
+            'confidence': burst_result.consensus.confidence,
+            'median_score': burst_result.consensus.median_score,
+            'mean_score': burst_result.consensus.mean_score,
+            'std_deviation': burst_result.consensus.std_deviation,
+            'temporal_consistency': burst_result.consensus.temporal_consistency,
+            'usable_frames': burst_result.consensus.usable_frame_count,
+            'total_frames': burst_result.consensus.total_frame_count,
+            'best_frames': burst_result.consensus.best_frames,
+            'reasons': burst_result.consensus.reasons
         },
+        'feedback': feedback,
         'thresholds': {
             'consensus_median_min': burst_thresholds['consensus_median_min'],
             'consensus_frame_min_score': burst_thresholds['consensus_frame_min_score'],
             'consensus_frame_min_count': int(burst_thresholds['consensus_frame_min_count'])
-        }
+        },
+        'processing_time_ms': burst_result.processing_time_ms
     }
 
 
