@@ -37,7 +37,7 @@
       },
       {
         "text": "PHASE 8: CONSENSUS & BIOMETRICS EVAL\n\n**Explanations:** Create `src/face/consensus.py` to filter blur/glare/pose failures, select top-k=5 frames, match against ID photo with median≥0.62, require ≥3 frames≥0.58, and reject if any top-k <0.58. Implement `/face/burst/eval` endpoint returning {match_score, consensus_ok, frames_used, topk_scores[]}.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 8`\n\nIMPORTANT NOTE: FAR target ~1% must be maintained; all thresholds must be configurable via ThresholdManager.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 9: DECISION MAPPING (FACE COMPONENT)\n\n**Explanations:** Implement `/face/decision` endpoint that maps passive score, challenges_passed, consensus_ok, and match_score to approve/review/deny decisions with clear reasons. Must auto-deny on liveness_fail, consensus_fail, or spoof_high conditions. Include human-readable reasons and policy_version snapshot in responses.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 9`\n\nIMPORTANT NOTE: No PII permitted in decision logs; only anonymized metrics and decision reasons.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-15T19:16:55.916444+08:00"
+    "updated": "2025-08-15T19:26:17.700711+08:00"
   }
 ]

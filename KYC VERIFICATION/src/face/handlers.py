@@ -34,6 +34,13 @@ from .pad_scorer import (
     format_pad_feedback,
     AttackType
 )
+from .telemetry import (
+    track_event,
+    record_metric,
+    EventType,
+    EventSeverity,
+    get_telemetry_collector
+)
 from ..config.threshold_manager import ThresholdManager
 
 logger = logging.getLogger(__name__)
@@ -135,6 +142,9 @@ def handle_lock_check(
     """
     start_time = time.time()
     
+    # Track lock attempt
+    track_event(EventType.LOCK_ATTEMPT, session_id)
+    
     # Get session
     session = get_or_create_session(session_id)
     
@@ -193,11 +203,26 @@ def handle_lock_check(
     
     if lock_achieved and session.lock_achieved_at is None:
         session.lock_achieved_at = time.time()
+        track_event(EventType.LOCK_ACHIEVED, session_id, 
+                   {'stable_duration_ms': stable_duration})
     elif not lock_achieved:
+        if session.lock_achieved_at is not None:
+            track_event(EventType.LOCK_LOST, session_id)
         session.lock_achieved_at = None
+        
+        # Track specific errors
+        if not geometry_ok:
+            for issue in geometry_result.issues:
+                if issue == QualityIssue.OFF_CENTER or issue == QualityIssue.FACE_TOO_SMALL:
+                    track_event(EventType.ERROR_GEOMETRY, session_id, 
+                               {'issue': issue.value}, EventSeverity.WARNING)
+                elif issue in [QualityIssue.TOO_DARK, QualityIssue.TOO_BRIGHT]:
+                    track_event(EventType.ERROR_BRIGHTNESS, session_id,
+                               {'issue': issue.value}, EventSeverity.WARNING)
     
     # Calculate response time
     response_time_ms = (time.time() - start_time) * 1000
+    record_metric('lock_check_response_ms', response_time_ms)
     
     # Build response
     response = {
