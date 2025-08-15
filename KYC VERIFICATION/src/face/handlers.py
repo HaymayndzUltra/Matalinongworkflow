@@ -168,6 +168,11 @@ def handle_lock_check(
     session = session_mgr.get_or_create_session(session_id)
     session.lock_attempt_count += 1
     
+    # Log session start if first request
+    if session.request_count == 1:
+        from .audit_logger import audit_event, AuditEventType
+        audit_event(AuditEventType.SESSION_START, session_id, {'source': 'face_lock_check'})
+    
     # Track lock attempt
     track_event(EventType.LOCK_ATTEMPT, session_id)
     
@@ -306,6 +311,10 @@ def handle_pad_pregate(
         Response with PAD score and decision
     """
     start_time = time.time()
+    
+    # Log PAD check event
+    from .audit_logger import audit_event, AuditEventType
+    audit_event(AuditEventType.PAD_CHECK, session_id, {'source': 'pad_pregate'})
     
     # Get session
     session = get_or_create_session(session_id)
@@ -784,6 +793,32 @@ def handle_face_decision(
         record_pad_result(passive_score, is_genuine=True, detected_genuine=detected_genuine)
     
     logger.info(f"Face decision: session={session_id}, decision={decision_result['decision']}, confidence={decision_result['confidence']:.2f}")
+    
+    # Audit the decision
+    from .audit_logger import audit_decision, AuditEventType, audit_event
+    
+    # Log the decision with policy snapshot
+    audit_decision(
+        session_id=session_id,
+        decision=decision_result['decision'],
+        confidence=decision_result['confidence'],
+        reasons=decision_result['reasons'],
+        thresholds=decision_result['threshold_snapshot'],
+        metrics={
+            'passive_score': passive_score,
+            'match_score': match_score,
+            'spoof_score': spoof_score,
+            'challenges_passed': session.challenges_passed,
+            'consensus_ok': session.consensus_ok
+        }
+    )
+    
+    # Log session end event
+    audit_event(
+        AuditEventType.SESSION_END,
+        session_id,
+        {'decision': decision_result['decision']}
+    )
     
     return {
         'ok': True,

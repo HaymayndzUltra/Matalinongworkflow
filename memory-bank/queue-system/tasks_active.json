@@ -49,7 +49,7 @@
       },
       {
         "text": "PHASE 11: PRIVACY & WORM AUDIT\n\n**Explanations:** Enforce comprehensive privacy measures including no gallery storage, EXIF stripping, and redacted logs. Implement WORM (Write Once Read Many) audit snapshot system capturing thresholds used and decision rationale. Audit entries must be written with documented retention policy.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 11`\n\nIMPORTANT NOTE: Store policy snapshot and metrics only; no raw biometric data in audit logs.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 12: ACCEPTANCE CRITERIA & VALIDATION\n\n**Explanations:** Validate all performance targets: Lock p50 ≤1.2s, p95 ≤2.5s; countdown ≥600ms; cancel-on-jitter <50ms; challenge pass-rate ≥95% (good light); TAR@FAR1% ≥0.98 (eval set); PAD FMR ≤1%, FNMR ≤3%. Generate comprehensive report with metrics and propose threshold adjustments if gaps exist.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 12`\n\nIMPORTANT NOTE: Use ThresholdManager for all adjustments; no hardcoding of thresholds in code is permitted.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-16T01:51:22.491989+08:00"
+    "updated": "2025-08-16T01:58:04.534329+08:00"
   }
 ]
