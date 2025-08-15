@@ -13,7 +13,7 @@
       },
       {
         "text": "PHASE 2: THRESHOLD MANAGER (STRICT FACE GATES)\n\n**Explanations:** Implementation of the threshold management system with strict face gates. We'll add comprehensive thresholds including bbox_fill, centering, pose, Tenengrad@640w, brightness (mean/p05/p95), stability milliseconds, PAD minimum, burst caps, and match thresholds. All values must be validated and environment overrides must be properly documented.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 2`\n\nIMPORTANT NOTE: Explicit names are required for all thresholds; validation and bounds must be strictly enforced with no exceptions.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 3: GEOMETRY & GATING LIBRARY\n\n**Explanations:** Create `src/face/geometry.py` containing pure functions for occupancy calculation, centering evaluation, pose assessment, brightness analysis, Tenengrad sharpness computation, and stability measurements. All functions must provide reasoned failures with deterministic outputs and comprehensive unit tests.\n\n**Concluding Step: Phase Completion Protocol**\n- `python3 todo_manager.py show face_scan_actionable_20250116`\n- `python3 todo_manager.py done face_scan_actionable_20250116 3`\n\nIMPORTANT NOTE: No I/O side effects are allowed in any geometry functions. All functions must be pure with deterministic outputs.",
@@ -58,6 +58,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T14:30:00+08:00",
-    "updated": "2025-08-15T18:23:17.084900+08:00"
+    "updated": "2025-08-15T18:29:49.625998+08:00"
   }
 ]

@@ -1,0 +1,265 @@
+{
+  "description": "Face Scan Threshold Configuration",
+  "version": "1.0.0",
+  "last_updated": "2025-01-16T14:30:00+08:00",
+  "thresholds": {
+    "geometry": {
+      "face_bbox_fill_min": {
+        "value": 0.3,
+        "min": 0.1,
+        "max": 0.8,
+        "unit": "ratio",
+        "description": "Minimum face bounding box fill ratio",
+        "env_var": "FACE_BBOX_FILL_MIN"
+      },
+      "face_centering_tolerance": {
+        "value": 0.15,
+        "min": 0.05,
+        "max": 0.3,
+        "unit": "ratio",
+        "description": "Maximum deviation from center",
+        "env_var": "FACE_CENTERING_TOLERANCE"
+      },
+      "face_pose_max_angle": {
+        "value": 30,
+        "min": 10,
+        "max": 45,
+        "unit": "degrees",
+        "description": "Maximum allowed pose angles (yaw/pitch/roll)",
+        "env_var": "FACE_POSE_MAX_ANGLE"
+      },
+      "face_tenengrad_min_640w": {
+        "value": 500,
+        "min": 100,
+        "max": 2000,
+        "unit": "score",
+        "description": "Minimum sharpness at 640px width",
+        "env_var": "FACE_TENENGRAD_MIN_640W"
+      },
+      "face_brightness_mean_min": {
+        "value": 60,
+        "min": 0,
+        "max": 255,
+        "unit": "intensity",
+        "description": "Minimum acceptable brightness mean",
+        "env_var": "FACE_BRIGHTNESS_MEAN_MIN"
+      },
+      "face_brightness_mean_max": {
+        "value": 200,
+        "min": 0,
+        "max": 255,
+        "unit": "intensity",
+        "description": "Maximum acceptable brightness mean",
+        "env_var": "FACE_BRIGHTNESS_MEAN_MAX"
+      },
+      "face_brightness_p05_min": {
+        "value": 20,
+        "min": 0,
+        "max": 255,
+        "unit": "intensity",
+        "description": "5th percentile brightness minimum",
+        "env_var": "FACE_BRIGHTNESS_P05_MIN"
+      },
+      "face_brightness_p95_max": {
+        "value": 235,
+        "min": 0,
+        "max": 255,
+        "unit": "intensity",
+        "description": "95th percentile brightness maximum",
+        "env_var": "FACE_BRIGHTNESS_P95_MAX"
+      },
+      "face_stability_min_ms": {
+        "value": 900,
+        "min": 500,
+        "max": 2000,
+        "unit": "milliseconds",
+        "description": "Minimum stable detection duration",
+        "env_var": "FACE_STABILITY_MIN_MS"
+      }
+    },
+    "pad": {
+      "face_pad_score_min": {
+        "value": 0.70,
+        "min": 0.5,
+        "max": 1.0,
+        "unit": "score",
+        "description": "Minimum passive liveness score",
+        "env_var": "FACE_PAD_SCORE_MIN"
+      },
+      "face_pad_spoof_threshold": {
+        "value": 0.30,
+        "min": 0.1,
+        "max": 0.5,
+        "unit": "score",
+        "description": "Spoof detection threshold",
+        "env_var": "FACE_PAD_SPOOF_THRESHOLD"
+      },
+      "face_pad_fmr_target": {
+        "value": 0.01,
+        "min": 0.001,
+        "max": 0.05,
+        "unit": "ratio",
+        "description": "PAD False Match Rate target",
+        "env_var": "FACE_PAD_FMR_TARGET"
+      },
+      "face_pad_fnmr_target": {
+        "value": 0.03,
+        "min": 0.01,
+        "max": 0.1,
+        "unit": "ratio",
+        "description": "PAD False Non-Match Rate target",
+        "env_var": "FACE_PAD_FNMR_TARGET"
+      }
+    },
+    "burst": {
+      "face_burst_max_frames": {
+        "value": 24,
+        "min": 10,
+        "max": 60,
+        "unit": "frames",
+        "description": "Maximum frames per burst",
+        "env_var": "FACE_BURST_MAX_FRAMES"
+      },
+      "face_burst_max_duration_ms": {
+        "value": 3500,
+        "min": 2000,
+        "max": 5000,
+        "unit": "milliseconds",
+        "description": "Maximum burst duration",
+        "env_var": "FACE_BURST_MAX_DURATION_MS"
+      },
+      "face_consensus_top_k": {
+        "value": 5,
+        "min": 3,
+        "max": 10,
+        "unit": "frames",
+        "description": "Number of top frames to consider",
+        "env_var": "FACE_CONSENSUS_TOP_K"
+      },
+      "face_consensus_median_min": {
+        "value": 0.62,
+        "min": 0.5,
+        "max": 0.8,
+        "unit": "score",
+        "description": "Minimum median match score",
+        "env_var": "FACE_CONSENSUS_MEDIAN_MIN"
+      },
+      "face_consensus_frame_min_count": {
+        "value": 3,
+        "min": 1,
+        "max": 10,
+        "unit": "frames",
+        "description": "Minimum frames above threshold",
+        "env_var": "FACE_CONSENSUS_FRAME_MIN_COUNT"
+      },
+      "face_consensus_frame_min_score": {
+        "value": 0.58,
+        "min": 0.4,
+        "max": 0.7,
+        "unit": "score",
+        "description": "Per-frame minimum score",
+        "env_var": "FACE_CONSENSUS_FRAME_MIN_SCORE"
+      }
+    },
+    "challenge": {
+      "face_challenge_action_count": {
+        "value": 2,
+        "min": 1,
+        "max": 5,
+        "unit": "actions",
+        "description": "Number of actions per challenge",
+        "env_var": "FACE_CHALLENGE_ACTION_COUNT"
+      },
+      "face_challenge_ttl_ms": {
+        "value": 7000,
+        "min": 5000,
+        "max": 15000,
+        "unit": "milliseconds",
+        "description": "Challenge time-to-live",
+        "env_var": "FACE_CHALLENGE_TTL_MS"
+      },
+      "face_challenge_action_max_ms": {
+        "value": 3500,
+        "min": 2000,
+        "max": 5000,
+        "unit": "milliseconds",
+        "description": "Maximum time per action",
+        "env_var": "FACE_CHALLENGE_ACTION_MAX_MS"
+      },
+      "face_challenge_ear_threshold": {
+        "value": 0.2,
+        "min": 0.1,
+        "max": 0.4,
+        "unit": "ratio",
+        "description": "Eye Aspect Ratio threshold",
+        "env_var": "FACE_CHALLENGE_EAR_THRESHOLD"
+      },
+      "face_challenge_mar_threshold": {
+        "value": 0.5,
+        "min": 0.3,
+        "max": 0.8,
+        "unit": "ratio",
+        "description": "Mouth Aspect Ratio threshold",
+        "env_var": "FACE_CHALLENGE_MAR_THRESHOLD"
+      },
+      "face_challenge_yaw_threshold": {
+        "value": 30,
+        "min": 20,
+        "max": 45,
+        "unit": "degrees",
+        "description": "Yaw angle threshold",
+        "env_var": "FACE_CHALLENGE_YAW_THRESHOLD"
+      }
+    },
+    "performance": {
+      "face_lock_p50_ms": {
+        "value": 1200,
+        "min": 500,
+        "max": 3000,
+        "unit": "milliseconds",
+        "description": "P50 time to achieve face lock",
+        "env_var": "FACE_LOCK_P50_MS"
+      },
+      "face_lock_p95_ms": {
+        "value": 2500,
+        "min": 1000,
+        "max": 5000,
+        "unit": "milliseconds",
+        "description": "P95 time to achieve face lock",
+        "env_var": "FACE_LOCK_P95_MS"
+      },
+      "face_countdown_min_ms": {
+        "value": 600,
+        "min": 300,
+        "max": 1500,
+        "unit": "milliseconds",
+        "description": "Minimum countdown duration after lock",
+        "env_var": "FACE_COUNTDOWN_MIN_MS"
+      },
+      "face_cancel_jitter_max_ms": {
+        "value": 50,
+        "min": 10,
+        "max": 200,
+        "unit": "milliseconds",
+        "description": "Maximum cancel-on-jitter response time",
+        "env_var": "FACE_CANCEL_JITTER_MAX_MS"
+      },
+      "face_challenge_pass_rate_target": {
+        "value": 0.95,
+        "min": 0.8,
+        "max": 1.0,
+        "unit": "ratio",
+        "description": "Challenge pass rate target (good lighting)",
+        "env_var": "FACE_CHALLENGE_PASS_RATE_TARGET"
+      },
+      "face_tar_at_far1_target": {
+        "value": 0.98,
+        "min": 0.9,
+        "max": 1.0,
+        "unit": "ratio",
+        "description": "TAR@FAR1% target",
+        "env_var": "FACE_TAR_AT_FAR1_TARGET"
+      }
+    }
+  }
+}

@@ -12,7 +12,7 @@ This module provides centralized threshold management with:
 import os
 import json
 import logging
-from typing import Dict, Any, Optional, Union
+from typing import Dict, Any, Optional, Union, Tuple
 from datetime import datetime, timezone, timedelta
 from dataclasses import dataclass, field, asdict
 from pathlib import Path
@@ -399,6 +399,107 @@ class ThresholdManager:
                 lines.append(f"{config.env_var}={config.value}{comment}{unit}")
         
         return "\n".join(lines)
+    
+    # ============= Face Threshold Getter Methods =============
+    
+    def get_face_geometry_thresholds(self) -> Dict[str, Any]:
+        """Get all face geometry thresholds"""
+        return {
+            "bbox_fill_min": self.get("face_bbox_fill_min"),
+            "centering_tolerance": self.get("face_centering_tolerance"),
+            "pose_max_angle": self.get("face_pose_max_angle"),
+            "tenengrad_min_640w": self.get("face_tenengrad_min_640w"),
+            "brightness_mean_min": self.get("face_brightness_mean_min"),
+            "brightness_mean_max": self.get("face_brightness_mean_max"),
+            "brightness_p05_min": self.get("face_brightness_p05_min"),
+            "brightness_p95_max": self.get("face_brightness_p95_max"),
+            "stability_min_ms": self.get("face_stability_min_ms")
+        }
+    
+    def get_face_pad_thresholds(self) -> Dict[str, Any]:
+        """Get all face PAD (Presentation Attack Detection) thresholds"""
+        return {
+            "score_min": self.get("face_pad_score_min"),
+            "spoof_threshold": self.get("face_pad_spoof_threshold"),
+            "fmr_target": self.get("face_pad_fmr_target"),
+            "fnmr_target": self.get("face_pad_fnmr_target")
+        }
+    
+    def get_face_burst_thresholds(self) -> Dict[str, Any]:
+        """Get all face burst and consensus thresholds"""
+        return {
+            "max_frames": self.get("face_burst_max_frames"),
+            "max_duration_ms": self.get("face_burst_max_duration_ms"),
+            "consensus_top_k": self.get("face_consensus_top_k"),
+            "consensus_median_min": self.get("face_consensus_median_min"),
+            "consensus_frame_min_count": self.get("face_consensus_frame_min_count"),
+            "consensus_frame_min_score": self.get("face_consensus_frame_min_score")
+        }
+    
+    def get_face_challenge_thresholds(self) -> Dict[str, Any]:
+        """Get all face challenge thresholds"""
+        return {
+            "action_count": self.get("face_challenge_action_count"),
+            "ttl_ms": self.get("face_challenge_ttl_ms"),
+            "action_max_ms": self.get("face_challenge_action_max_ms"),
+            "ear_threshold": self.get("face_challenge_ear_threshold"),
+            "mar_threshold": self.get("face_challenge_mar_threshold"),
+            "yaw_threshold": self.get("face_challenge_yaw_threshold")
+        }
+    
+    def get_face_performance_targets(self) -> Dict[str, Any]:
+        """Get all face performance target thresholds"""
+        return {
+            "lock_p50_ms": self.get("face_lock_p50_ms"),
+            "lock_p95_ms": self.get("face_lock_p95_ms"),
+            "countdown_min_ms": self.get("face_countdown_min_ms"),
+            "cancel_jitter_max_ms": self.get("face_cancel_jitter_max_ms"),
+            "challenge_pass_rate_target": self.get("face_challenge_pass_rate_target"),
+            "tar_at_far1_target": self.get("face_tar_at_far1_target")
+        }
+    
+    def validate_face_thresholds(self) -> Tuple[bool, Dict[str, Any]]:
+        """
+        Validate all face thresholds with strict bounds checking
+        
+        Returns:
+            Tuple of (all_valid, validation_results)
+        """
+        from src.face.threshold_validator import get_validator
+        
+        validator = get_validator()
+        face_values = {
+            name: config.value
+            for name, config in self.thresholds.items()
+            if name.startswith("face_")
+        }
+        
+        all_valid, results = validator.validate_all(face_values)
+        
+        # Additional cross-threshold validations
+        if all_valid:
+            # Check brightness range consistency
+            brightness_result = validator.validate_brightness_range(
+                self.get("face_brightness_mean_min"),
+                self.get("face_brightness_mean_max")
+            )
+            if not brightness_result.valid:
+                all_valid = False
+                results.append(brightness_result)
+            
+            # Check performance targets consistency
+            perf_result = validator.validate_performance_targets(
+                self.get("face_lock_p50_ms"),
+                self.get("face_lock_p95_ms")
+            )
+            if not perf_result.valid:
+                all_valid = False
+                results.append(perf_result)
+        
+        return all_valid, {
+            "valid": all_valid,
+            "results": [{"valid": r.valid, "message": r.message} for r in results]
+        }
     
     def get_summary(self) -> Dict[str, Any]:
         """
