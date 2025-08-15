@@ -17,7 +17,40 @@ from typing import Dict, Optional, Tuple, List, Any
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from collections import deque
+from enum import Enum
 import threading
+import logging
+
+logger = logging.getLogger(__name__)
+
+# ============= CAPTURE STATES (UX Requirement A) =============
+class CaptureState(Enum):
+    """Document capture state machine states"""
+    SEARCHING = "searching"          # Looking for document in frame
+    LOCKED = "locked"                # Document detected and stable
+    COUNTDOWN = "countdown"          # Capture countdown in progress
+    CAPTURED = "captured"            # Image captured successfully
+    CONFIRM = "confirm"              # User confirmation step
+    FLIP_TO_BACK = "flip_to_back"   # Prompting user to flip document
+    BACK_SEARCHING = "back_searching"  # Looking for back of document
+    COMPLETE = "complete"            # Process finished
+
+class DocumentSide(Enum):
+    """Document side being captured"""
+    FRONT = "front"
+    BACK = "back"
+
+# ============= STATE TRANSITIONS MATRIX =============
+ALLOWED_TRANSITIONS = {
+    CaptureState.SEARCHING: [CaptureState.LOCKED],
+    CaptureState.LOCKED: [CaptureState.COUNTDOWN, CaptureState.SEARCHING],
+    CaptureState.COUNTDOWN: [CaptureState.CAPTURED, CaptureState.SEARCHING],
+    CaptureState.CAPTURED: [CaptureState.CONFIRM],
+    CaptureState.CONFIRM: [CaptureState.FLIP_TO_BACK, CaptureState.COMPLETE],
+    CaptureState.FLIP_TO_BACK: [CaptureState.BACK_SEARCHING],
+    CaptureState.BACK_SEARCHING: [CaptureState.LOCKED],
+    CaptureState.COMPLETE: []  # Terminal state
+}
 
 # ============= TIMING CONSTANTS (per AI spec) =============
 COUNTDOWN_MIN_MS = 600  # Minimum time before capture allowed
@@ -201,10 +234,19 @@ class EnhancedSessionState:
     challenge_completed: bool = False
     burst_frames: Optional[List[Dict]] = None
     
+    # State machine fields (UX Requirement A)
+    capture_state: CaptureState = field(default=CaptureState.SEARCHING)
+    current_side: DocumentSide = field(default=DocumentSide.FRONT)
+    front_captured: bool = False
+    back_captured: bool = False
+    state_history: List[Tuple[CaptureState, float, Optional[str]]] = field(default_factory=list)
+    
     def __post_init__(self):
         """Initialize mutable default values"""
         if self.burst_frames is None:
             self.burst_frames = []
+        # Record initial state
+        self.state_history.append((self.capture_state, time.time(), "session_created"))
     
     def generate_lock_token(self) -> LockToken:
         """Generate new lock token with countdown"""
@@ -225,6 +267,9 @@ class EnhancedSessionState:
         self.lock_open_ts = now
         self.not_before_ts = now + (COUNTDOWN_MIN_MS / 1000)
         self.expires_ts = lock_token.expires_at
+        
+        # Transition to COUNTDOWN state
+        self.transition_to(CaptureState.COUNTDOWN, reason="lock_token_generated")
         
         return lock_token
     
@@ -390,6 +435,119 @@ class EnhancedSessionState:
                 'spoof_max': 0.3
             }
         }
+    
+    def transition_to(self, new_state: CaptureState, reason: Optional[str] = None) -> bool:
+        """
+        Transition to a new capture state with validation
+        
+        Args:
+            new_state: Target state to transition to
+            reason: Optional reason for transition (for telemetry)
+            
+        Returns:
+            bool: True if transition successful, False if invalid
+        """
+        # Check if transition is allowed
+        if new_state not in ALLOWED_TRANSITIONS.get(self.capture_state, []):
+            logger.warning(f"Invalid state transition: {self.capture_state.value} -> {new_state.value}")
+            return False
+        
+        # Record old state for telemetry
+        old_state = self.capture_state
+        timestamp = time.time()
+        
+        # Perform transition
+        self.capture_state = new_state
+        self.state_history.append((new_state, timestamp, reason))
+        
+        # Update capture flags based on state
+        if new_state == CaptureState.CAPTURED:
+            if self.current_side == DocumentSide.FRONT:
+                self.front_captured = True
+            else:
+                self.back_captured = True
+        elif new_state == CaptureState.FLIP_TO_BACK:
+            self.current_side = DocumentSide.BACK
+        elif new_state == CaptureState.SEARCHING:
+            # Reset lock-related fields when returning to searching
+            self.lock_achieved_at = None
+            self.current_lock_token = None
+        
+        # Emit telemetry event
+        self._emit_state_transition_event(old_state, new_state, timestamp, reason)
+        
+        logger.info(f"State transition: {old_state.value} -> {new_state.value} (reason: {reason})")
+        return True
+    
+    def _emit_state_transition_event(self, old_state: CaptureState, new_state: CaptureState, 
+                                    timestamp: float, reason: Optional[str] = None):
+        """Emit telemetry event for state transition"""
+        try:
+            from .telemetry import track_event
+            
+            event_data = {
+                'session_id': self.session_id,
+                'old_state': old_state.value,
+                'new_state': new_state.value,
+                'current_side': self.current_side.value,
+                'front_captured': self.front_captured,
+                'back_captured': self.back_captured,
+                'timestamp': timestamp
+            }
+            
+            if reason:
+                event_data['reason'] = reason
+            
+            # Map specific transitions to UX telemetry events
+            if new_state == CaptureState.LOCKED:
+                track_event('capture.lock_open', event_data)
+            elif new_state == CaptureState.COUNTDOWN:
+                track_event('countdown.start', event_data)
+            elif old_state == CaptureState.COUNTDOWN and new_state == CaptureState.SEARCHING:
+                track_event('countdown.cancel_reason', event_data)
+            elif new_state == CaptureState.CAPTURED:
+                if self.current_side == DocumentSide.FRONT:
+                    track_event('capture.done_front', event_data)
+                else:
+                    track_event('capture.done_back', event_data)
+            elif new_state == CaptureState.FLIP_TO_BACK:
+                track_event('transition.front_to_back', event_data)
+            
+        except ImportError:
+            # Telemetry module not available, skip event emission
+            pass
+        except Exception as e:
+            logger.error(f"Error emitting telemetry event: {e}")
+    
+    def get_state_info(self) -> Dict[str, Any]:
+        """Get current state information for API responses"""
+        return {
+            'capture_state': self.capture_state.value,
+            'current_side': self.current_side.value,
+            'front_captured': self.front_captured,
+            'back_captured': self.back_captured,
+            'can_transition_to': [s.value for s in ALLOWED_TRANSITIONS.get(self.capture_state, [])],
+            'state_history_count': len(self.state_history)
+        }
+    
+    def reset_for_recapture(self, side: Optional[DocumentSide] = None):
+        """Reset state for recapture attempt"""
+        if side:
+            self.current_side = side
+            if side == DocumentSide.FRONT:
+                self.front_captured = False
+                self.capture_state = CaptureState.SEARCHING
+            else:
+                self.back_captured = False
+                self.capture_state = CaptureState.BACK_SEARCHING
+        else:
+            # Full reset
+            self.capture_state = CaptureState.SEARCHING
+            self.current_side = DocumentSide.FRONT
+            self.front_captured = False
+            self.back_captured = False
+        
+        self.state_history.append((self.capture_state, time.time(), "recapture_reset"))
 
 
 class SessionManager:

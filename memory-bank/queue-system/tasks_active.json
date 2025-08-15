@@ -9,7 +9,7 @@
       },
       {
         "text": "PHASE 1: STATE MACHINE IMPLEMENTATION\n\n**Explanations:** Implement document capture state machine in EnhancedSessionState supporting SEARCHING→LOCKED→COUNTDOWN→CAPTURED→CONFIRM→FLIP-TO-BACK→BACK-SEARCHING→COMPLETE states. Add current_side tracking (front/back), front_captured/back_captured flags, and state transition methods. Ensure each state change emits proper telemetry events.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 1\n```\n\nIMPORTANT NOTE: State machine is the foundation for all UX flows. Must support both front and back document capture with proper transitions.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 2: TIMING METADATA & ANIMATION SUPPORT\n\n**Explanations:** Add timing metadata to all API responses for frontend animation synchronization. Implement support for: capture.flash_check (120-180ms+250ms), transition.card_flip_y (350-450ms), stepper.advance_front_done (200ms), back.frame_pulse (3×300ms), countdown.ring (600ms), extraction.skeleton_fields (<500ms). Add these as configurable thresholds in threshold_manager.py.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 2\n```\n\nIMPORTANT NOTE: All timing values must be returned in API responses so frontend can synchronize animations. Cancel-on-jitter must respond in <50ms.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-08-16T07:02:59.798002+08:00"
+    "updated": "2025-08-16T07:31:46.401472+08:00"
   }
 ]

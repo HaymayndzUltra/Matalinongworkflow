@@ -47,7 +47,9 @@ from .session_manager import (
     StatusCode,
     ReasonCode,
     QUALITY_GATES,
-    EnhancedSessionState
+    EnhancedSessionState,
+    CaptureState,
+    DocumentSide
 )
 from ..config.threshold_manager import ThresholdManager
 
@@ -198,6 +200,12 @@ def handle_lock_check(
         
         # If quality gates fail, return immediately
         if not quality_ok:
+            # Transition back to SEARCHING if we were in LOCKED or COUNTDOWN
+            if session.capture_state in [CaptureState.LOCKED, CaptureState.COUNTDOWN]:
+                session.transition_to(
+                    CaptureState.SEARCHING,
+                    reason=f"quality_failed:{','.join(quality_reasons)}"
+                )
             return {
                 'ok': False,
                 'lock': False,
@@ -241,19 +249,31 @@ def handle_lock_check(
         
         # Mark lock achieved
         session.lock_open_ts = time.time()
+        session.lock_achieved_at = time.time()  # For compatibility
+        
+        # Transition to LOCKED state
+        session.transition_to(
+            CaptureState.LOCKED, 
+            reason=f"quality_ok:{quality_ok},fill_ratio:{fill_ratio:.3f}"
+        )
+        
         track_event(EventType.LOCK_ACHIEVED, session_id)
         
-        logger.info(f"Lock achieved: session={session_id}, token={new_token.token[:8]}...")
+        logger.info(f"Lock achieved: session={session_id}, state={session.capture_state.value}, token={new_token.token[:8]}...")
     
     # Calculate response time
     response_time_ms = (time.time() - start_time) * 1000
     record_metric('lock_check_response_ms', response_time_ms)
+    
+    # Include state info in response
+    state_info = session.get_state_info()
     
     # Build response
     response = {
         'ok': quality_ok,
         'lock': quality_ok,
         'session_id': session.session_id,
+        'state': state_info,
         'reasons': quality_reasons if not quality_ok else [],
         'metrics': {
             'fill_ratio': round(fill_ratio, 3),
@@ -674,11 +694,25 @@ def handle_burst_eval(
         for f in burst_result.frame_scores
     ]
     
-    logger.info(f"Burst eval: session={session_id}, consensus={burst_result.consensus.passed}, median={burst_result.consensus.median_score:.3f}")
+    # Transition to CAPTURED state if consensus passed
+    if burst_result.consensus.passed:
+        session.transition_to(
+            CaptureState.CAPTURED,
+            reason=f"burst_consensus_passed,median_score:{burst_result.consensus.median_score:.3f}"
+        )
+        
+        # Record capture in session
+        session.record_capture()
+    
+    logger.info(f"Burst eval: session={session_id}, consensus={burst_result.consensus.passed}, median={burst_result.consensus.median_score:.3f}, state={session.capture_state.value}")
+    
+    # Include state info in response
+    state_info = session.get_state_info()
     
     return {
         'ok': True,
         'session_id': session.session_id,
+        'state': state_info,
         'burst_id': burst_result.burst_id,
         'frame_scores': frame_scores,
         'consensus': {
