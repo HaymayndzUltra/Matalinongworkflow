@@ -342,6 +342,12 @@ def handle_challenge_script(
     Returns:
         Challenge script with actions and timing
     """
+    from .challenge_generator import generate_challenge_script
+    from .telemetry import track_event, EventType
+    
+    # Track challenge generation
+    track_event(EventType.CHALLENGE_GENERATED, session_id, {'complexity': complexity})
+    
     # Get session
     session = get_or_create_session(session_id)
     
@@ -349,50 +355,40 @@ def handle_challenge_script(
     tm = ThresholdManager()
     challenge_thresholds = tm.get_face_challenge_thresholds()
     
-    # Determine number of actions based on complexity
+    # Map complexity string to int
     complexity_map = {
         'easy': 1,
         'medium': 2,
         'hard': 3
     }
-    num_actions = complexity_map.get(complexity, 2)
-    num_actions = min(num_actions, int(challenge_thresholds['action_count']))
+    complexity_int = complexity_map.get(complexity, 2)
     
-    # Generate random actions
-    available_actions = list(ChallengeType)
-    selected_actions = []
+    # Generate challenge using the new generator
+    script_dict = generate_challenge_script(session_id, complexity_int)
     
-    import random
-    random.seed(int(time.time() * 1000) % 2**32)  # Seed for reproducibility in same millisecond
-    
-    for _ in range(num_actions):
-        action = random.choice(available_actions)
-        selected_actions.append({
-            'type': action.value,
-            'duration_ms': int(challenge_thresholds['action_max_ms']),
-            'instruction': _get_action_instruction(action)
-        })
-        available_actions.remove(action)  # Don't repeat actions
-    
-    # Create challenge script
-    challenge_id = hashlib.sha256(
-        f"{session_id}{time.time()}".encode()
-    ).hexdigest()[:16]
-    
+    # Format response to match existing API
     script = {
-        'challenge_id': challenge_id,
+        'challenge_id': script_dict['challenge_id'],
         'session_id': session.session_id,
-        'created_at': datetime.utcnow().isoformat(),
+        'created_at': datetime.fromtimestamp(script_dict['created_at']).isoformat(),
         'ttl_ms': int(challenge_thresholds['ttl_ms']),
-        'actions': selected_actions,
-        'total_duration_ms': sum(a['duration_ms'] for a in selected_actions),
+        'actions': [
+            {
+                'type': step['action'],
+                'duration_ms': step['duration_ms'],
+                'instruction': step['instruction']
+            }
+            for step in script_dict['steps']
+        ],
+        'total_duration_ms': sum(s['duration_ms'] for s in script_dict['steps']),
         'complexity': complexity
     }
     
     # Store in session
     session.challenge_script = script
+    session.challenge_id = script_dict['challenge_id']
     
-    logger.info(f"Challenge script: session={session_id}, actions={len(selected_actions)}, complexity={complexity}")
+    logger.info(f"Challenge script: session={session_id}, actions={len(script['actions'])}, complexity={complexity}")
     
     return script
 
@@ -466,33 +462,49 @@ def handle_challenge_verify(
             'error': f'Expected {len(expected_actions)} responses, got {len(responses)}'
         }
     
-    # Simple verification (in production, would analyze actual movements)
-    # For now, just check that responses were provided in reasonable time
-    verification_passed = True
-    details = []
+    # Use the challenge generator to verify
+    from .challenge_generator import verify_challenge_response
+    from .telemetry import track_event, EventType
     
-    for i, (expected, response) in enumerate(zip(expected_actions, responses)):
-        if response.get('action') != expected['type']:
-            verification_passed = False
-            details.append(f"Action {i}: type mismatch")
-        
-        # Check timing
-        if response.get('duration_ms', 0) < expected['duration_ms'] * 0.5:
-            verification_passed = False
-            details.append(f"Action {i}: too fast")
+    # Format responses for the verifier
+    formatted_responses = []
+    for i, response in enumerate(responses):
+        formatted_responses.append({
+            'action_detected': response.get('action'),
+            'duration_ms': response.get('duration_ms', 0),
+            'metrics': response.get('metrics', {})
+        })
     
-    # Mark as completed
-    if verification_passed:
+    # Calculate completion time
+    completion_time_ms = sum(r.get('duration_ms', 0) for r in responses)
+    
+    # Verify using the challenge generator
+    result = verify_challenge_response(
+        challenge_id,
+        formatted_responses,
+        completion_time_ms
+    )
+    
+    # Track event
+    if result['passed']:
+        track_event(EventType.CHALLENGE_COMPLETED, session_id, 
+                   {'score': result['score'], 'steps_completed': result['steps_completed']})
         session.challenge_completed = True
+    else:
+        track_event(EventType.CHALLENGE_FAILED, session_id,
+                   {'score': result['score'], 'reasons': result['failure_reasons']})
     
-    logger.info(f"Challenge verify: session={session_id}, passed={verification_passed}")
+    logger.info(f"Challenge verify: session={session_id}, passed={result['passed']}, score={result['score']}")
     
     return {
-        'ok': verification_passed,
+        'ok': result['passed'],
         'session_id': session.session_id,
         'challenge_id': challenge_id,
-        'verified': verification_passed,
-        'details': details if not verification_passed else ['All actions verified']
+        'verified': result['passed'],
+        'score': result['score'],
+        'steps_completed': result['steps_completed'],
+        'steps_total': result['steps_total'],
+        'details': result['failure_reasons'] if not result['passed'] else ['All actions verified']
     }
 
 
