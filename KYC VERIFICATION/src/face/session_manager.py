@@ -491,6 +491,9 @@ class EnhancedSessionState:
         # Emit telemetry event
         self._emit_state_transition_event(old_state, new_state, timestamp, reason)
         
+        # Broadcast state change via streaming (UX Requirement E)
+        self._broadcast_state_change_async(old_state, new_state, reason)
+        
         logger.info(f"State transition: {old_state.value} -> {new_state.value} (reason: {reason})")
         return True
     
@@ -698,6 +701,86 @@ class EnhancedSessionState:
     def set_error(self, error: Optional[str]):
         """Set current error for message generation"""
         self.last_error = error
+    
+    def _broadcast_state_change_async(self, old_state: CaptureState, new_state: CaptureState, reason: Optional[str] = None):
+        """Broadcast state change via streaming (runs in background)"""
+        try:
+            import asyncio
+            from .streaming import get_stream_manager
+            
+            # Create task to broadcast asynchronously
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            async def broadcast():
+                manager = get_stream_manager()
+                await manager.broadcast_state_change(
+                    self.session_id,
+                    old_state.value,
+                    new_state.value,
+                    reason
+                )
+            
+            # Run in background (fire and forget)
+            try:
+                loop.run_until_complete(broadcast())
+            finally:
+                loop.close()
+                
+        except Exception as e:
+            # Don't fail state transition if broadcast fails
+            logger.warning(f"Failed to broadcast state change: {e}")
+    
+    def _broadcast_quality_update_async(self, metrics: Dict[str, Any], passed: bool):
+        """Broadcast quality update via streaming"""
+        try:
+            import asyncio
+            from .streaming import get_stream_manager
+            
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            async def broadcast():
+                manager = get_stream_manager()
+                await manager.broadcast_quality_update(
+                    self.session_id,
+                    metrics,
+                    passed
+                )
+            
+            try:
+                loop.run_until_complete(broadcast())
+            finally:
+                loop.close()
+                
+        except Exception as e:
+            logger.warning(f"Failed to broadcast quality update: {e}")
+    
+    def _broadcast_extraction_progress_async(self, field_name: str, value: str, confidence: float):
+        """Broadcast extraction field progress via streaming"""
+        try:
+            import asyncio
+            from .streaming import get_stream_manager
+            
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            async def broadcast():
+                manager = get_stream_manager()
+                await manager.broadcast_extraction_field(
+                    self.session_id,
+                    field_name,
+                    value,
+                    confidence
+                )
+            
+            try:
+                loop.run_until_complete(broadcast())
+            finally:
+                loop.close()
+                
+        except Exception as e:
+            logger.warning(f"Failed to broadcast extraction progress: {e}")
     
     def start_extraction(self, document_side: str):
         """Start extraction process for a document side"""

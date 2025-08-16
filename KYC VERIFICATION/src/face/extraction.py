@@ -343,6 +343,67 @@ class ExtractionProcessor:
                 callback(event)
             except Exception as e:
                 logger.error(f"Error in streaming callback: {e}")
+        
+        # Broadcast via SSE streaming (UX Requirement E)
+        self._broadcast_extraction_event_async(event_type, session_id, data)
+    
+    def _broadcast_extraction_event_async(self, event_type: ExtractionEvent, session_id: str, data: Dict[str, Any]):
+        """Broadcast extraction event via SSE streaming"""
+        try:
+            import asyncio
+            from .streaming import get_stream_manager, StreamEventType
+            
+            # Map extraction events to stream events
+            event_map = {
+                ExtractionEvent.EXTRACT_START: StreamEventType.EXTRACTION_START,
+                ExtractionEvent.EXTRACT_FIELD: StreamEventType.EXTRACTION_FIELD,
+                ExtractionEvent.EXTRACT_PROGRESS: StreamEventType.EXTRACTION_PROGRESS,
+                ExtractionEvent.EXTRACT_RESULT: StreamEventType.EXTRACTION_COMPLETE
+            }
+            
+            if event_type not in event_map:
+                return
+            
+            stream_event_type = event_map[event_type]
+            
+            # Create new event loop for async broadcast
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            
+            async def broadcast():
+                manager = get_stream_manager()
+                
+                # Special handling for field events
+                if event_type == ExtractionEvent.EXTRACT_FIELD:
+                    await manager.broadcast_extraction_field(
+                        session_id,
+                        data.get("field", ""),
+                        data.get("value", ""),
+                        data.get("confidence", 0.0)
+                    )
+                elif event_type == ExtractionEvent.EXTRACT_PROGRESS:
+                    await manager.broadcast_extraction_progress(
+                        session_id,
+                        data.get("progress", 0.0),
+                        data.get("fields_extracted", 0),
+                        8  # Assuming 8 fields for front side
+                    )
+                else:
+                    # Generic event broadcast
+                    await manager.send_event(
+                        session_id,
+                        stream_event_type,
+                        data
+                    )
+            
+            try:
+                loop.run_until_complete(broadcast())
+            finally:
+                loop.close()
+                
+        except Exception as e:
+            # Don't fail extraction if broadcast fails
+            logger.warning(f"Failed to broadcast extraction event: {e}")
     
     def validate_extraction(self, result: ExtractionResult) -> Tuple[bool, List[str]]:
         """

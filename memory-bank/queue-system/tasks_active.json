@@ -25,7 +25,7 @@
       },
       {
         "text": "PHASE 5: REAL-TIME STREAMING IMPLEMENTATION\n\n**Explanations:** Implement WebSocket endpoint at /ws/extraction/{session_id} for real-time extraction updates. Add Server-Sent Events fallback at /api/v1/kyc/extraction/stream/{session_id}. Stream extraction progress with field-by-field updates including confidence scores. Implement extraction.skeleton_fields with shimmer placeholder support. Ensure <500ms initial response.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 5\n```\n\nIMPORTANT NOTE: Streaming must support multiple concurrent sessions and provide real-time field updates as extraction progresses.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 6: ENHANCED QUALITY GATES & CANCEL-ON-JITTER\n\n**Explanations:** Implement instant cancel-on-jitter during countdown when quality gates fail: focus <7.0, motion >0.4, corners <0.95, glare >3.5%. Response time must be <50ms from detection. Add countdown.cancel_reason to telemetry. Implement error prompts for partial_document, low_res, blur_high conditions. Support single-tap recapture flow.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 6\n```\n\nIMPORTANT NOTE: Cancel detection must be instant to prevent shaky frame captures. Must include clear Tagalog error messages.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-08-16T09:27:20.558175+08:00"
+    "updated": "2025-08-16T09:55:08.295354+08:00"
   }
 ]

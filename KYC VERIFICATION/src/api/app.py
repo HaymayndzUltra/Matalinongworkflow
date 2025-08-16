@@ -18,9 +18,10 @@ logger = logging.getLogger(__name__)
 
 from fastapi import FastAPI, HTTPException, status, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, FileResponse, Response, HTMLResponse
+from fastapi.responses import JSONResponse, FileResponse, Response, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 import uvicorn
+import asyncio
 
 from .metrics import (
     REQUEST_COUNTER,
@@ -1457,6 +1458,88 @@ async def get_face_metrics():
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail={"error": str(e), "error_code": "METRICS_ERROR"}
         )
+
+
+# ============= SSE STREAMING ENDPOINT (UX Requirement E) =============
+
+@app.get("/face/stream/{session_id}")
+async def stream_face_events(
+    session_id: str,
+    last_event_id: Optional[str] = None
+):
+    """
+    Stream real-time events for a face scan session using Server-Sent Events
+    
+    Supports multiple concurrent sessions and provides real-time updates for:
+    - State transitions
+    - Quality gate updates
+    - Extraction field progress
+    - Capture events
+    
+    Args:
+        session_id: Session identifier
+        last_event_id: Last event ID for reconnection (optional)
+    
+    Returns:
+        SSE stream of events
+    """
+    try:
+        from src.face.streaming import create_sse_stream, get_stream_manager
+        
+        # Start streaming
+        async def event_generator():
+            try:
+                async for event in create_sse_stream(session_id, last_event_id):
+                    yield event
+            except asyncio.CancelledError:
+                # Client disconnected
+                logger.info(f"SSE stream closed for session: {session_id}")
+                raise
+            except Exception as e:
+                logger.error(f"SSE stream error: {e}")
+                # Send error event
+                error_event = f'event: error\ndata: {{"error": "{str(e)}"}}\n\n'
+                yield error_event
+        
+        # Return SSE streaming response
+        return StreamingResponse(
+            event_generator(),
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache",
+                "X-Accel-Buffering": "no",  # Disable nginx buffering
+                "Connection": "keep-alive"
+            }
+        )
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "STREAM_ERROR"}
+        )
+
+
+@app.get("/face/stream/stats")
+async def get_stream_stats():
+    """
+    Get streaming connection statistics
+    
+    Returns information about active streaming connections.
+    """
+    try:
+        from src.face.streaming import get_stream_manager
+        
+        manager = get_stream_manager()
+        stats = manager.get_connection_stats()
+        
+        return JSONResponse(content=stats)
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "STATS_ERROR"}
+        )
+
 
 # Exception handlers
 @app.exception_handler(HTTPException)
