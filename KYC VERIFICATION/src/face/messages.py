@@ -136,6 +136,36 @@ ERROR_MESSAGES = {
         tagalog="Gumalaw—subukan ulit",
         english="Movement detected—try again"
     ),
+    "motion_detected": Message(
+        key="error.motion_detected",
+        type=MessageType.ERROR,
+        tagalog="Gumalaw—subukan ulit",
+        english="Movement detected—try again"
+    ),
+    "focus_lost": Message(
+        key="error.focus_lost",
+        type=MessageType.ERROR,
+        tagalog="Hindi malinaw—steady lang",
+        english="Not clear—hold steady"
+    ),
+    "glare_high": Message(
+        key="error.glare_high",
+        type=MessageType.ERROR,
+        tagalog="Sobrang liwanag—bawas glare",
+        english="Too bright—reduce glare"
+    ),
+    "stability_lost": Message(
+        key="error.stability_lost",
+        type=MessageType.ERROR,
+        tagalog="Hindi stable—hawak nang steady",
+        english="Not stable—hold steady"
+    ),
+    "quality_degraded": Message(
+        key="error.quality_degraded",
+        type=MessageType.ERROR,
+        tagalog="Bumaba ang quality—subukan ulit",
+        english="Quality degraded—try again"
+    ),
     "timeout": Message(
         key="error.timeout",
         type=MessageType.ERROR,

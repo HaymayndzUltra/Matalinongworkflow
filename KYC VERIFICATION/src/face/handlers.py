@@ -283,16 +283,65 @@ def handle_lock_check(
     else:
         session.set_quality_issues([])
     
-    # Get localized messages for current state
+    # Enhanced quality gates check (UX Requirement F)
+    try:
+        from .quality_gates import get_quality_manager
+    except ImportError:
+        from face.quality_gates import get_quality_manager
+    
+    quality_manager = get_quality_manager()
+    
+    # Prepare metrics for quality gates
+    quality_metrics = {
+        "focus": focus,
+        "motion": motion,
+        "glare": glare,
+        "corners": corners,
+        "fill_ratio": fill_ratio
+    }
+    
+    # Check quality with cancel-on-jitter
+    quality_result = quality_manager.check_quality(quality_metrics)
+    
+    # Override quality_ok if cancel detected
+    if quality_result.cancel_reason:
+        quality_ok = False
+        # Add cancel reason to quality_reasons
+        quality_reasons.insert(0, quality_result.cancel_reason.value.upper())
+        # Set error for messages
+        session.set_error("cancelled")
+        # Force state rollback if locked/countdown
+        if session.capture_state in [CaptureState.LOCKED, CaptureState.COUNTDOWN]:
+            # Rollback to searching state
+            session.transition_to(CaptureState.SEARCHING, reason=f"cancel:{quality_result.cancel_reason.value}")
+            logger.info(f"Cancel-on-jitter: rolled back to SEARCHING (reason: {quality_result.cancel_reason.value})")
+    
+    # Update session quality issues with hints
+    if quality_result.hints:
+        session.set_quality_issues(quality_reasons + quality_result.hints)
+    else:
+        session.set_quality_issues(quality_reasons)
+    
+    # Get localized messages (now includes quality gate messages)
     messages = session.get_messages()
     
+    # Override with quality gate messages if available
+    if quality_result.tagalog_message:
+        messages["primary"] = quality_result.tagalog_message
+        if quality_result.english_message:
+            messages["primary_en"] = quality_result.english_message
+    
+    # Add quality hints to messages
+    if quality_result.hints:
+        messages["hints"] = quality_result.hints
+    
     # Check cancel-on-jitter timing requirement
-    if not quality_ok and session.capture_state in [CaptureState.LOCKED, CaptureState.COUNTDOWN]:
-        meets_timing, actual_ms = session.check_cancel_on_jitter_timing()
+    if quality_result.cancel_reason and session.capture_state in [CaptureState.LOCKED, CaptureState.COUNTDOWN]:
+        meets_timing = quality_result.response_time_ms < 50
         if not meets_timing:
-            logger.warning(f"Cancel-on-jitter response time {actual_ms:.1f}ms exceeds 50ms target")
-        # Set error for cancel message
-        session.set_error("cancelled")
+            logger.warning(f"Cancel-on-jitter response time {quality_result.response_time_ms:.1f}ms exceeds 50ms target")
+        else:
+            logger.info(f"Cancel-on-jitter achieved {quality_result.response_time_ms:.1f}ms response time")
     
     # Build response
     response = {
@@ -302,11 +351,13 @@ def handle_lock_check(
         'state': state_info,
         'timing': timing_metadata,  # Include timing metadata for UX Requirement B
         'messages': messages,  # Include localized messages for UX Requirement C
+        'quality_gates': quality_result.to_dict(),  # Include quality gate results for UX Requirement F
         'reasons': quality_reasons if not quality_ok else [],
         'metrics': {
             'fill_ratio': round(fill_ratio, 3),
             'roi_pixels': roi_pixels,
             'response_time_ms': round(response_time_ms, 1),
+            'stability_score': quality_manager.get_stability_score(),
             **(metrics or {})
         },
         **lock_token_response  # Include token info if lock achieved
