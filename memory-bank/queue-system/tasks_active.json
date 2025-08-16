@@ -57,7 +57,7 @@
       },
       {
         "text": "PHASE 13: BIOMETRIC & EXTRACTION INTEGRATION\n\n**Explanations:** Connect existing face_matcher.py with session management for unified decision making. Link biometric matching to session state, add TAR@FAR calculations, integrate match scores into decision logic. Ensure evidence_extractor.py is fully integrated with burst evaluation pipeline.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 13\n```\n\nIMPORTANT NOTE: Biometric integration must maintain accuracy targets while supporting all UX flows.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 14: API CONSOLIDATION\n\n**Explanations:** Create unified API structure: merge face scan endpoints under /api/v1/kyc/face/*, standardize all response formats, ensure consistent error handling, add security middleware for CORS and rate limiting, update OpenAPI documentation. Maintain backward compatibility for existing endpoints.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 14\n```\n\nIMPORTANT NOTE: API consolidation must not break any existing integrations. All endpoints must follow consistent patterns.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-08-16T22:15:33.327321+08:00"
+    "updated": "2025-08-16T22:35:57.325034+08:00"
   }
 ]

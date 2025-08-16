@@ -792,6 +792,15 @@ def handle_burst_eval(
         for f in burst_result.frame_scores
     ]
     
+    # Integrate biometric checks
+    try:
+        from .biometric_integration import integrate_biometrics_with_burst
+        # Get reference image if available (from previous capture or document)
+        reference_image = getattr(session, 'reference_image', None)
+        burst_result = integrate_biometrics_with_burst(burst_result, session, reference_image)
+    except ImportError:
+        logger.debug("Biometric integration not available")
+    
     # Transition to CAPTURED state if consensus passed
     if burst_result.consensus.passed:
         session.transition_to(
@@ -918,6 +927,10 @@ def handle_burst_eval(
         },
         'processing_time_ms': burst_result.processing_time_ms
     }
+    
+    # Add biometric data if available (Phase 13)
+    if 'biometric' in burst_result:
+        response['biometric'] = burst_result['biometric']
     
     # Add extraction data if available (UX Requirement D)
     if extraction_summary:
