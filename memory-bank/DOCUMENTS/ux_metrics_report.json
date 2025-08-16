@@ -1,0 +1,79 @@
+{
+  "timestamp": "2025-08-16T08:29:06.828764",
+  "summary": {
+    "total_requirements": 8,
+    "requirements_passed": 3,
+    "requirements_failed": 5,
+    "parity_items": 10,
+    "parity_passed": 8,
+    "parity_failed": 2
+  },
+  "requirements": {
+    "Requirement_A": {
+      "passed": 11,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Requirement_B": {
+      "passed": 5,
+      "failed": 1,
+      "status": "FAIL"
+    },
+    "Requirement_C": {
+      "passed": 1,
+      "failed": 1,
+      "status": "FAIL"
+    },
+    "Requirement_D": {
+      "passed": 0,
+      "failed": 1,
+      "status": "FAIL"
+    },
+    "Requirement_E": {
+      "passed": 1,
+      "failed": 1,
+      "status": "FAIL"
+    },
+    "Requirement_F": {
+      "passed": 3,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "Requirement_G": {
+      "passed": 1,
+      "failed": 1,
+      "status": "FAIL"
+    },
+    "Requirement_H": {
+      "passed": 4,
+      "failed": 0,
+      "status": "PASS"
+    }
+  },
+  "performance": {
+    "cancel_on_jitter_ms": 0.00476837158203125,
+    "cancel_detection_ms": 0.16450881958007812,
+    "back_completion_rate": null,
+    "telemetry_overhead_ms": 0.053505897521972656
+  },
+  "accessibility": {
+    "passed": [
+      "Reduced motion support",
+      "Screen reader support",
+      "WCAG 2.1 AA compliance"
+    ],
+    "failed": []
+  },
+  "parity_checklist": {
+    "State Machine": true,
+    "Timing Animations": true,
+    "Complete Localization": true,
+    "Confidence Scoring": false,
+    "Real-time Updates": true,
+    "Instant Cancellation": true,
+    "Front/Back Guidance": true,
+    "Full Telemetry": true,
+    "WCAG Compliance": true,
+    "Performance Targets": false
+  }
+}
