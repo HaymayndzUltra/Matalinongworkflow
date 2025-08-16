@@ -35,12 +35,11 @@ from .pad_scorer import (
     format_pad_feedback,
     AttackType
 )
-from .telemetry import (
-    track_event,
-    record_metric,
-    EventType,
-    EventSeverity,
-    get_telemetry_collector
+# Legacy telemetry removed - using ux_telemetry instead
+from .ux_telemetry import (
+    track_ux_event,
+    track_capture_event,
+    UXEventType
 )
 from .session_manager import (
     get_session_manager,
@@ -158,7 +157,12 @@ def handle_lock_check(
         audit_event(AuditEventType.SESSION_START, session_id, {'source': 'face_lock_check'})
     
     # Track lock attempt
-    track_event(EventType.LOCK_ATTEMPT, session_id)
+    track_ux_event(
+        event_type="capture.lock_attempt",
+        session_id=session_id,
+        data={},
+        context={'source': 'face_lock_check'}
+    )
     
     # If lock_token provided, validate it
     if lock_token:
@@ -263,13 +267,18 @@ def handle_lock_check(
         # Record timing event for lock achieved
         session.record_timing_event("lock_achieved")
         
-        track_event(EventType.LOCK_ACHIEVED, session_id)
+        track_capture_event(
+            session_id=session_id,
+            capture_type="lock_achieved",
+            quality_score=consensus_quality,
+            success=True
+        )
         
         logger.info(f"Lock achieved: session={session_id}, state={session.capture_state.value}, token={new_token.token[:8]}...")
     
     # Calculate response time
     response_time_ms = (time.time() - start_time) * 1000
-    record_metric('lock_check_response_ms', response_time_ms)
+    # Response time is tracked via timing metadata in session
     
     # Include state info in response
     state_info = session.get_state_info()
@@ -463,10 +472,13 @@ def handle_challenge_script(
         Challenge script with actions and timing
     """
     from .challenge_generator import generate_challenge_script
-    from .telemetry import track_event, EventType
-    
     # Track challenge generation
-    track_event(EventType.CHALLENGE_GENERATED, session_id, {'complexity': complexity})
+    track_ux_event(
+        event_type="challenge.generated",
+        session_id=session_id,
+        data={'complexity': complexity},
+        context={'source': 'face_challenge_script'}
+    )
     
     # Get session
     session = get_or_create_session(session_id)
@@ -584,7 +596,6 @@ def handle_challenge_verify(
     
     # Use the challenge generator to verify
     from .challenge_generator import verify_challenge_response
-    from .telemetry import track_event, EventType
     
     # Format responses for the verifier
     formatted_responses = []
@@ -607,12 +618,20 @@ def handle_challenge_verify(
     
     # Track event
     if result['passed']:
-        track_event(EventType.CHALLENGE_COMPLETED, session_id, 
-                   {'score': result['score'], 'steps_completed': result['steps_completed']})
+        track_ux_event(
+            event_type="challenge.completed",
+            session_id=session_id,
+            data={'score': result['score'], 'steps_completed': result['steps_completed']},
+            context={'source': 'face_challenge_verify'}
+        )
         session.challenge_completed = True
     else:
-        track_event(EventType.CHALLENGE_FAILED, session_id,
-                   {'score': result['score'], 'reasons': result['failure_reasons']})
+        track_ux_event(
+            event_type="challenge.failed",
+            session_id=session_id,
+            data={'score': result['score'], 'reasons': result['failure_reasons']},
+            context={'source': 'face_challenge_verify'}
+        )
     
     logger.info(f"Challenge verify: session={session_id}, passed={result['passed']}, score={result['score']}")
     
@@ -955,21 +974,29 @@ def handle_face_decision(
     
     # Track decision event
     if decision_result['decision'] == 'approve_face':
-        track_event(EventType.DECISION_APPROVED, session_id, 
-                   {'confidence': decision_result['confidence']})
+        track_ux_event(
+            event_type="decision.approved",
+            session_id=session_id,
+            data={'confidence': decision_result['confidence']},
+            context={'source': 'face_decision'}
+        )
     elif decision_result['decision'] == 'deny_face':
-        track_event(EventType.DECISION_REJECTED, session_id,
-                   {'reasons': decision_result['reasons']})
+        track_ux_event(
+            event_type="decision.rejected",
+            session_id=session_id,
+            data={'reasons': decision_result['reasons']},
+            context={'source': 'face_decision'}
+        )
     else:  # review_face
-        track_event(EventType.DECISION_REVIEW, session_id,
-                   {'reasons': decision_result['reasons']})
+        track_ux_event(
+            event_type="decision.review",
+            session_id=session_id,
+            data={'reasons': decision_result['reasons']},
+            context={'source': 'face_decision'}
+        )
     
-    # Record metrics for telemetry
-    record_metric('face_decision_confidence', decision_result['confidence'])
-    if match_score:
-        record_metric('face_match_score', match_score)
-    if passive_score:
-        record_metric('face_passive_score', passive_score)
+    # Metrics are tracked through events and session state
+    # Confidence, match_score, and passive_score are included in the decision data
     
     # Record metrics for Prometheus
     from .metrics_exporter import record_decision as record_prometheus_decision
