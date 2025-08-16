@@ -209,6 +209,26 @@ class ThresholdManager:
                           "Challenge pass rate target (good lighting)", "FACE_CHALLENGE_PASS_RATE_TARGET"),
             ThresholdConfig("face_tar_at_far1_target", ThresholdCategory.FACE, 0.98, 0.9, 1.0, "ratio",
                           "TAR@FAR1% target", "FACE_TAR_AT_FAR1_TARGET"),
+            
+            # Face Scan - Animation Timing (UX Requirement B)
+            ThresholdConfig("face_anim_flash_duration_ms", ThresholdCategory.FACE, 150, 120, 180, "ms",
+                          "Flash animation duration", "FACE_ANIM_FLASH_DURATION_MS"),
+            ThresholdConfig("face_anim_checkmark_duration_ms", ThresholdCategory.FACE, 250, 200, 300, "ms",
+                          "Checkmark animation duration", "FACE_ANIM_CHECKMARK_DURATION_MS"),
+            ThresholdConfig("face_anim_card_flip_y_ms", ThresholdCategory.FACE, 400, 350, 450, "ms",
+                          "Card flip Y-axis animation duration", "FACE_ANIM_CARD_FLIP_Y_MS"),
+            ThresholdConfig("face_anim_stepper_advance_ms", ThresholdCategory.FACE, 200, 150, 250, "ms",
+                          "Stepper advance animation duration", "FACE_ANIM_STEPPER_ADVANCE_MS"),
+            ThresholdConfig("face_anim_frame_pulse_ms", ThresholdCategory.FACE, 300, 250, 350, "ms",
+                          "Back frame pulse duration (single)", "FACE_ANIM_FRAME_PULSE_MS"),
+            ThresholdConfig("face_anim_frame_pulse_count", ThresholdCategory.FACE, 3, 2, 5, "count",
+                          "Number of back frame pulses", "FACE_ANIM_FRAME_PULSE_COUNT"),
+            ThresholdConfig("face_anim_countdown_ring_ms", ThresholdCategory.FACE, 600, 500, 700, "ms",
+                          "Countdown ring animation duration", "FACE_ANIM_COUNTDOWN_RING_MS"),
+            ThresholdConfig("face_anim_extraction_skeleton_ms", ThresholdCategory.FACE, 400, 300, 500, "ms",
+                          "Extraction skeleton fields animation", "FACE_ANIM_EXTRACTION_SKELETON_MS"),
+            ThresholdConfig("face_anim_reduce_motion_fade_ms", ThresholdCategory.FACE, 200, 150, 250, "ms",
+                          "Reduced motion crossfade duration", "FACE_ANIM_REDUCE_MOTION_FADE_MS"),
         ]
         
         for config in defaults:
@@ -456,6 +476,36 @@ class ThresholdManager:
             "cancel_jitter_max_ms": self.get("face_cancel_jitter_max_ms"),
             "challenge_pass_rate_target": self.get("face_challenge_pass_rate_target"),
             "tar_at_far1_target": self.get("face_tar_at_far1_target")
+        }
+    
+    def get_face_animation_timings(self) -> Dict[str, Any]:
+        """Get all face animation timing thresholds for UX Requirement B"""
+        return {
+            "capture": {
+                "flash_duration_ms": self.get("face_anim_flash_duration_ms"),
+                "checkmark_duration_ms": self.get("face_anim_checkmark_duration_ms"),
+                "flash_check_total_ms": self.get("face_anim_flash_duration_ms") + self.get("face_anim_checkmark_duration_ms")
+            },
+            "transition": {
+                "card_flip_y_ms": self.get("face_anim_card_flip_y_ms"),
+                "stepper_advance_ms": self.get("face_anim_stepper_advance_ms")
+            },
+            "back": {
+                "frame_pulse_ms": self.get("face_anim_frame_pulse_ms"),
+                "frame_pulse_count": self.get("face_anim_frame_pulse_count"),
+                "frame_pulse_total_ms": self.get("face_anim_frame_pulse_ms") * self.get("face_anim_frame_pulse_count")
+            },
+            "countdown": {
+                "ring_duration_ms": self.get("face_anim_countdown_ring_ms"),
+                "minimum_visible_ms": self.get("face_countdown_min_ms")
+            },
+            "extraction": {
+                "skeleton_fields_ms": self.get("face_anim_extraction_skeleton_ms"),
+                "initial_response_max_ms": 500  # Fixed requirement
+            },
+            "accessibility": {
+                "reduce_motion_fade_ms": self.get("face_anim_reduce_motion_fade_ms")
+            }
         }
     
     def validate_face_thresholds(self) -> Tuple[bool, Dict[str, Any]]:

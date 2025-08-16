@@ -13,7 +13,7 @@
       },
       {
         "text": "PHASE 2: TIMING METADATA & ANIMATION SUPPORT\n\n**Explanations:** Add timing metadata to all API responses for frontend animation synchronization. Implement support for: capture.flash_check (120-180ms+250ms), transition.card_flip_y (350-450ms), stepper.advance_front_done (200ms), back.frame_pulse (3×300ms), countdown.ring (600ms), extraction.skeleton_fields (<500ms). Add these as configurable thresholds in threshold_manager.py.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 2\n```\n\nIMPORTANT NOTE: All timing values must be returned in API responses so frontend can synchronize animations. Cancel-on-jitter must respond in <50ms.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 3: TAGALOG MICROCOPY SUPPORT\n\n**Explanations:** Implement all Tagalog-first microcopy in API responses. Add message templates: \"Steady lang… kukunin na\" (LOCKED), \"Harap OK ✅\" (front captured), \"Likod naman. I-frame ang barcode/QR kung meron\" (flip prompt), \"Bawas glare / Ayusin sa loob ng frame / Hawak nang steady\" (quality hints), \"Gumalaw—subukan ulit\" (cancel), \"Likod OK ✅ — Tinitingnan ang detalye…\" (back captured). Support message localization.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 3\n```\n\nIMPORTANT NOTE: All user-facing messages must be in Tagalog by default with English fallback. Messages must be returned in API responses for frontend display.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-08-16T07:31:46.401472+08:00"
+    "updated": "2025-08-16T08:05:22.359651+08:00"
   }
 ]

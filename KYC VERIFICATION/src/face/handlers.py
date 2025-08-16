@@ -149,6 +149,9 @@ def handle_lock_check(
     session = session_mgr.get_or_create_session(session_id)
     session.lock_attempt_count += 1
     
+    # Start response timing for cancel-on-jitter measurement
+    session.start_response_timing()
+    
     # Log session start if first request
     if session.request_count == 1:
         from .audit_logger import audit_event, AuditEventType
@@ -257,6 +260,9 @@ def handle_lock_check(
             reason=f"quality_ok:{quality_ok},fill_ratio:{fill_ratio:.3f}"
         )
         
+        # Record timing event for lock achieved
+        session.record_timing_event("lock_achieved")
+        
         track_event(EventType.LOCK_ACHIEVED, session_id)
         
         logger.info(f"Lock achieved: session={session_id}, state={session.capture_state.value}, token={new_token.token[:8]}...")
@@ -268,12 +274,22 @@ def handle_lock_check(
     # Include state info in response
     state_info = session.get_state_info()
     
+    # Get timing metadata for animation synchronization
+    timing_metadata = session.get_timing_metadata()
+    
+    # Check cancel-on-jitter timing requirement
+    if not quality_ok and session.capture_state in [CaptureState.LOCKED, CaptureState.COUNTDOWN]:
+        meets_timing, actual_ms = session.check_cancel_on_jitter_timing()
+        if not meets_timing:
+            logger.warning(f"Cancel-on-jitter response time {actual_ms:.1f}ms exceeds 50ms target")
+    
     # Build response
     response = {
         'ok': quality_ok,
         'lock': quality_ok,
         'session_id': session.session_id,
         'state': state_info,
+        'timing': timing_metadata,  # Include timing metadata for UX Requirement B
         'reasons': quality_reasons if not quality_ok else [],
         'metrics': {
             'fill_ratio': round(fill_ratio, 3),
@@ -709,10 +725,18 @@ def handle_burst_eval(
     # Include state info in response
     state_info = session.get_state_info()
     
+    # Get timing metadata
+    timing_metadata = session.get_timing_metadata()
+    
+    # Record capture timing event
+    if burst_result.consensus.passed:
+        session.record_timing_event(f"capture_{session.current_side.value}_complete")
+    
     return {
         'ok': True,
         'session_id': session.session_id,
         'state': state_info,
+        'timing': timing_metadata,  # Include timing metadata
         'burst_id': burst_result.burst_id,
         'frame_scores': frame_scores,
         'consensus': {

@@ -241,6 +241,11 @@ class EnhancedSessionState:
     back_captured: bool = False
     state_history: List[Tuple[CaptureState, float, Optional[str]]] = field(default_factory=list)
     
+    # Timing metadata fields (UX Requirement B)
+    timing_events: Dict[str, float] = field(default_factory=dict)
+    animation_timings: Optional[Dict[str, Any]] = None
+    response_start_time: Optional[float] = None
+    
     def __post_init__(self):
         """Initialize mutable default values"""
         if self.burst_frames is None:
@@ -548,6 +553,77 @@ class EnhancedSessionState:
             self.back_captured = False
         
         self.state_history.append((self.capture_state, time.time(), "recapture_reset"))
+    
+    def record_timing_event(self, event_name: str, timestamp: Optional[float] = None):
+        """Record a timing event for animation synchronization"""
+        if timestamp is None:
+            timestamp = time.time()
+        self.timing_events[event_name] = timestamp
+        
+    def get_timing_metadata(self) -> Dict[str, Any]:
+        """Get timing metadata for API response (UX Requirement B)"""
+        try:
+            from ..config.threshold_manager import ThresholdManager
+        except ImportError:
+            # Fallback for test environment
+            from config.threshold_manager import ThresholdManager
+        
+        # Get animation timings if not cached
+        if self.animation_timings is None:
+            tm = ThresholdManager()
+            self.animation_timings = tm.get_face_animation_timings()
+        
+        # Calculate response time if tracking
+        response_time_ms = None
+        if self.response_start_time:
+            response_time_ms = (time.time() - self.response_start_time) * 1000
+        
+        # Build timing metadata
+        metadata = {
+            "animation_timings": self.animation_timings,
+            "current_state": self.capture_state.value,
+            "timing_events": {
+                name: int(ts * 1000)  # Convert to milliseconds
+                for name, ts in self.timing_events.items()
+            },
+            "response_time_ms": response_time_ms
+        }
+        
+        # Add state-specific timing hints
+        if self.capture_state == CaptureState.LOCKED:
+            metadata["next_animation"] = "countdown_ring"
+            metadata["next_duration_ms"] = self.animation_timings["countdown"]["ring_duration_ms"]
+        elif self.capture_state == CaptureState.COUNTDOWN:
+            metadata["next_animation"] = "capture_flash"
+            metadata["next_duration_ms"] = self.animation_timings["capture"]["flash_check_total_ms"]
+        elif self.capture_state == CaptureState.CAPTURED:
+            if self.current_side == DocumentSide.FRONT:
+                metadata["next_animation"] = "card_flip_y"
+                metadata["next_duration_ms"] = self.animation_timings["transition"]["card_flip_y_ms"]
+            else:
+                metadata["next_animation"] = "extraction_skeleton"
+                metadata["next_duration_ms"] = self.animation_timings["extraction"]["skeleton_fields_ms"]
+        elif self.capture_state == CaptureState.FLIP_TO_BACK:
+            metadata["next_animation"] = "frame_pulse"
+            metadata["next_duration_ms"] = self.animation_timings["back"]["frame_pulse_total_ms"]
+        
+        return metadata
+    
+    def start_response_timing(self):
+        """Start timing for response time measurement"""
+        self.response_start_time = time.time()
+    
+    def check_cancel_on_jitter_timing(self) -> Tuple[bool, float]:
+        """
+        Check if cancel-on-jitter response time meets <50ms requirement
+        Returns: (meets_requirement, actual_time_ms)
+        """
+        if not self.response_start_time:
+            return True, 0.0
+        
+        response_time_ms = (time.time() - self.response_start_time) * 1000
+        meets_requirement = response_time_ms < 50  # UX Requirement B
+        return meets_requirement, response_time_ms
 
 
 class SessionManager:
