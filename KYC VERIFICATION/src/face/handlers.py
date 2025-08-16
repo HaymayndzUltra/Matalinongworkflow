@@ -820,6 +820,17 @@ def handle_burst_eval(
     # Get localized messages
     messages = session.get_messages()
     
+    # Apply accessibility adaptations if needed
+    try:
+        from .accessibility import adapt_response_for_accessibility
+        # Get headers/params from session if available
+        headers = getattr(session, 'request_headers', {})
+        params = getattr(session, 'request_params', {})
+    except ImportError:
+        adapt_response_for_accessibility = None
+        headers = {}
+        params = {}
+    
     # Record capture timing event
     if burst_result.consensus.passed:
         session.record_timing_event(f"capture_{session.current_side.value}_complete")
@@ -897,6 +908,10 @@ def handle_burst_eval(
         current_side = session.current_side.value
         if current_side in session.extraction_results:
             response['extraction']['current_result'] = session.extraction_results[current_side]
+    
+    # Apply accessibility adaptations if available
+    if adapt_response_for_accessibility:
+        response = adapt_response_for_accessibility(response, headers, params)
     
     return response
 

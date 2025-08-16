@@ -256,6 +256,13 @@ class EnhancedSessionState:
     extraction_events: List[Dict[str, Any]] = field(default_factory=list)
     extraction_in_progress: bool = False
     
+    # Accessibility settings
+    accessibility_settings: Optional[Dict[str, Any]] = None
+    reduced_motion: bool = False
+    screen_reader_mode: bool = False
+    request_headers: Dict[str, str] = field(default_factory=dict)
+    request_params: Dict[str, str] = field(default_factory=dict)
+    
     def __post_init__(self):
         """Initialize mutable default values"""
         if self.burst_frames is None:
@@ -836,6 +843,43 @@ class EnhancedSessionState:
                 }
         
         return summary
+    
+    def set_accessibility_preferences(self, headers: Dict[str, str], params: Dict[str, str]):
+        """
+        Set accessibility preferences from request
+        
+        Args:
+            headers: Request headers
+            params: Query parameters
+        """
+        self.request_headers = headers
+        self.request_params = params
+        
+        # Check for reduced motion
+        if headers.get('Prefers-Reduced-Motion') == 'reduce' or params.get('reduced_motion') == 'true':
+            self.reduced_motion = True
+        
+        # Check for screen reader
+        if headers.get('Screen-Reader-Active') == 'true' or params.get('screen_reader') == 'true':
+            self.screen_reader_mode = True
+        
+        # Store full settings
+        try:
+            from face.accessibility import detect_accessibility_settings
+            settings = detect_accessibility_settings(headers, params)
+            self.accessibility_settings = settings.to_dict()
+        except ImportError:
+            pass
+    
+    def get_state_for_accessibility(self) -> str:
+        """Get current state adapted for accessibility needs"""
+        state = self.capture_state.value
+        
+        # Skip countdown for reduced motion
+        if self.reduced_motion and state == "countdown":
+            return "captured"
+        
+        return state
 
 
 class SessionManager:

@@ -1631,6 +1631,96 @@ async def get_quality_metrics():
         )
 
 
+# ============= ACCESSIBILITY ENDPOINTS =============
+
+@app.get("/accessibility/test")
+async def test_accessibility(
+    request: Request,
+    reduced_motion: Optional[bool] = False,
+    screen_reader: Optional[bool] = False,
+    high_contrast: Optional[bool] = False,
+    simplified: Optional[bool] = False
+):
+    """
+    Test accessibility features
+    
+    Returns sample response adapted for accessibility settings.
+    """
+    try:
+        from src.face.accessibility import adapt_response_for_accessibility
+        
+        # Create test response
+        test_response = {
+            "state": {
+                "current": "countdown",
+                "next": "captured"
+            },
+            "timing": {
+                "countdown_duration_ms": 3000,
+                "state_transition_ms": 500
+            },
+            "messages": {
+                "primary": "Hinahanap ang dokumento",
+                "primary_en": "Looking for document",
+                "instruction": "Ilagay ang dokumento sa loob ng frame"
+            },
+            "quality_gates": {
+                "level": "good",
+                "hints": ["Ilapit ng kaunti", "Mas maliwanag"]
+            },
+            "capture_progress": {
+                "progress": 50,
+                "message": "Capturing document"
+            }
+        }
+        
+        # Build params from query
+        params = {}
+        if reduced_motion:
+            params['reduced_motion'] = 'true'
+        if screen_reader:
+            params['screen_reader'] = 'true'
+        if high_contrast:
+            params['high_contrast'] = 'true'
+        if simplified:
+            params['simplified'] = 'true'
+        
+        # Get headers
+        headers = dict(request.headers)
+        
+        # Adapt response
+        adapted = adapt_response_for_accessibility(test_response, headers, params)
+        
+        return JSONResponse(content=adapted)
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "ACCESSIBILITY_TEST_ERROR"}
+        )
+
+
+@app.get("/accessibility/compliance")
+async def get_wcag_compliance():
+    """
+    Get WCAG 2.1 AA compliance status
+    
+    Returns compliance information for accessibility standards.
+    """
+    try:
+        from src.face.accessibility import get_wcag_compliance_hints
+        
+        compliance = get_wcag_compliance_hints()
+        
+        return JSONResponse(content=compliance)
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "COMPLIANCE_ERROR"}
+        )
+
+
 # Exception handlers
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
