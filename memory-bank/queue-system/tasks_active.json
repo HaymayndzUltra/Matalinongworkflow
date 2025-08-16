@@ -9,7 +9,7 @@
       },
       {
         "text": "PHASE 1: SESSION STATE & MANAGER COMPATIBILITY\n\n**Explanations:**\nExpose EnhancedSessionState.current_state as an alias of capture_state. Provide SessionManager.create_session(session_id) alias to get_or_create_session. Ensure timing metadata remains backward-compatible (flat keys alongside structured map).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id Replace All>\npython3 todo_manager.py done <task_id Replace All> 1\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No behavioral changes to the state machine; only aliases and metadata flattening. Maintain thread-safety for manager operations.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 2: QUALITY GATES TUNING & LEGACY ALIASES\n\n**Explanations:**\nNormalize focus scores from 0..10 to 0..1. Map cancel reasons for legacy expectations: motion → CancelReason.MOTION_BLUR; focus → CancelReason.OUT_OF_FOCUS. Ensure \"excellent\" quality is reachable in the provided good metrics example; adjust mapping/weights so weighted score ≥ 0.90 yields QualityLevel.EXCELLENT (without relaxing cancel thresholds).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id Replace All>\npython3 todo_manager.py done <task_id Replace All> 2\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Keep response time target (<50ms) unchanged. Do not relax cancel thresholds; only normalize input and add alias mapping.",
@@ -42,6 +42,6 @@
     ],
     "status": "in_progress",
     "created": "2025-08-16T00:00:00+08:00",
-    "updated": "2025-08-17T03:57:09.863680+08:00"
+    "updated": "2025-08-17T04:05:20.614953+08:00"
   }
 ]
