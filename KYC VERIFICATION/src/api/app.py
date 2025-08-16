@@ -211,6 +211,14 @@ def get_application() -> FastAPI:
         # Drift and fairness gauges will be updated lazily elsewhere if needed.
      
     # Static files are already mounted above at line 161-165
+    
+    # Add v2 endpoints
+    try:
+        from .v2_endpoints import v2_router
+        app.include_router(v2_router, tags=["V2 API"])
+        logger.info("V2 API endpoints registered")
+    except ImportError:
+        logger.warning("V2 endpoints not available")
 
     return app
 
@@ -1131,13 +1139,21 @@ async def complete_kyc_verification(request: CompleteKYCRequest):
 # ============= Face Scan Endpoints =============
 
 @app.post("/face/lock/check", response_model=FaceLockCheckResponse)
-async def check_face_lock(request: FaceLockCheckRequest):
+async def check_face_lock(request: FaceLockCheckRequest, response: Response):
     """
     Check if face position meets lock criteria
     
     This endpoint evaluates face position without processing images.
     It checks geometry, centering, pose, brightness, and stability.
+    
+    DEPRECATED: Use /v2/face/scan with action="lock" instead.
     """
+    # Add deprecation warning
+    response.headers["X-API-Deprecated"] = "true"
+    response.headers["X-API-Deprecated-Use"] = "/v2/face/scan"
+    response.headers["X-API-Deprecated-Sunset"] = "2025-07-16"
+    response.headers["Warning"] = '299 - "/face/lock/check is deprecated. Use /v2/face/scan. Sunset: 2025-07-16"'
+    
     try:
         from src.face.handlers import handle_lock_check
         
@@ -1285,13 +1301,20 @@ async def verify_challenge(request: FaceChallengeVerifyRequest):
 
 
 @app.post("/face/burst/upload", response_model=FaceBurstUploadResponse)
-async def upload_burst(request: FaceBurstUploadRequest):
+async def upload_burst(request: FaceBurstUploadRequest, response: Response):
     """
     Upload burst of face frames
     
     Receives multiple frames captured in quick succession.
     Frames are stored transiently and auto-deleted after processing.
+    
+    DEPRECATED: Use /v2/face/scan with action="upload" instead.
     """
+    # Add deprecation warning
+    response.headers["X-API-Deprecated"] = "true"
+    response.headers["X-API-Deprecated-Use"] = "/v2/face/scan"
+    response.headers["X-API-Deprecated-Sunset"] = "2025-07-16"
+    response.headers["Warning"] = '299 - "/face/burst/upload is deprecated. Use /v2/face/scan. Sunset: 2025-07-16"'
     try:
         # TODO: Implement actual burst upload in Phase 7
         # For now, return mock upload response
