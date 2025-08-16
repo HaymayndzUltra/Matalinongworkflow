@@ -246,6 +246,11 @@ class EnhancedSessionState:
     animation_timings: Optional[Dict[str, Any]] = None
     response_start_time: Optional[float] = None
     
+    # Message fields (UX Requirement C)
+    current_language: str = "tl"  # Default to Tagalog
+    quality_issues: List[str] = field(default_factory=list)
+    last_error: Optional[str] = None
+    
     def __post_init__(self):
         """Initialize mutable default values"""
         if self.burst_frames is None:
@@ -624,6 +629,70 @@ class EnhancedSessionState:
         response_time_ms = (time.time() - self.response_start_time) * 1000
         meets_requirement = response_time_ms < 50  # UX Requirement B
         return meets_requirement, response_time_ms
+    
+    def get_messages(self) -> Dict[str, Any]:
+        """Get localized messages for current state (UX Requirement C)"""
+        try:
+            from .messages import get_message_manager, Language
+        except ImportError:
+            # Fallback for test environment
+            try:
+                from face.messages import get_message_manager, Language
+            except ImportError:
+                # Return empty if messages module not available
+                return {}
+        
+        # Get message manager
+        msg_manager = get_message_manager()
+        
+        # Set language
+        lang = Language.TAGALOG if self.current_language == "tl" else Language.ENGLISH
+        
+        # Map quality issues to message keys
+        quality_issue_keys = []
+        for issue in self.quality_issues:
+            # Map ReasonCode to message keys
+            issue_map = {
+                "FOCUS_LOW": "focus_low",
+                "MOTION_HIGH": "motion_high",
+                "GLARE_HIGH": "glare_high",
+                "CORNERS_LOW": "focus_low",
+                "FILL_OUT_OF_RANGE": "not_centered",
+                "TOO_SMALL": "too_far",
+                "TOO_LARGE": "too_close",
+                "BRIGHTNESS_LOW": "too_dark",
+                "BRIGHTNESS_HIGH": "too_bright",
+                "CENTERING_FAIL": "not_centered"
+            }
+            if issue in issue_map:
+                quality_issue_keys.append(issue_map[issue])
+        
+        # Get messages for current state
+        messages = msg_manager.get_messages_for_response(
+            state=self.capture_state.value,
+            success=(self.capture_state == CaptureState.LOCKED or 
+                    self.capture_state == CaptureState.CAPTURED),
+            quality_issues=quality_issue_keys if quality_issue_keys else None,
+            error=self.last_error,
+            language=lang
+        )
+        
+        # Add specific success messages based on capture state
+        if self.capture_state == CaptureState.CAPTURED:
+            if self.current_side == DocumentSide.FRONT and self.front_captured:
+                messages["success"] = msg_manager.get_message("success.front_captured", lang)
+            elif self.current_side == DocumentSide.BACK and self.back_captured:
+                messages["success"] = msg_manager.get_message("success.back_captured", lang)
+        
+        return messages
+    
+    def set_quality_issues(self, issues: List[str]):
+        """Set current quality issues for message generation"""
+        self.quality_issues = issues
+    
+    def set_error(self, error: Optional[str]):
+        """Set current error for message generation"""
+        self.last_error = error
 
 
 class SessionManager:

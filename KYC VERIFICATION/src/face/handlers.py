@@ -277,11 +277,22 @@ def handle_lock_check(
     # Get timing metadata for animation synchronization
     timing_metadata = session.get_timing_metadata()
     
+    # Set quality issues for message generation
+    if quality_reasons:
+        session.set_quality_issues(quality_reasons)
+    else:
+        session.set_quality_issues([])
+    
+    # Get localized messages for current state
+    messages = session.get_messages()
+    
     # Check cancel-on-jitter timing requirement
     if not quality_ok and session.capture_state in [CaptureState.LOCKED, CaptureState.COUNTDOWN]:
         meets_timing, actual_ms = session.check_cancel_on_jitter_timing()
         if not meets_timing:
             logger.warning(f"Cancel-on-jitter response time {actual_ms:.1f}ms exceeds 50ms target")
+        # Set error for cancel message
+        session.set_error("cancelled")
     
     # Build response
     response = {
@@ -290,6 +301,7 @@ def handle_lock_check(
         'session_id': session.session_id,
         'state': state_info,
         'timing': timing_metadata,  # Include timing metadata for UX Requirement B
+        'messages': messages,  # Include localized messages for UX Requirement C
         'reasons': quality_reasons if not quality_ok else [],
         'metrics': {
             'fill_ratio': round(fill_ratio, 3),
@@ -728,6 +740,9 @@ def handle_burst_eval(
     # Get timing metadata
     timing_metadata = session.get_timing_metadata()
     
+    # Get localized messages
+    messages = session.get_messages()
+    
     # Record capture timing event
     if burst_result.consensus.passed:
         session.record_timing_event(f"capture_{session.current_side.value}_complete")
@@ -737,6 +752,7 @@ def handle_burst_eval(
         'session_id': session.session_id,
         'state': state_info,
         'timing': timing_metadata,  # Include timing metadata
+        'messages': messages,  # Include localized messages
         'burst_id': burst_result.burst_id,
         'frame_scores': frame_scores,
         'consensus': {
