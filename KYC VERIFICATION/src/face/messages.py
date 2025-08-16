@@ -80,14 +80,14 @@ STATE_MESSAGES = {
     "flip_to_back": Message(
         key="state.flip_to_back",
         type=MessageType.STATE,
-        tagalog="Likod naman. I-frame ang barcode/QR kung meron",
-        english="Flip to back. Frame the barcode/QR if present"
+        tagalog="🔄 I-FLIP ang dokumento - Likod ng ID (HINDI SELFIE!)",
+        english="🔄 FLIP the document - Back of ID (NOT A SELFIE!)"
     ),
     "back_searching": Message(
         key="state.back_searching",
         type=MessageType.STATE,
-        tagalog="Hinahanap ang likod ng dokumento",
-        english="Looking for back of document"
+        tagalog="Hinahanap ang likod... ⚠️ LIKOD ng ID, hindi mukha!",
+        english="Looking for back... ⚠️ BACK of ID, not face!"
     ),
     "complete": Message(
         key="state.complete",
@@ -103,15 +103,15 @@ SUCCESS_MESSAGES = {
     "front_captured": Message(
         key="success.front_captured",
         type=MessageType.SUCCESS,
-        tagalog="Harap OK",
-        english="Front OK",
+        tagalog="Harap OK ✅ (1/2) - Ihanda ang likod",
+        english="Front OK ✅ (1/2) - Prepare back side",
         emoji="✅"
     ),
     "back_captured": Message(
         key="success.back_captured",
         type=MessageType.SUCCESS,
-        tagalog="Likod OK — Tinitingnan ang detalye…",
-        english="Back OK — Extracting details…",
+        tagalog="Likod OK ✅ (2/2) - Kumpleto na!",
+        english="Back OK ✅ (2/2) - Complete!",
         emoji="✅"
     ),
     "lock_achieved": Message(
@@ -261,8 +261,20 @@ INSTRUCTION_MESSAGES = {
     "flip_document": Message(
         key="instruction.flip_document",
         type=MessageType.INSTRUCTION,
-        tagalog="I-flip ang dokumento para sa likod",
-        english="Flip document to capture back"
+        tagalog="⚠️ I-FLIP ang ID - Ipakita ang LIKOD (hindi selfie!)",
+        english="⚠️ FLIP the ID - Show the BACK (not a selfie!)"
+    ),
+    "back_not_selfie": Message(
+        key="instruction.back_not_selfie",
+        type=MessageType.INSTRUCTION,
+        tagalog="⚠️ BABALA: Likod ng ID lang, hindi mukha!",
+        english="⚠️ WARNING: Back of ID only, not face!"
+    ),
+    "show_back_side": Message(
+        key="instruction.show_back_side",
+        type=MessageType.INSTRUCTION,
+        tagalog="Ipakita ang likod na may barcode/signature",
+        english="Show the back with barcode/signature"
     ),
     "frame_barcode": Message(
         key="instruction.frame_barcode",

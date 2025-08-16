@@ -782,6 +782,32 @@ def handle_burst_eval(
         
         # Record capture in session
         session.record_capture()
+        
+        # Track capture flow progress (UX Requirement G)
+        try:
+            from .capture_flow import get_capture_manager, CaptureStep
+        except ImportError:
+            from face.capture_flow import get_capture_manager, CaptureStep
+        
+        capture_manager = get_capture_manager()
+        
+        # Advance capture flow based on current side
+        if session.current_side.value == "front":
+            # Front captured
+            capture_manager.current_step = CaptureStep.FRONT_CAPTURED
+            progress = capture_manager.advance_step(
+                success=True,
+                quality_score=burst_result.consensus.median_score
+            )
+            logger.info(f"Front capture complete: {progress.display}")
+        else:
+            # Back captured
+            capture_manager.current_step = CaptureStep.BACK_CAPTURED
+            progress = capture_manager.advance_step(
+                success=True,
+                quality_score=burst_result.consensus.median_score
+            )
+            logger.info(f"Back capture complete: {progress.display}")
     
     logger.info(f"Burst eval: session={session_id}, consensus={burst_result.consensus.passed}, median={burst_result.consensus.median_score:.3f}, state={session.capture_state.value}")
     
@@ -828,12 +854,18 @@ def handle_burst_eval(
     # Get extraction summary if extraction was performed
     extraction_summary = session.get_extraction_summary() if burst_result.consensus.passed else None
     
+    # Get capture flow progress (UX Requirement G)
+    capture_progress = None
+    if burst_result.consensus.passed:
+        capture_progress = capture_manager.get_progress().to_dict()
+    
     response = {
         'ok': True,
         'session_id': session.session_id,
         'state': state_info,
         'timing': timing_metadata,  # Include timing metadata
         'messages': messages,  # Include localized messages
+        'capture_progress': capture_progress,  # Include capture flow progress
         'burst_id': burst_result.burst_id,
         'frame_scores': frame_scores,
         'consensus': {
