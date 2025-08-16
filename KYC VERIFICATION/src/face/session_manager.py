@@ -251,6 +251,11 @@ class EnhancedSessionState:
     quality_issues: List[str] = field(default_factory=list)
     last_error: Optional[str] = None
     
+    # Extraction fields (UX Requirement D)
+    extraction_results: Dict[str, Any] = field(default_factory=dict)  # side -> ExtractionResult
+    extraction_events: List[Dict[str, Any]] = field(default_factory=list)
+    extraction_in_progress: bool = False
+    
     def __post_init__(self):
         """Initialize mutable default values"""
         if self.burst_frames is None:
@@ -693,6 +698,47 @@ class EnhancedSessionState:
     def set_error(self, error: Optional[str]):
         """Set current error for message generation"""
         self.last_error = error
+    
+    def start_extraction(self, document_side: str):
+        """Start extraction process for a document side"""
+        self.extraction_in_progress = True
+        self.record_timing_event(f"extraction_{document_side}_start")
+    
+    def store_extraction_result(self, result: Dict[str, Any]):
+        """Store extraction result for document side"""
+        if "document_side" in result:
+            self.extraction_results[result["document_side"]] = result
+            self.extraction_in_progress = False
+            self.record_timing_event(f"extraction_{result['document_side']}_complete")
+    
+    def add_extraction_event(self, event: Dict[str, Any]):
+        """Add extraction streaming event"""
+        self.extraction_events.append(event)
+        # Keep only last 50 events to avoid memory issues
+        if len(self.extraction_events) > 50:
+            self.extraction_events = self.extraction_events[-50:]
+    
+    def get_extraction_summary(self) -> Dict[str, Any]:
+        """Get extraction summary for API response"""
+        summary = {
+            "in_progress": self.extraction_in_progress,
+            "front_extracted": "front" in self.extraction_results,
+            "back_extracted": "back" in self.extraction_results,
+            "results": {}
+        }
+        
+        # Add simplified results for each side
+        for side, result in self.extraction_results.items():
+            if isinstance(result, dict):
+                summary["results"][side] = {
+                    "overall_confidence": result.get("overall_confidence", 0),
+                    "confidence_level": result.get("confidence_level", "low"),
+                    "fields_extracted": len(result.get("fields", {})),
+                    "low_confidence_fields": result.get("low_confidence_fields", []),
+                    "extraction_duration_ms": result.get("extraction_duration_ms", 0)
+                }
+        
+        return summary
 
 
 class SessionManager:

@@ -746,8 +746,38 @@ def handle_burst_eval(
     # Record capture timing event
     if burst_result.consensus.passed:
         session.record_timing_event(f"capture_{session.current_side.value}_complete")
+        
+        # Start extraction process (UX Requirement D)
+        try:
+            from .extraction import extract_with_confidence
+        except ImportError:
+            from face.extraction import extract_with_confidence
+        
+        # Create streaming callback to store events
+        def streaming_callback(event):
+            session.add_extraction_event(event)
+        
+        # Start extraction
+        session.start_extraction(session.current_side.value)
+        
+        # Simulate image data (in production, use actual burst frames)
+        mock_image_data = b"mock_image_data"
+        
+        # Extract with confidence scores
+        extraction_result = extract_with_confidence(
+            mock_image_data,
+            session.session_id,
+            session.current_side.value,
+            streaming_callback
+        )
+        
+        # Store extraction result
+        session.store_extraction_result(extraction_result)
     
-    return {
+    # Get extraction summary if extraction was performed
+    extraction_summary = session.get_extraction_summary() if burst_result.consensus.passed else None
+    
+    response = {
         'ok': True,
         'session_id': session.session_id,
         'state': state_info,
@@ -775,6 +805,17 @@ def handle_burst_eval(
         },
         'processing_time_ms': burst_result.processing_time_ms
     }
+    
+    # Add extraction data if available (UX Requirement D)
+    if extraction_summary:
+        response['extraction'] = extraction_summary
+        
+        # If extraction completed, add detailed result
+        current_side = session.current_side.value
+        if current_side in session.extraction_results:
+            response['extraction']['current_result'] = session.extraction_results[current_side]
+    
+    return response
 
 
 # ============= DECISION ENDPOINT =============

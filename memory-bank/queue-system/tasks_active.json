@@ -21,7 +21,7 @@
       },
       {
         "text": "PHASE 4: OCR EXTRACTION WITH CONFIDENCE SCORES\n\n**Explanations:** Integrate evidence_extractor.py with face scan flow. Enhance extraction to return confidence scores per field (Name: 0.94, DOB: 0.89, etc.). Implement color coding logic: Green ≥0.9, Amber 0.75-0.89, Red <0.75. Add extraction to burst_eval handler for back-side processing. Ensure extraction completes within 4s (p50) to 6s (p95) from CAPTURED state.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 4\n```\n\nIMPORTANT NOTE: Extraction must include confidence scores for each field and support streaming updates via EXTRACT_START/RESULT events.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 5: REAL-TIME STREAMING IMPLEMENTATION\n\n**Explanations:** Implement WebSocket endpoint at /ws/extraction/{session_id} for real-time extraction updates. Add Server-Sent Events fallback at /api/v1/kyc/extraction/stream/{session_id}. Stream extraction progress with field-by-field updates including confidence scores. Implement extraction.skeleton_fields with shimmer placeholder support. Ensure <500ms initial response.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 5\n```\n\nIMPORTANT NOTE: Streaming must support multiple concurrent sessions and provide real-time field updates as extraction progresses.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-08-16T08:41:47.636786+08:00"
+    "updated": "2025-08-16T09:27:20.558175+08:00"
   }
 ]
