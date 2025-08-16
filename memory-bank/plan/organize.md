@@ -1,159 +1,79 @@
-PHASE 0: SETUP & UX REQUIREMENTS REVIEW
-
-Explanations: Review all UX requirements (A-H) and prepare the environment. Document the state flow (SEARCHING→LOCKED→COUNTDOWN→CAPTURED→CONFIRM→FLIP-TO-BACK→BACK-SEARCHING), timing requirements, Tagalog microcopy, visual hierarchy tokens, UX parity tickets, acceptance criteria, telemetry events, and parity checklist. Create backup of current working implementation.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 0
-IMPORTANT NOTE: This phase ensures we understand ALL UX requirements before implementation. No code changes yet, only planning and documentation.
-
-PHASE 1: STATE MACHINE IMPLEMENTATION
-
-Explanations: Implement complete document capture state machine in session_manager.py supporting SEARCHING, LOCKED, COUNTDOWN, CAPTURED, CONFIRM, FLIP-TO-BACK, BACK-SEARCHING states. Add current_side tracking (front/back), front_captured/back_captured flags, state transition methods, and state history for telemetry. Ensure state transitions match UX flow exactly.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 1
-IMPORTANT NOTE: State machine must support all transitions including front→back flip, with proper event emission for each state change.
-
-PHASE 2: TIMING & ANIMATION BACKEND SUPPORT
-
-Explanations: Add backend support for all UX timing requirements. Implement timing metadata in API responses: capture.flash_check (120-180ms flash + 250ms checkmark), transition.card_flip_y (350-450ms), stepper.advance_front_done (200ms), back.frame_pulse (3×300ms), countdown.ring (600ms), extraction.skeleton_fields (<500ms). Add timing configuration to threshold_manager.py.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 2
-IMPORTANT NOTE: All timing values must be returned in API responses so frontend can synchronize animations. Cancel-on-jitter must respond in <50ms.
-
-PHASE 3: TAGALOG MICROCOPY SUPPORT
-
-Explanations: Implement all Tagalog-first microcopy in API responses. Add message templates: "Steady lang… kukunin na" (LOCKED), "Harap OK ✅" (front captured), "Likod naman. I-frame ang barcode/QR kung meron" (flip prompt), "Bawas glare / Ayusin sa loob ng frame / Hawak nang steady" (quality hints), "Gumalaw—subukan ulit" (cancel), "Likod OK ✅ — Tinitingnan ang detalye…" (back captured). Support message localization.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 3
-IMPORTANT NOTE: All user-facing messages must be in Tagalog by default with English fallback. Messages must be returned in API responses for frontend display.
-
-PHASE 4: OCR EXTRACTION WITH CONFIDENCE SCORES
-
-Explanations: Integrate evidence_extractor.py with face scan flow. Enhance extraction to return confidence scores per field (Name: 0.94, DOB: 0.89, etc.). Implement color coding logic: Green ≥0.9, Amber 0.75-0.89, Red <0.75. Add extraction to burst_eval handler for back-side processing. Ensure extraction completes within 4s (p50) to 6s (p95) from CAPTURED state.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 4
-IMPORTANT NOTE: Extraction must include confidence scores for each field and support streaming updates via EXTRACT_START/RESULT events.
-
-PHASE 5: REAL-TIME STREAMING IMPLEMENTATION
-
-Explanations: Implement WebSocket endpoint at /ws/extraction/{session_id} for real-time extraction updates. Add Server-Sent Events fallback at /api/v1/kyc/extraction/stream/{session_id}. Stream extraction progress with field-by-field updates including confidence scores. Implement extraction.skeleton_fields with shimmer placeholder support. Ensure <500ms initial response.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 5
-IMPORTANT NOTE: Streaming must support multiple concurrent sessions and provide real-time field updates as extraction progresses.
-
-PHASE 6: ENHANCED QUALITY GATES & CANCEL-ON-JITTER
-
-Explanations: Implement instant cancel-on-jitter during countdown when quality gates fail: focus <7.0, motion >0.4, corners <0.95, glare >3.5%. Response time must be <50ms from detection. Add countdown.cancel_reason to telemetry. Implement error prompts for partial_document, low_res, blur_high conditions. Support single-tap recapture flow.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 6
-IMPORTANT NOTE: Cancel detection must be instant to prevent shaky frame captures. Must include clear Tagalog error messages.
-
-PHASE 7: FRONT/BACK CAPTURE FLOW
-
-Explanations: Implement complete front/back document flow. Add "Harap OK" badge trigger after front capture, automatic stepper advance animation support, flip-to-back transition triggers, back-side guidance with "I-frame ang barcode/QR" hint, barcode/MRZ detection that delays countdown until decode_conf ≥0.95, and "Likod OK" confirmation. Track both sides separately.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 7
-IMPORTANT NOTE: Back-side capture must guide users to capture document, not selfie. Completion rate for back step must be ≥95%.
-
-PHASE 8: TELEMETRY FOR UX EVENTS
-
-Explanations: Implement all UX telemetry events: capture.lock_open, countdown.start, countdown.cancel_reason, capture.done_front, transition.front_to_back, capture.done_back, extraction.fields_confidence_avg, time_to_fields_ms. Add event timing data, state transition tracking, and quality metrics. Enable real-time tuning based on telemetry.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 8
-IMPORTANT NOTE: All telemetry must include precise timing data for performance analysis and UX optimization.
-
-PHASE 9: ACCESSIBILITY & REDUCE MOTION SUPPORT
-
-Explanations: Implement accessibility features: detect OS 'Reduce Motion' setting, provide alternative timing hints (replace flip with 200ms crossfade), disable haptic feedback when accessibility is on, ensure all visual feedback has text alternatives, support screen reader captions, maintain ≥44×44 touch target sizing hints. Add accessibility flags to API responses.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 9
-IMPORTANT NOTE: Backend must detect accessibility settings and provide appropriate alternative responses for reduced motion mode.
-
-PHASE 10: UX ACCEPTANCE TESTING
-
-Explanations: Validate all acceptance criteria: Front→Back completion rate ≥95%, countdown visible ≥600ms, cancel-on-jitter <50ms response, extraction latency p50≤4s/p95≤6s, comprehension test (9/10 users understand flow). Verify all parity checklist items: lock+green corners, shutter flash, stepper advance, flip animation support, barcode assist, real-time confidences.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 10
-IMPORTANT NOTE: Must pass ALL acceptance criteria and parity checklist items. Generate detailed UX metrics report.
-
-PHASE 11: SYSTEM INTEGRATION ANALYSIS
-
-Explanations: Now that UX is complete, begin integration plan. Map overlaps between our face modules and existing KYC modules. Document which modules to merge (pad_scorer vs pad_detector), which to keep separate (session_manager, challenge_generator), and which to enhance (evidence_extractor). Create dependency graph.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 11
-IMPORTANT NOTE: This begins the code integration phase AFTER UX requirements are fully implemented and tested.
-
-PHASE 12: DEDUPLICATION & MERGE
-
-Explanations: Merge duplicate functionality: Combine PAD detection (pad_detector.py + pad_scorer.py → enhanced_pad_detector.py), consolidate face analysis (geometry.py + quality_analyzer.py → enhanced_quality_analyzer.py), unify metrics (metrics.py + telemetry.py → unified_metrics.py). Preserve best features from both implementations.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 12
-IMPORTANT NOTE: Run comparison tests after each merge to ensure no functionality is lost during consolidation.
-
-PHASE 13: BIOMETRIC & EXTRACTION INTEGRATION
-
-Explanations: Connect existing face_matcher.py with session management for unified decision making. Link biometric matching to session state, add TAR@FAR calculations, integrate match scores into decision logic. Ensure evidence_extractor.py is fully integrated with burst evaluation pipeline.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 13
-IMPORTANT NOTE: Biometric integration must maintain accuracy targets while supporting all UX flows.
-
-PHASE 14: API CONSOLIDATION
-
-Explanations: Create unified API structure: merge face scan endpoints under /api/v1/kyc/face/*, standardize all response formats, ensure consistent error handling, add security middleware for CORS and rate limiting, update OpenAPI documentation. Maintain backward compatibility for existing endpoints.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 14
-IMPORTANT NOTE: API consolidation must not break any existing integrations. All endpoints must follow consistent patterns.
-
-PHASE 15: FINAL CLEANUP & DOCUMENTATION
-
-Explanations: Remove duplicate modules, reorganize code into appropriate directories, update all import paths, enhance README with UX implementation details, create migration guide showing before/after changes, document all timing values, state transitions, telemetry events, and API changes. Archive replaced modules.
-
-Concluding Step: Phase Completion Protocol
-
-python3 todo_manager.py show ux_integration_actionable_20250116
-python3 todo_manager.py done ux_integration_actionable_20250116 15
-IMPORTANT NOTE: Documentation must be comprehensive enough for new developers to understand both UX requirements and technical implementation.
+Title: Stabilize KYC Face System: Fix Unit Failures and Build Comprehensive Test Suites
+Context:
+Repo: HaymayndzUltra/MatalinongWorkflow
+Path: KYC VERIFICATION/src and KYC VERIFICATION/tests
+Python 3.10; run tests with:
+PYTHONPATH="KYC VERIFICATION/src" python3 "KYC VERIFICATION/tests/test_suite_master.py" --suite unit
+Goals:
+1) Fix failing unit tests without breaking APIs.
+2) Add missing sync wrappers for async APIs used by legacy tests.
+3) Expand tests to cover integration, performance, security, and accessibility areas already present in code.
+Required changes:
+Session state
+Ensure EnhancedSessionState exposes current_state property alias for capture_state.
+SessionManager must have create_session(session_id) alias to get_or_create_session.
+Quality gates
+Normalize focus 0..10 to 0..1; map cancel reasons to legacy aliases:
+motion cancel → CancelReason.MOTION_BLUR
+focus cancel → CancelReason.OUT_OF_FOCUS
+Make EXCELLENT threshold reachable for typical “good” metrics: either adjust quality weights or define EXCELLENT as >=0.90 and verify sample set reaches it.
+Extraction
+ExtractionProcessor.extract_document must accept optional session_id, return a dict, and flatten fields to list of dicts with confidence.
+Add _get_confidence_color where 0.60 must be red, (0.60, 0.85) amber, ≥0.85 green.
+Streaming
+Keep async API: create_connection_async(session_id, last_event_id=None), send_event(session_id, event_type, data, retry_after=None).
+Add sync facades for tests: create_connection(session_id, last_event_id=None) runs the async variant in a loop; send_event_sync(session_id, event) accepts dict with type and data.
+get_connection_stats() must expose active_connections.
+Biometrics
+Add sync shim methods:
+match_faces(reference_face, live_face) -> {"match_score": float, "passed": bool}
+detect_presentation_attack(face_data) -> {"pad_score": float, "is_live": bool}
+Ensure process_biometrics(session, burst_frames=None, reference_image=None, live_image=None) supports optional args; tests may call without awaiting, so provide a helper process_biometrics_sync(...) that uses asyncio.run.
+Messages
+Map legacy keys used by tests:
+lock_acquired ⇒ state locked message (Tagalog should contain “Steady”).
+quality_motion ⇒ motion error
+quality_focus ⇒ focus error
+quality_glare, quality_corners, quality_partial accordingly.
+Commands to run non-interactively:
+Setup:
+python3 -V
+pip install -r requirements.txt -q || true
+Test runs:
+PYTHONPATH="KYC VERIFICATION/src" python3 "KYC VERIFICATION/tests/test_suite_master.py" --suite unit
+PYTHONPATH="KYC VERIFICATION/src" python3 "KYC VERIFICATION/tests/test_suite_master.py" --suite integration
+PYTHONPATH="KYC VERIFICATION/src" python3 "KYC VERIFICATION/tests/test_suite_master.py" --suite performance
+PYTHONPATH="KYC VERIFICATION/src" python3 "KYC VERIFICATION/tests/test_suite_master.py" --suite smoke
+Acceptance criteria:
+All unit tests pass.
+Integration tests run green or are updated to match stable interfaces.
+No API regressions.
+No linter errors; minimal diffs; clear commit messages.
+Request to build additional tests
+Add/expand:
+Unit:
+face/handlers.py (state transitions, lock token TTL, countdown timing)
+face/messages.py (Tagalog/English mapping, legacy key mapping)
+face/streaming.py (connection lifecycle, backpressure on queues)
+face/extraction.py (front/back field sets, low-confidence fields)
+face/biometric_integration.py (confidence composition, timeout handling)
+Integration:
+Full capture flow with quality gates, extraction, streaming, messages
+Back capture with anti-selfie guidance
+Cancel-on-jitter rollback to searching
+Performance:
+Cancel-on-jitter latency <50ms
+100+ streaming connections basic stats
+Extraction throughput (simulate >1000 checks/sec stub)
+Security:
+ThresholdManager bounds checks
+RateLimiter saturation behavior
+Session TTL cleanup
+Test naming and placement:
+Place under KYC VERIFICATION/tests/ with files:
+test_messages_legacy_keys.py
+test_streaming_sync_facade.py
+test_biometrics_sync_shims.py
+test_capture_flow_extended.py
+Execution:
+Run master suite; ensure exit code 0.

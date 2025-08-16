@@ -5,7 +5,7 @@ description: Execute the next unfinished phase with Phase Gates + required docs 
 This workflow advances the active task strictly following the rules in memory-bank/queue-system/tasks_active.json, Phase Gates, and Exec Policy.
 
 Defaults
- - TASK_ID: auto-detected from memory-bank/queue-system/tasks_active.json
+ - task_id Replace All: auto-detected from memory-bank/queue-system/tasks_active.json
 - Repo root: /home/haymayndz/MatalinongWorkflow
 
 1) Ensure rules are enabled (send as chat message)

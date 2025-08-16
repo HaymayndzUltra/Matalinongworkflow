@@ -329,8 +329,20 @@ class MessageManager:
         """
         lang = language or self.default_language
         
+        # Backward-compatibility: map legacy keys used in tests
+        legacy_map = {
+            "lock_acquired": STATE_MESSAGES["locked"],
+            "quality_motion": ERROR_MESSAGES["motion_detected"],
+            "quality_glare": ERROR_MESSAGES["glare_high"],
+            "quality_focus": ERROR_MESSAGES["focus_lost"],
+            "quality_corners": ERROR_MESSAGES["stability_lost"],
+            "quality_partial": ERROR_MESSAGES["partial_document"],
+            "front_captured": SUCCESS_MESSAGES["front_captured"],
+        }
         if key in self.messages:
             return self.messages[key].get_text(lang)
+        if key in legacy_map:
+            return legacy_map[key].get_text(lang)
         
         # Fallback to key if message not found
         return key

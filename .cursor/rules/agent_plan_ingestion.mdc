@@ -17,8 +17,8 @@ Objective: Any AI/session MUST generate an actionable, phase-gated plan directly
    - Each phase MUST include:
      - `**Explanations:**` a short paragraph aligned with the source.
      - `**Concluding Step: Phase Completion Protocol**` with:
-       - `python3 todo_manager.py show <TASK_ID>`
-       - `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
+       - `python3 todo_manager.py show <task_id Replace All>`
+       - `python3 todo_manager.py done <task_id Replace All> <PHASE_INDEX>`
      - `IMPORTANT NOTE:` constraints synthesized from the source (e.g., sections A–G).
    - Present the complete draft for approval.
 
@@ -33,7 +33,7 @@ Objective: Any AI/session MUST generate an actionable, phase-gated plan directly
 ### Validation (Read-Only Tools)
 - Before execution begins, validate the produced JSON by running:
   - `python3 plan_next.py` → Check next phase, IMPORTANT NOTE presence, monotonic completion.
-  - `python3 plain_hier.py <TASK_ID>` → Verify progress counters, phase list, and command preview.
+  - `python3 plain_hier.py <task_id Replace All>` → Verify progress counters, phase list, and command preview.
 
 ### Constraints
 - No direct edits to queue/state files by the agent. JSON is provided as content-only output.

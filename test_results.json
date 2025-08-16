@@ -1,0 +1,25 @@
+{
+  "timestamp": "2025-08-17T01:21:38.819302",
+  "suites": {
+    "Unit Tests": {
+      "passed": false,
+      "duration": 0.3033335208892822
+    },
+    "Integration Tests": {
+      "passed": false,
+      "duration": 0.4237051010131836
+    },
+    "Performance Tests": {
+      "passed": false,
+      "duration": 1.138110876083374
+    }
+  },
+  "summary": {
+    "total_tests": 0,
+    "passed": 0,
+    "failed": 0,
+    "errors": 0,
+    "skipped": 0,
+    "duration": 1.865220308303833
+  }
+}

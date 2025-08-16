@@ -352,7 +352,12 @@ class TestStreamingEvents(unittest.TestCase):
             "type": self.StreamEventType.STATE_CHANGE,
             "data": {"state": "locked"}
         }
-        self.manager.send_event(session_id, event)
+        # Use sync facade for tests
+        try:
+            self.manager.send_event_sync(session_id, event)
+        except AttributeError:
+            # Fallback if facade not present
+            self.manager.send_event(session_id, event)
         
         # Check event was queued
         self.assertGreater(len(connection.event_queue), 0)
@@ -377,7 +382,10 @@ class TestStreamingEvents(unittest.TestCase):
         # Send many events
         for i in range(10100):  # More than 10k limit
             event = {"type": "test", "index": i}
-            self.manager.send_event(session_id, event)
+            try:
+                self.manager.send_event_sync(session_id, event)
+            except AttributeError:
+                self.manager.send_event(session_id, event)
         
         # Buffer should be capped at 10k
         self.assertLessEqual(len(connection.event_queue), 10000)

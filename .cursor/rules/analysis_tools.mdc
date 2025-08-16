@@ -10,7 +10,7 @@ These tools are permitted for visibility and validation only. They MUST NOT modi
 - Purpose: Print a compact, read-only view of a task's phases, including the first fenced code block preview and any IMPORTANT NOTE snippet.
 - Usage:
   ```bash
-  python3 plain_hier.py <TASK_ID>
+  python3 plain_hier.py <task_id Replace All Replace All>
   ```
 - Output highlights:
   - Progress summary (done/total)
@@ -31,7 +31,7 @@ These tools are permitted for visibility and validation only. They MUST NOT modi
 
 ## When to Use
 - Before executing a phase: run `plan_next.py` to confirm the next phase has an "IMPORTANT NOTE" and to preview commands.
-- Before marking a phase done: run `plain_hier.py <TASK_ID>` to validate status and commands preview match expectations.
+- Before marking a phase done: run `plain_hier.py <task_id Replace All Replace All>` to validate status and commands preview match expectations.
 
 ## Safety Constraints
 - Both tools operate in read-only mode and are allowed solely for validation/visibility.
@@ -43,5 +43,5 @@ These tools are permitted for visibility and validation only. They MUST NOT modi
 - Current implementations are read-only and rely on parsing `memory-bank/queue-system/tasks_active.json`.
 
 ### Triggers
-- "Validate plan", "Check next phase", "Lint plan", "Show hierarchy <TASK_ID>" should route to these tools per `trigger_phrases.mdc`.
+- "Validate plan", "Check next phase", "Lint plan", "Show hierarchy <task_id Replace All Replace All Replace All>" should route to these tools per `trigger_phrases.mdc`.
 

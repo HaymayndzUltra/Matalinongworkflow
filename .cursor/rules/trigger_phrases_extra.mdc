@@ -1,26 +1,61 @@
+---
+alwaysApply: true
+---
+
 ## Additional Triggers → Required Actions
+
+### DRY RUN (Read-only Simulation)
+- Triggers: "Dry run", "Dry run next phase", "Dry run all", "Run dry run", "Simulate plan", "Simulate phases", "DRY RUN (MAX_LOOPS:<n>)"
+- Actions:
+  - Set optional environment variable `MAX_LOOPS=<n>` (if provided)
+  - Run read-only workflow: `/.windsurf/workflows/autopilot-dry-run.md` (no writes, no done)
 
 ### Validate / Inspect
 - Triggers: "I-validate ang plan", "Suriin ang susunod", "Ano ang next phase?", "Show hierarchy", "Ipakita ang plano"
 - Actions:
   - Run: `python3 plan_next.py`
-  - Then: `python3 plain_hier.py <TASK_ID>`
+  - Then: `python3 plain_hier.py <task_id ReplaceAll ReplaceAll>`
 
 ### Execute Sub-step
 - Triggers: "Gawin ang step <i>", "Execute <i>", "Run sub-step <i>", "Ituloy ang <i>"
 - Actions:
-  - Run: `python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>`
-  - Then: `python3 todo_manager.py show <TASK_ID>`
+  - Run: `python3 todo_manager.py exec <task_id ReplaceAll ReplaceAll Replace> <SUB_INDEX>`
+  - Then: `python3 todo_manager.py show <task_id ReplaceAll ReplaceAll ReplaceAll>`
 
 ### Mark Phase Done
 - Triggers: "Tapusin ang phase <k>", "Markahan done ang phase <k>", "Finish phase <k>", "Complete phase <k>", "Close phase <k>", "Tapos na ang phase <k>"
 - Actions:
-  - Pre-checks: `python3 plan_next.py` and `python3 plain_hier.py <TASK_ID>`
-  - Mark done: `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
+  - Pre-checks: `python3 plan_next.py` and `python3 plain_hier.py <task_id ReplaceAll ReplaceAll>`
+  - Mark done: `python3 todo_manager.py done <task_id ReplaceAll ReplaceAll> <PHASE_INDEX>`
   - Verify: `python3 plan_next.py`
 
 ### Next Action Heuristic
 - Triggers: "Ano ang susunod na gagawin?", "Next action", "Next step"
 - Actions:
   - Run: `python3 plan_next.py`
-  - If a specific sub-step is shown, follow with `python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>`
+  - If a specific sub-step is shown, follow with `python3 todo_manager.py exec <task_id ReplaceAll ReplaceAll> <SUB_INDEX>`## Additional Triggers → Required Actions
+
+### Validate / Inspect
+- Triggers: "I-validate ang plan", "Suriin ang susunod", "Ano ang next phase?", "Show hierarchy", "Ipakita ang plano"
+- Actions:
+  - Run: `python3 plan_next.py`
+  - Then: `python3 plain_hier.py <task_id ReplaceAll ReplaceAll>`
+
+### Execute Sub-step
+- Triggers: "Gawin ang step <i>", "Execute <i>", "Run sub-step <i>", "Ituloy ang <i>"
+- Actions:
+  - Run: `python3 todo_manager.py exec <task_id ReplaceAll ReplaceAll> <SUB_INDEX>`
+  - Then: `python3 todo_manager.py show <task_id ReplaceAll ReplaceAll>`
+
+### Mark Phase Done
+- Triggers: "Tapusin ang phase <k>", "Markahan done ang phase <k>", "Finish phase <k>", "Complete phase <k>", "Close phase <k>", "Tapos na ang phase <k>"
+- Actions:
+  - Pre-checks: `python3 plan_next.py` and `python3 plain_hier.py <task_id ReplaceAll ReplaceAll>`
+  - Mark done: `python3 todo_manager.py done <task_id ReplaceAll ReplaceAll> <PHASE_INDEX>`
+  - Verify: `python3 plan_next.py`
+
+### Next Action Heuristic
+- Triggers: "Ano ang susunod na gagawin?", "Next action", "Next step"
+- Actions:
+  - Run: `python3 plan_next.py`
+  - If a specific sub-step is shown, follow with `python3 todo_manager.py exec <task_id ReplaceAll ReplaceAll> <SUB_INDEX>`

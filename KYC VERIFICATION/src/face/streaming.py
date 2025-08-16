@@ -139,7 +139,7 @@ class StreamManager:
         self._lock = asyncio.Lock()
         self._cleanup_task = None
         
-    async def create_connection(self, session_id: str, last_event_id: Optional[str] = None) -> StreamConnection:
+    async def create_connection_async(self, session_id: str, last_event_id: Optional[str] = None) -> StreamConnection:
         """
         Create a new streaming connection
         
@@ -189,6 +189,15 @@ class StreamManager:
             
             logger.info(f"Created stream connection: {connection_id} for session: {session_id}")
             return connection
+
+    # Backward-compatibility: synchronous facade for tests that don't await
+    def create_connection(self, session_id: str, last_event_id: Optional[str] = None) -> StreamConnection:  # sync wrapper for tests
+        loop = asyncio.new_event_loop()
+        try:
+            asyncio.set_event_loop(loop)
+            return loop.run_until_complete(self.create_connection_async(session_id, last_event_id))
+        finally:
+            loop.close()
     
     async def close_connection(self, connection_id: str):
         """Close a streaming connection"""
@@ -221,13 +230,7 @@ class StreamManager:
                         data: Dict[str, Any],
                         retry_after: Optional[int] = None):
         """
-        Send event to all connections for a session
-        
-        Args:
-            session_id: Session identifier
-            event_type: Type of event
-            data: Event data
-            retry_after: Retry hint in milliseconds
+        Send event to all connections for a session (awaitable API)
         """
         async with self._lock:
             # Generate event
@@ -249,6 +252,25 @@ class StreamManager:
                         self.connections[connection_id].add_event(event)
                         
                 logger.debug(f"Sent {event_type.value} event to {len(self.session_connections[session_id])} connections")
+
+    # Backward-compatibility: synchronous facade mirroring async send_event
+    def send_event_sync(self, session_id: str, event: Dict[str, Any]):
+        """Synchronous facade for tests: accepts a single event dictionary."""
+        try:
+            etype = event.get("type")
+            # Map raw type string to StreamEventType if possible
+            try:
+                event_type = StreamEventType(etype) if isinstance(etype, str) else etype
+            except Exception:
+                event_type = StreamEventType.STATE_CHANGE
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(self.send_event(session_id, event_type, event.get("data", {})))
+        finally:
+            try:
+                loop.close()
+            except Exception:
+                pass
     
     async def stream_events(self, connection_id: str) -> AsyncIterator[str]:
         """
@@ -406,7 +428,7 @@ class StreamManager:
     
     def get_connection_stats(self) -> Dict[str, Any]:
         """Get streaming statistics"""
-        return {
+        stats = {
             "total_connections": len(self.connections),
             "active_sessions": len(self.session_connections),
             "connections_per_session": {
@@ -416,6 +438,9 @@ class StreamManager:
             "max_connections": self.max_connections,
             "global_sequence": self.global_sequence
         }
+        # Backward-compatibility: expose old key expected by tests
+        stats["active_connections"] = stats["total_connections"]
+        return stats
 
 
 # Global stream manager instance

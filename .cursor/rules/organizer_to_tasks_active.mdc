@@ -27,8 +27,8 @@ alwaysApply: true
    - `Explanations:` summarize near-phase lines like `Immediate:`, `Week x:`, `Day(s):`, `Verification:`.
    - Include the concluding commands block:
      ```bash
-     python3 todo_manager.py show <TASK_ID>
-     python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>
+     python3 todo_manager.py show <task_id ReplaceAll>
+     python3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>
      ```
    - `IMPORTANT NOTE:`
      - Prefer explicit constraints/version lines from the organizer.
@@ -37,7 +37,7 @@ alwaysApply: true
 ### Validation Gates (Read-Only)
 - Before execution, run:
   - `python3 plan_next.py`
-  - `python3 plain_hier.py <TASK_ID>`
+  - `python3 plain_hier.py <task_id ReplaceAll>`
 - Hard errors if:
   - Phase 0 is missing or not first
   - Any phase lacks `IMPORTANT NOTE:`

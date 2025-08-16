@@ -14,7 +14,7 @@ Before executing a phase or marking it done, enforce the following gates:
      - Lint shows no non-monotonic completion
 
 2. Gate: Hierarchy Consistency (Recommended)
-   - Run: `python3 plain_hier.py <TASK_ID>`
+   - Run: `python3 plain_hier.py <task_id ReplaceAll>`
    - Verify:
      - Progress counters are correct
      - Phase list aligns with plan
