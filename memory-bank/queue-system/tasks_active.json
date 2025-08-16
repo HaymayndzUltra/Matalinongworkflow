@@ -5,7 +5,7 @@
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\nUse Python 3.10. Run tests with PYTHONPATH=\"KYC VERIFICATION/src\". Scope: Stabilize KYC Face system by fixing unit failures, adding sync shims for legacy tests, and expanding test suites per the source plan. After all changes, execute unit, integration, performance, and smoke suites non-interactively.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id Replace All>\npython3 todo_manager.py done <task_id Replace All> 0\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] Do not directly edit queue/state files; this phase defines protocol and environment only. Keep APIs stable; changes are compatibility-focused. Test runs must use the provided master suite commands.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 1: SESSION STATE & MANAGER COMPATIBILITY\n\n**Explanations:**\nExpose EnhancedSessionState.current_state as an alias of capture_state. Provide SessionManager.create_session(session_id) alias to get_or_create_session. Ensure timing metadata remains backward-compatible (flat keys alongside structured map).\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id Replace All>\npython3 todo_manager.py done <task_id Replace All> 1\n```\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER] No behavioral changes to the state machine; only aliases and metadata flattening. Maintain thread-safety for manager operations.",
@@ -42,6 +42,6 @@
     ],
     "status": "in_progress",
     "created": "2025-08-16T00:00:00+08:00",
-    "updated": "2025-08-16T00:00:00+08:00"
+    "updated": "2025-08-17T03:57:09.863680+08:00"
   }
 ]
