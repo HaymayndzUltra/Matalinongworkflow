@@ -37,7 +37,7 @@
       },
       {
         "text": "PHASE 8: TELEMETRY FOR UX EVENTS\n\n**Explanations:** Implement all UX telemetry events: capture.lock_open, countdown.start, countdown.cancel_reason, capture.done_front, transition.front_to_back, capture.done_back, extraction.fields_confidence_avg, time_to_fields_ms. Add event timing data, state transition tracking, and quality metrics. Enable real-time tuning based on telemetry.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 8\n```\n\nIMPORTANT NOTE: All telemetry must include precise timing data for performance analysis and UX optimization.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 9: ACCESSIBILITY & REDUCE MOTION SUPPORT\n\n**Explanations:** Implement accessibility features: detect OS 'Reduce Motion' setting, provide alternative timing hints (replace flip with 200ms crossfade), disable haptic feedback when accessibility is on, ensure all visual feedback has text alternatives, support screen reader captions, maintain ≥44×44 touch target sizing hints. Add accessibility flags to API responses.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 9\n```\n\nIMPORTANT NOTE: Backend must detect accessibility settings and provide appropriate alternative responses for reduced motion mode.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-08-16T11:01:58.847334+08:00"
+    "updated": "2025-08-16T15:29:54.538678+08:00"
   }
 ]

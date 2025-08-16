@@ -1541,6 +1541,96 @@ async def get_stream_stats():
         )
 
 
+# ============= TELEMETRY ENDPOINTS =============
+
+@app.get("/telemetry/events/{session_id}")
+async def get_telemetry_events(session_id: str):
+    """
+    Get telemetry events for a session
+    
+    Returns timeline of all UX events with precise timing data.
+    """
+    try:
+        from src.face.ux_telemetry import get_session_timeline
+        
+        timeline = get_session_timeline(session_id)
+        
+        return JSONResponse(content={
+            "session_id": session_id,
+            "event_count": len(timeline),
+            "timeline": timeline
+        })
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "TELEMETRY_ERROR"}
+        )
+
+
+@app.get("/telemetry/performance")
+async def get_performance_metrics():
+    """
+    Get performance metrics across all sessions
+    
+    Returns percentiles (p50, p95, p99) for response times.
+    """
+    try:
+        from src.face.ux_telemetry import get_performance_metrics
+        
+        metrics = get_performance_metrics()
+        
+        return JSONResponse(content=metrics)
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "METRICS_ERROR"}
+        )
+
+
+@app.get("/telemetry/flow")
+async def get_flow_analytics():
+    """
+    Get capture flow analytics
+    
+    Returns completion rates and abandonment points.
+    """
+    try:
+        from src.face.ux_telemetry import get_flow_analytics
+        
+        analytics = get_flow_analytics()
+        
+        return JSONResponse(content=analytics)
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "ANALYTICS_ERROR"}
+        )
+
+
+@app.get("/telemetry/quality")
+async def get_quality_metrics():
+    """
+    Get quality gate metrics
+    
+    Returns pass/fail rates and cancel-on-jitter statistics.
+    """
+    try:
+        from src.face.ux_telemetry import get_quality_metrics
+        
+        metrics = get_quality_metrics()
+        
+        return JSONResponse(content=metrics)
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={"error": str(e), "error_code": "QUALITY_METRICS_ERROR"}
+        )
+
+
 # Exception handlers
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):

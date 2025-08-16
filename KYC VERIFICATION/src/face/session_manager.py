@@ -501,41 +501,55 @@ class EnhancedSessionState:
                                     timestamp: float, reason: Optional[str] = None):
         """Emit telemetry event for state transition"""
         try:
-            from .telemetry import track_event
+            # Import new UX telemetry module
+            try:
+                from .ux_telemetry import track_ux_event, track_state_transition
+            except ImportError:
+                from face.ux_telemetry import track_ux_event, track_state_transition
             
-            event_data = {
-                'session_id': self.session_id,
-                'old_state': old_state.value,
-                'new_state': new_state.value,
+            # Calculate elapsed time
+            elapsed_ms = None
+            if hasattr(self, '_last_transition_time'):
+                elapsed_ms = (timestamp - self._last_transition_time) * 1000
+            self._last_transition_time = timestamp
+            
+            # Track state transition with precise timing
+            track_state_transition(
+                session_id=self.session_id,
+                from_state=old_state.value,
+                to_state=new_state.value,
+                reason=reason,
+                elapsed_ms=elapsed_ms
+            )
+            
+            # Prepare context data
+            context = {
                 'current_side': self.current_side.value,
                 'front_captured': self.front_captured,
-                'back_captured': self.back_captured,
-                'timestamp': timestamp
+                'back_captured': self.back_captured
             }
-            
-            if reason:
-                event_data['reason'] = reason
             
             # Map specific transitions to UX telemetry events
             if new_state == CaptureState.LOCKED:
-                track_event('capture.lock_open', event_data)
+                track_ux_event('capture.lock_open', self.session_id, {'reason': reason}, context)
             elif new_state == CaptureState.COUNTDOWN:
-                track_event('countdown.start', event_data)
+                track_ux_event('countdown.start', self.session_id, {'reason': reason}, context)
             elif old_state == CaptureState.COUNTDOWN and new_state == CaptureState.SEARCHING:
-                track_event('countdown.cancel_reason', event_data)
+                track_ux_event('countdown.cancel_reason', self.session_id, {'reason': reason}, context)
             elif new_state == CaptureState.CAPTURED:
                 if self.current_side == DocumentSide.FRONT:
-                    track_event('capture.done_front', event_data)
+                    track_ux_event('capture.done_front', self.session_id, {'reason': reason}, context)
                 else:
-                    track_event('capture.done_back', event_data)
+                    track_ux_event('capture.done_back', self.session_id, {'reason': reason}, context)
             elif new_state == CaptureState.FLIP_TO_BACK:
-                track_event('transition.front_to_back', event_data)
+                track_ux_event('transition.front_to_back', self.session_id, {'reason': reason}, context)
             
         except ImportError:
             # Telemetry module not available, skip event emission
             pass
         except Exception as e:
-            logger.error(f"Error emitting telemetry event: {e}")
+            # Log at debug level to avoid noise
+            logger.debug(f"Telemetry event skipped: {e}")
     
     def get_state_info(self) -> Dict[str, Any]:
         """Get current state information for API responses"""

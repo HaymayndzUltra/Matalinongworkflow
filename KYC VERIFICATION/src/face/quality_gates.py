@@ -344,6 +344,23 @@ class QualityGateManager:
         # Calculate response time
         response_time_ms = (time.time() - start_time) * 1000
         
+        # Track telemetry event
+        try:
+            from .ux_telemetry import track_quality_event
+            # Use a placeholder session_id if not available
+            session_id = getattr(self, 'session_id', 'quality_check')
+            track_quality_event(
+                session_id=session_id,
+                quality_score=overall_score,
+                passed=overall_score >= 0.70 and not cancel_reason,
+                cancel_reason=cancel_reason.value if cancel_reason else None,
+                response_time_ms=response_time_ms
+            )
+        except ImportError:
+            pass  # Telemetry not available
+        except Exception:
+            pass  # Don't let telemetry errors affect quality checks
+        
         # Create result
         result = QualityGateResult(
             overall_score=overall_score,

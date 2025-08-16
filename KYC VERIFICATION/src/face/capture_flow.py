@@ -211,17 +211,30 @@ class CaptureFlowManager:
             }
         }
     
-    def start_capture(self, side: str = "front") -> CaptureProgress:
+    def start_capture(self, side: str = "front", session_id: Optional[str] = None) -> CaptureProgress:
         """
         Start capture flow
         
         Args:
             side: Which side to start with ("front" or "back")
+            session_id: Session ID for telemetry
             
         Returns:
             CaptureProgress with current state
         """
         self.total_sessions += 1
+        self.current_session_id = session_id or f"capture_{int(time.time())}"
+        
+        # Track telemetry
+        try:
+            from .ux_telemetry import track_flow_event
+            track_flow_event(
+                session_id=self.current_session_id,
+                flow_step=f"{side}_start",
+                progress=0
+            )
+        except ImportError:
+            pass
         
         if side == "front":
             self.current_step = CaptureStep.FRONT_START
@@ -291,6 +304,18 @@ class CaptureFlowManager:
             if self.start_time:
                 self.metrics.total_time_ms = (time.time() - self.start_time) * 1000
             logger.info(f"Capture flow completed in {self.metrics.total_time_ms:.1f}ms")
+            
+            # Track flow completion
+            try:
+                from .ux_telemetry import track_flow_event
+                track_flow_event(
+                    session_id=getattr(self, 'current_session_id', 'capture'),
+                    flow_step="complete",
+                    progress=100,
+                    completed=True
+                )
+            except ImportError:
+                pass
         
         # Also set total time when reaching COMPLETE
         if self.current_step == CaptureStep.COMPLETE:
@@ -335,6 +360,20 @@ class CaptureFlowManager:
         # Calculate times
         if self.start_time:
             self.metrics.total_time_ms = (time.time() - self.start_time) * 1000
+        
+        # Track abandonment telemetry
+        try:
+            from .ux_telemetry import track_flow_event
+            progress = self.get_progress()
+            track_flow_event(
+                session_id=getattr(self, 'current_session_id', 'capture'),
+                flow_step=self.current_step.value,
+                progress=progress.progress_percentage,
+                abandoned=True,
+                abandonment_reason=reason.value
+            )
+        except ImportError:
+            pass
         
         logger.warning(f"Flow abandoned at {self.current_step.value}: {reason.value}")
         
