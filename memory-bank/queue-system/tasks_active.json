@@ -45,11 +45,11 @@
       },
       {
         "text": "PHASE 10: UX ACCEPTANCE TESTING\n\n**Explanations:** Validate all acceptance criteria: Front→Back completion rate ≥95%, countdown visible ≥600ms, cancel-on-jitter <50ms response, extraction latency p50≤4s/p95≤6s, comprehension test (9/10 users understand flow). Verify all parity checklist items: lock+green corners, shutter flash, stepper advance, flip animation support, barcode assist, real-time confidences.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 10\n```\n\nIMPORTANT NOTE: Must pass ALL acceptance criteria and parity checklist items. Generate detailed UX metrics report.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 11: SYSTEM INTEGRATION ANALYSIS\n\n**Explanations:** Now that UX is complete, begin integration plan. Map overlaps between our face modules and existing KYC modules. Document which modules to merge (pad_scorer vs pad_detector), which to keep separate (session_manager, challenge_generator), and which to enhance (evidence_extractor). Create dependency graph.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 11\n```\n\nIMPORTANT NOTE: This begins the code integration phase AFTER UX requirements are fully implemented and tested.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 12: DEDUPLICATION & MERGE\n\n**Explanations:** Merge duplicate functionality: Combine PAD detection (pad_detector.py + pad_scorer.py → enhanced_pad_detector.py), consolidate face analysis (geometry.py + quality_analyzer.py → enhanced_quality_analyzer.py), unify metrics (metrics.py + telemetry.py → unified_metrics.py). Preserve best features from both implementations.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show ux_first_actionable_20250116\npython3 todo_manager.py done ux_first_actionable_20250116 12\n```\n\nIMPORTANT NOTE: Run comparison tests after each merge to ensure no functionality is lost during consolidation.",
@@ -70,6 +70,6 @@
     ],
     "status": "in_progress",
     "created": "2025-01-16T16:45:00+08:00",
-    "updated": "2025-08-16T16:07:03.491219+08:00"
+    "updated": "2025-08-16T19:26:25.871665+08:00"
   }
 ]
