@@ -1,0 +1,44 @@
+---
+description: Analysis-only ingestion protocol from tasks_active.json (no scripts)
+alwaysApply: true
+---
+## Analysis Ingestion from tasks_active.json (No Scripts)
+
+Objective: Any session MUST construct a Human-Readable Analysis Draft (and, upon approval, a JSON content-only plan) using ONLY `memory-bank/queue-system/tasks_active.json` as the single source of truth. No writes, no execution.
+
+### Inputs
+- Frozen source: `memory-bank/queue-system/tasks_active.json` (array with one active task containing `todos`/phases).
+- Use the execution phases as the basis to mirror analysis phases.
+
+### Output (Two-Pass, Agent-Only)
+1) Human-Readable Analysis Draft
+   - Compose `PHASE 0: SETUP & PROTOCOL ANALYSIS (READ FIRST)` (always present).
+   - For each execution `PHASE k: <Title>` in the source, compose `PHASE k: <Title> — ANALYSIS`.
+   - Each analysis phase MUST include:
+     - `Purpose`, `Scope` (semantic/architectural only; no runtime tests), and `Checks` (ownership, dependencies, category boundaries, policy/interface single-source).
+     - `LOGIC PARITY CHECK`: classify SAME | OVERLAP | CONFLICT.
+     - `DECISION GATE`: conditions to halt if conflicts/overlaps remain.
+     - `**Concluding Step: Phase Completion Protocol**` with:
+       - `python3 todo_manager.py show <TASK_ID>`
+       - `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
+     - `IMPORTANT NOTE:` constraints (analysis-only; no edits/execution).
+   - Present the complete draft for approval.
+
+2) JSON Finalization (Content-Only)
+   - After approval, produce a single JSON array (one task object) mirroring the draft.
+   - Set `id` to `<original_slug>_analysis_<YYYYMMDD>`; timestamps must be ISO with `+08:00` timezone.
+   - Do not write files. Output JSON content only; the system/operator will place it where needed.
+
+### IMPORTANT NOTE Enforcement
+- Every analysis phase MUST end with an `IMPORTANT NOTE:`. If any phase lacks it, halt and request clarification or provide a sourced synthesis.
+
+### Constraints
+- No direct edits to queue/state files by the agent; analysis is content-only.
+- Single source of truth for analysis: `tasks_active.json`. If missing or malformed, respond with:
+  ```json
+  {"status":"INSUFFICIENT_EVIDENCE","follow_up":"tasks_active.json not found or invalid"}
+  ```
+
+### Triggers
+- See `trigger_phrases.mdc` — Analysis Ingestion from tasks_active.json.
+

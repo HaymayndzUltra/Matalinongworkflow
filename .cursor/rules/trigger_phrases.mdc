@@ -15,6 +15,18 @@ Agents MUST interpret the following phrases (Tagalog/English) anywhere in the us
   2. Produce a complete Human-Readable Plan Draft per `agent_plan_ingestion.mdc` (include Phase 0, Explanations, Concluding Step, IMPORTANT NOTE per phase).
   3. Stop for approval.
 
+### Analysis Ingestion from tasks_active.json (No Scripts)
+- Triggers:
+  - "Ingest analysis from tasks_active.json"
+  - "Prepare analysis draft from current plan"
+  - "Phase-by-phase analysis draft"
+- Action:
+  1. Read the frozen source `memory-bank/queue-system/tasks_active.json`.
+  2. Produce a Human-Readable Analysis Draft per `analysis_ingestion_from_tasks_active.mdc` (include Phase 0, Purpose/Scope/Checks, Logic Parity Check, Decision Gate, Concluding Step, IMPORTANT NOTE per phase).
+  3. Stop for approval (no writes).
+
+<!-- Conflict analysis ingestion triggers removed per user request -->
+
 ### Approve & Finalize JSON (No File Writes)
 - Triggers:
   - "Approve draft", "Finalize JSON", "Generate tasks_active.json content", "Convert to JSON"

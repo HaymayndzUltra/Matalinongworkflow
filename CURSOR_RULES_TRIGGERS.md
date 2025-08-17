@@ -298,3 +298,7 @@
 **Total Unique Triggers Found:** 100+  
 **Languages Supported:** English, Tagalog, Taglish  
 **Confidence Score:** 100%
+
+---
+
+<!-- Deep-analysis triggers removed per user request -->
