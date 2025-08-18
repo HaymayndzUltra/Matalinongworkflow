@@ -2,6 +2,8 @@
 description: Execute the next unfinished phase with Phase Gates + required docs (post-review & pre-analysis)
 ---
 
+> OPERATOR-ONLY PLAYBOOK (outside agent exec-policy). Contains VCS operations (git add/commit/pull/push). Agents must not execute these; use `auto_phase_runner.mdc` + `exec_policy.mdc` instead.
+
 This workflow advances the active task strictly following the rules in memory-bank/queue-system/tasks_active.json, Phase Gates, and Exec Policy.
 
 Defaults

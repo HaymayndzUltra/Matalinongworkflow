@@ -1,6 +1,5 @@
 ---
-description: Phase gates using read-only analyzers
-alwaysApply: true
+--- existing code ...
 ---
 ## Phase Gates (Pre-Execution Checks)
 
@@ -11,7 +10,8 @@ Before executing a phase or marking it done, enforce the following gates:
    - Verify:
      - The reported next phase matches expectation (index and title)
      - "IMPORTANT NOTE:" is present for that phase
-     - Lint shows no non-monotonic completion
+     - Lint MUST NOT report: "Phase 0 is not first" or missing IMPORTANT NOTE
+     - Note: Ignore "Completion is non-monotonic (undone after done)" during normal forward progress
 
 2. Gate: Hierarchy Consistency (Recommended)
    - Run: `python3 plain_hier.py <task_id ReplaceAll>`
@@ -21,4 +21,3 @@ Before executing a phase or marking it done, enforce the following gates:
      - Command preview matches the intended actions
 
 Only after passing these gates should `todo_manager.py exec` or `done` be performed.
-

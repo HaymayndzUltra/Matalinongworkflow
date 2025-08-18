@@ -142,7 +142,7 @@
 ---
 
 ## 🛡️ VALIDATION & ENFORCEMENT TRIGGERS
-**Rule:** `phase_gates.mdc` + `done_enforcement.mdc` + `imporant_note_enforcement.mdc`
+**Rule:** `phase_gates.mdc` + `done_enforcement.mdc` + `important_note_enforcement.mdc`
 
 ### Phase Gates
 | Trigger | Action |
@@ -271,7 +271,7 @@
 | autopilot-next-phase.md | When triggered | Auto-execution mode |
 | phase_gates.mdc | During execution | Phase validation |
 | done_enforcement.mdc | During execution | Completion rules |
-| imporant_note_enforcement.mdc | During planning | Note requirements |
+| important_note_enforcement.mdc | During planning | Note requirements |
 | analysis_tools.mdc | When triggered | Analysis commands |
 | exec_policy.mdc | During execution | Execution policy |
 | organizer_authority.mdc | During planning | Source authority |

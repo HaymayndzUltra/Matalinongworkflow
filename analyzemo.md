@@ -16,12 +16,12 @@ AI AGENT: Ran plan_next.py. — source: .cursor/rules/analysis_tools.mdc, .curso
 Dependencies (plan_next.py): json, re, sys, os, pathlib.Path, typing (stdlib only; synchronous, no asyncio)
 AI AGENT: Ran plain_hier.py auth_feature_tests_actionable_20250817. — source: .cursor/rules/analysis_tools.mdc, .cursor/rules/phase_gates.mdc
 Dependencies (plain_hier.py): json, sys, re, os, pathlib.Path (stdlib only; synchronous, no asyncio)
-USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/imporant_note_enforcement.mdc, .cursor/rules/phase_gates.mdc
-AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase0_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_preanalysis.md. — source: .cursor/rules/imporant_note_enforcement.mdc
+USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/important_note_enforcement.mdc, .cursor/rules/phase_gates.mdc
+AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase0_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_preanalysis.md. — source: .cursor/rules/important_note_enforcement.mdc
 AI AGENT: Executed todo_manager.py show auth_feature_tests_actionable_20250817 and todo_manager.py done auth_feature_tests_actionable_20250817 0; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc
 Dependencies (todo_manager.py): __future__.annotations, json, os, sys, datetime, pathlib.Path, typing, re, subprocess (stdlib only; synchronous, no asyncio; subprocess import present, not required by the shown commands)
 Dependencies (plan_next.py): json, re, sys, os, pathlib.Path, typing (stdlib; synchronous)
-AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase2_preanalysis.md; executed todo_manager.py done auth_feature_tests_actionable_20250817 1; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/imporant_note_enforcement.mdc
+AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase2_preanalysis.md; executed todo_manager.py done auth_feature_tests_actionable_20250817 1; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/important_note_enforcement.mdc
 Dependencies (todo_manager.py): same as above
 Dependencies (plan_next.py): same as above
 USER: Trigger: [cursor-rules:off] — source: .cursor/rules/rules_master_toggle.mdc
@@ -205,12 +205,12 @@ AI AGENT: Ran plan_next.py. — source: .cursor/rules/analysis_tools.mdc, .curso
 Dependencies (plan_next.py): json, re, sys, os, pathlib.Path, typing (stdlib only; synchronous, no asyncio)
 AI AGENT: Ran plain_hier.py auth_feature_tests_actionable_20250817. — source: .cursor/rules/analysis_tools.mdc, .cursor/rules/phase_gates.mdc
 Dependencies (plain_hier.py): json, sys, re, os, pathlib.Path (stdlib only; synchronous, no asyncio)
-USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/imporant_note_enforcement.mdc, .cursor/rules/phase_gates.mdc
-AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase0_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_preanalysis.md. — source: .cursor/rules/imporant_note_enforcement.mdc
+USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/important_note_enforcement.mdc, .cursor/rules/phase_gates.mdc
+AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase0_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_preanalysis.md. — source: .cursor/rules/important_note_enforcement.mdc
 AI AGENT: Executed todo_manager.py show auth_feature_tests_actionable_20250817 and todo_manager.py done auth_feature_tests_actionable_20250817 0; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc
 Dependencies (todo_manager.py): __future__.annotations, json, os, sys, datetime, pathlib.Path, typing, re, subprocess (stdlib only; synchronous, no asyncio; subprocess import present, not required by the shown commands)
 Dependencies (plan_next.py): json, re, sys, os, pathlib.Path, typing (stdlib; synchronous)
-AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase2_preanalysis.md; executed todo_manager.py done auth_feature_tests_actionable_20250817 1; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/imporant_note_enforcement.mdc
+AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase2_preanalysis.md; executed todo_manager.py done auth_feature_tests_actionable_20250817 1; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/important_note_enforcement.mdc
 Dependencies (todo_manager.py): same as above
 Dependencies (plan_next.py): same as above
 USER: Trigger: [cursor-rules:off] — source: .cursor/rules/rules_master_toggle.mdc
@@ -258,12 +258,12 @@ flowchart TD
   %% Proceed / Execution
   subgraph D["Proceed / Execution"]
     U5["USER: 'proceed'"]
-    E1["Create postreview + preanalysis docs\nsrc: imporant_note_enforcement.mdc"]
+    E1["Create postreview + preanalysis docs\nsrc: important_note_enforcement.mdc"]
     G1["Phase gates before DONE:\nplan_next.py + plain_hier.py\nsrc: tool_usage_guarantee.mdc, phase_gates.mdc"]
     S1["todo_manager.py show <task_id>\nsrc: todo_manager_flow.mdc"]
     D0["todo_manager.py done <task_id> 0\nsrc: done_enforcement.mdc, exec_policy.mdc"]
     P0["Post-DONE: plan_next.py\nsrc: done_enforcement.mdc"]
-    E2["Docs: phase1 postreview + phase2 preanalysis\nsrc: imporant_note_enforcement.mdc"]
+    E2["Docs: phase1 postreview + phase2 preanalysis\nsrc: important_note_enforcement.mdc"]
     D1["todo_manager.py done <task_id> 1\nsrc: done_enforcement.mdc, exec_policy.mdc"]
     P1b["Post-DONE: plan_next.py\nsrc: done_enforcement.mdc"]
 
@@ -318,12 +318,12 @@ flowchart TD
   %% Proceed / Execution
   subgraph D["Proceed / Execution"]
     U5["USER: 'proceed'"]
-    E1["Create postreview + preanalysis docs\nsrc: imporant_note_enforcement.mdc"]
+    E1["Create postreview + preanalysis docs\nsrc: important_note_enforcement.mdc"]
     G1["Phase gates before DONE:\nplan_next.py + plain_hier.py\nsrc: tool_usage_guarantee.mdc, phase_gates.mdc"]
     S1["todo_manager.py show <task_id>\nsrc: todo_manager_flow.mdc"]
     D0["todo_manager.py done <task_id> 0\nsrc: done_enforcement.mdc, exec_policy.mdc"]
     P0["Post-DONE: plan_next.py\nsrc: done_enforcement.mdc"]
-    E2["Docs: phase1 postreview + phase2 preanalysis\nsrc: imporant_note_enforcement.mdc"]
+    E2["Docs: phase1 postreview + phase2 preanalysis\nsrc: important_note_enforcement.mdc"]
     D1["todo_manager.py done <task_id> 1\nsrc: done_enforcement.mdc, exec_policy.mdc"]
     P1b["Post-DONE: plan_next.py\nsrc: done_enforcement.mdc"]
 
@@ -509,7 +509,7 @@ flowchart TD
   %% Proceed / Execution (per phase K)
   subgraph D["Proceed / Execution (repeat per phase K)"]
     U5["USER: 'proceed'"]
-    EDocs["Create docs: postreview(K) + preanalysis(K+1)\nsrc: imporant_note_enforcement.mdc"]
+    EDocs["Create docs: postreview(K) + preanalysis(K+1)\nsrc: important_note_enforcement.mdc"]
     MSpre["mcp_memory_store (docs saved)"]
 
     Gpre["Immediate pre-DONE gates (Phase K):\nplan_next.py + plain_hier.py\nsrc: tool_usage_guarantee.mdc, phase_gates.mdc"]
@@ -587,7 +587,7 @@ flowchart TD
   %% Proceed / Execution (per phase K)
   subgraph D["Proceed / Execution (repeat per phase K)"]
     U5["USER: 'proceed'"]
-    EDocs["Create docs: postreview(K) + preanalysis(K+1)\nsrc: imporant_note_enforcement.mdc"]
+    EDocs["Create docs: postreview(K) + preanalysis(K+1)\nsrc: important_note_enforcement.mdc"]
     MSpre["mcp_memory_store (docs saved)"]
 
     Gpre["Immediate pre-DONE gates (Phase K):\nplan_next.py + plain_hier.py\nsrc: tool_usage_guarantee.mdc, phase_gates.mdc"]
@@ -2302,12 +2302,12 @@ AI AGENT: Ran plan_next.py. — source: .cursor/rules/analysis_tools.mdc, .curso
 Dependencies (plan_next.py): json, re, sys, os, pathlib.Path, typing (stdlib only; synchronous, no asyncio)
 AI AGENT: Ran plain_hier.py auth_feature_tests_actionable_20250817. — source: .cursor/rules/analysis_tools.mdc, .cursor/rules/phase_gates.mdc
 Dependencies (plain_hier.py): json, sys, re, os, pathlib.Path (stdlib only; synchronous, no asyncio)
-USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/imporant_note_enforcement.mdc, .cursor/rules/phase_gates.mdc
-AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase0_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_preanalysis.md. — source: .cursor/rules/imporant_note_enforcement.mdc
+USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/important_note_enforcement.mdc, .cursor/rules/phase_gates.mdc
+AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase0_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_preanalysis.md. — source: .cursor/rules/important_note_enforcement.mdc
 AI AGENT: Executed todo_manager.py show auth_feature_tests_actionable_20250817 and todo_manager.py done auth_feature_tests_actionable_20250817 0; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc
 Dependencies (todo_manager.py): __future__.annotations, json, os, sys, datetime, pathlib.Path, typing, re, subprocess (stdlib only; synchronous, no asyncio; subprocess import present, not required by the shown commands)
 Dependencies (plan_next.py): json, re, sys, os, pathlib.Path, typing (stdlib; synchronous)
-AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase2_preanalysis.md; executed todo_manager.py done auth_feature_tests_actionable_20250817 1; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/imporant_note_enforcement.mdc
+AI AGENT: Created memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase1_postreview.md and memory-bank/DOCUMENTS/auth_feature_tests_actionable_20250817_phase2_preanalysis.md; executed todo_manager.py done auth_feature_tests_actionable_20250817 1; re-checked plan_next.py. — source: .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/important_note_enforcement.mdc
 Dependencies (todo_manager.py): same as above
 Dependencies (plan_next.py): same as above
 USER: Trigger: [cursor-rules:off] — source: .cursor/rules/rules_master_toggle.mdc
@@ -2490,7 +2490,7 @@ Dependencies (plain_hier.py): json, sys, os, pathlib.Path, re (stdlib only; sync
 
 ### Issues found
 - Missing sources: Early ingestion/finalization steps should cite `.cursor/rules/organizer_authority.mdc` and `.cursor/rules/organizer_to_tasks_active.mdc` in addition to `agent_plan_ingestion.mdc` and `tasks_active_schema.mdc`.
-- Missing enforcement steps in “proceed”: No immediate pre-DONE gates shown (plan_next.py + plain_hier.py) and no doc artifacts (postreview/preanalysis) logged per `.cursor/rules/imporant_note_enforcement.mdc`.
+- Missing enforcement steps in “proceed”: No immediate pre-DONE gates shown (plan_next.py + plain_hier.py) and no doc artifacts (postreview/preanalysis) logged per `.cursor/rules/important_note_enforcement.mdc`.
 - Monotonic notes are fine mid-run, but once all phases are done the last lint should be “ok” only once.
 - “Execute 2.1 now / 2.2 now”: Your trace shows they didn’t run and only validators executed. That means the RUN trigger wasn’t recognized in that session. The RUN mapping we added (“Execute <i> now”, “Run <i>”) exists only after our recent rules update; older sessions won’t match it. Also, the sources on those lines should include `.cursor/rules/trigger_phrases_extra.mdc` and `.cursor/rules/todo_manager_flow.mdc`, not only analysis tools.
 - Task ID: You used `user_authentication_tests_actionable_20250817`, which differs from the current repo task id (`auth_feature_tests_actionable_20250817`). Ensure consistency.
@@ -2500,7 +2500,7 @@ Dependencies (plain_hier.py): json, sys, os, pathlib.Path, re (stdlib only; sync
 AI AGENT: Read memory-bank/plan/organize.md and drafted phases with IMPORTANT NOTEs. — source: .cursor/rules/organizer_authority.mdc, .cursor/rules/organizer_to_tasks_active.mdc
 - USER: Trigger: "Finalize JSON" — source: .cursor/rules/agent_plan_ingestion.mdc (JSON Finalization), .cursor/rules/tasks_active_schema.mdc  
 AI AGENT: Produced content-only for memory-bank/queue-system/tasks_active.json (id: auth_feature_tests_actionable_20250817). — source: .cursor/rules/organizer_to_tasks_active.mdc, .cursor/rules/tasks_active_schema.mdc
-- USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/imporant_note_enforcement.mdc, .cursor/rules/phase_gates.mdc  
+- USER: Trigger: "proceed" — source: .cursor/rules/exec_policy.mdc, .cursor/rules/tool_usage_guarantee.mdc, .cursor/rules/todo_manager_flow.mdc, .cursor/rules/done_enforcement.mdc, .cursor/rules/important_note_enforcement.mdc, .cursor/rules/phase_gates.mdc  
 AI AGENT: Created memory-bank/DOCUMENTS/..._phase0_postreview.md and ..._phase1_preanalysis.md; ran plan_next.py and plain_hier.py (pre-DONE gates); marked phase 0 done; ran plan_next.py (post-DONE). — source: same as above
 
 - For RUN sub-steps, after our update:  
