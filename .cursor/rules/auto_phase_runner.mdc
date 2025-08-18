@@ -1,0 +1,49 @@
+---
+description: Auto-runner to complete the next unfinished phase while honoring gates
+alwaysApply: true
+---
+
+## Phase Auto-Runner (Single Phase, Gate-Compliant)
+
+Objective: When triggered, automatically execute all sub-steps for the next unfinished phase K, then mark the phase done, while strictly following the gates from `phase_gates.mdc` and the sequence from `tool_usage_guarantee.mdc`.
+
+### Preconditions
+- Active execution task exists in `memory-bank/queue-system/tasks_active.json`.
+- Phase K contains a fenced code block with commands.
+- IMPORTANT NOTE is present for phase K.
+
+### Sequence (Required)
+1) Validate next phase and lint:
+```bash
+python3 plan_next.py
+```
+2) Show hierarchy (recommended):
+```bash
+python3 plain_hier.py <TASK_ID>
+```
+3) Preview phase K commands (no side effects):
+```bash
+python3 todo_manager.py exec <TASK_ID> K
+```
+4) Execute phase K commands:
+```bash
+python3 todo_manager.py exec <TASK_ID> K --run
+```
+5) Show updated status:
+```bash
+python3 todo_manager.py show <TASK_ID>
+```
+6) Mark phase K done:
+```bash
+python3 todo_manager.py done <TASK_ID> K
+```
+7) Post-action verification:
+```bash
+python3 plan_next.py
+```
+
+### Notes
+- Replace `<TASK_ID>` with the current active task and `K` with the next unfinished phase index reported by `plan_next.py`.
+- If any gate or validation step fails, stop immediately and print the error. Do not proceed to execution or marking done.
+- Keep outputs concise; after completion, suggest the next trigger per `next_action_suggestions.mdc`.
+

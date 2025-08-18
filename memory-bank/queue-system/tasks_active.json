@@ -13,7 +13,7 @@
       },
       {
         "text": "PHASE 2: Modify Scripts for Mode/Gate\n\n**Explanations:**\nMake `todo_manager.py`, `plan_next.py`, and `plain_hier.py` mode-aware and add a reusable Deep Analysis Gate check. Block `exec --run` and `done` in execution mode when the gate fails.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- `todo_manager.py`: add `--mode execution|analysis` to CRUD-like cmds; enforce gate for `exec --run` and for `done` in execution mode; allow preview without gate.\n- `plan_next.py`: add `--mode execution|analysis` and `--gate --task-id <ID>` to print PASS/BLOCK and exit non-zero on BLOCK.\n- `plain_hier.py`: add `--mode execution|analysis` for read-only views.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 3: Update Rules for Compliance\n\n**Explanations:**\nAlign rules to require the Deep Analysis Gate before execution, document new flags, and extend triggers for deep analysis usage.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Update `exec_policy.mdc`: require `python3 plan_next.py --gate --task-id <TASK_ID>` PASS before `exec --run` and `done`.\n- Update `phase_gates.mdc`: add Gate 0 (Deep Analysis Gate) before existing gates.\n- Update `trigger_phrases.mdc`: add triggers for `[deep-analysis:only]`, deep analysis validation, and analysis gate checks.\n- Update `analysis_tools.mdc`, `tasks_active_schema.mdc`, `todo_manager_flow.mdc`; optionally note gate in `tool_usage_guarantee.mdc` and `done_enforcement.mdc`.",
@@ -26,6 +26,6 @@
     ],
     "status": "in_progress",
     "created": "2025-08-18T19:15:00+08:00",
-    "updated": "2025-08-18T23:14:57.721565+08:00"
+    "updated": "2025-08-18T23:40:48.660836+08:00"
   }
 ]
