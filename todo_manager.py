@@ -475,6 +475,86 @@ def _replace_placeholders_in_command(command: str, task_id: str, phase_index: in
     return command
 
 
+# ------------------------------------------------------------------
+# Deep Analysis Gate helpers ---------------------------------------
+# ------------------------------------------------------------------
+
+def _analysis_file() -> Path:
+    return Path(os.getcwd()) / "memory-bank" / "queue-system" / "analysis_active.json"
+
+
+def _load_json_list(path: Path) -> List[Dict[str, Any]]:
+    if not path.exists():
+        return []
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(data, dict) and "tasks" in data:
+            data = data["tasks"]
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+def _find_analysis_for_task(execution_task_id: str) -> Optional[Dict[str, Any]]:
+    """Find analysis task linked to the execution task via source_task_id or id prefix."""
+    analyses = _load_json_list(_analysis_file())
+    for a in analyses:
+        if a.get("source_task_id") == execution_task_id:
+            return a
+    for a in analyses:
+        if str(a.get("id", "")).startswith(f"{execution_task_id}_analysis_"):
+            return a
+    return None
+
+
+def _analysis_phase_has_required_sections(text: str) -> bool:
+    return ("IMPORTANT NOTE:" in (text or "")) and ("Decision Gate" in (text or ""))
+
+
+def _analysis_phase_has_blocking_findings(text: str) -> bool:
+    txt = text or ""
+    return (
+        re.search(r"Type:\s*Conflict", txt, re.I) is not None
+        or re.search(r"Type:\s*Duplicate", txt, re.I) is not None
+    )
+
+
+def enforce_deep_analysis_gate(execution_task_id: str) -> (bool, str):
+    """Return (ok, message). ok=False blocks execution side-effects for this task."""
+    analysis = _find_analysis_for_task(execution_task_id)
+    if analysis is None:
+        return (
+            False,
+            "No analysis found in analysis_active.json for this execution task (missing source_task_id link).",
+        )
+    todos = analysis.get("todos", [])
+    if not todos:
+        return False, "Analysis task has no phases."
+    for idx, td in enumerate(todos):
+        txt = td.get("text", "")
+        if not td.get("done"):
+            return False, f"Analysis phase {idx} not done."
+        if not _analysis_phase_has_required_sections(txt):
+            return False, f"Analysis phase {idx} missing 'Decision Gate' or 'IMPORTANT NOTE:'."
+        if _analysis_phase_has_blocking_findings(txt):
+            return False, f"Analysis phase {idx} contains blocking Findings (Conflict/Duplicate)."
+    return True, "Deep Analysis Gate passed."
+
+
+# ------------------------------------------------------------------
+# Mode selection for data file -------------------------------------
+# ------------------------------------------------------------------
+
+def _set_data_file_for_mode(mode: str) -> None:
+    """Switch DATA_FILE to execution or analysis SOT for CRUD/show flows."""
+    global DATA_FILE
+    base = Path(os.getcwd()) / "memory-bank" / "queue-system"
+    if mode == "analysis":
+        DATA_FILE = base / "analysis_active.json"
+    else:
+        DATA_FILE = base / "tasks_active.json"
+
+
 def exec_substep(task_id: str, sub_index: str, run: bool = False) -> None:
     """Preview (default) or run command(s) for a specific phase sub-step.
 
@@ -565,28 +645,36 @@ def main(argv: Optional[List[str]] = None) -> None:
 
     sub_new = sub.add_parser("new", help="create a new task")
     sub_new.add_argument("description")
+    sub_new.add_argument("--mode", choices=["execution", "analysis"], default="execution")
 
     sub_add = sub.add_parser("add", help="add todo to task")
     sub_add.add_argument("task_id")
     sub_add.add_argument("text")
+    sub_add.add_argument("--mode", choices=["execution", "analysis"], default="execution")
 
     sub_done = sub.add_parser("done", help="mark todo item done")
     sub_done.add_argument("task_id")
     sub_done.add_argument("index", help="TODO item index (0-based)")
+    sub_done.add_argument("--mode", choices=["execution", "analysis"], default="execution")
 
     sub_delete = sub.add_parser("delete", help="delete todo item completely")
     sub_delete.add_argument("task_id")
     sub_delete.add_argument("index", help="TODO item index (0-based)")
+    sub_delete.add_argument("--mode", choices=["execution", "analysis"], default="execution")
 
     sub_list = sub.add_parser("list", help="list open tasks")
+    sub_list.add_argument("--mode", choices=["execution", "analysis"], default="execution")
     
     sub_show = sub.add_parser("show", help="show detailed task information")
     sub_show.add_argument("task_id")
+    sub_show.add_argument("--mode", choices=["execution", "analysis"], default="execution")
 
     sub_hard_delete = sub.add_parser("hard_delete", help="completely remove task from memory")
     sub_hard_delete.add_argument("task_id")
+    sub_hard_delete.add_argument("--mode", choices=["execution", "analysis"], default="execution")
 
     sub_cleanup = sub.add_parser("cleanup", help="remove all completed tasks from memory")
+    sub_cleanup.add_argument("--mode", choices=["execution", "analysis"], default="execution")
 
     # New: exec subcommand (safe preview by default; use --run to execute)
     sub_exec = sub.add_parser("exec", help="execute a specific sub-step command (preview by default)")
@@ -597,10 +685,13 @@ def main(argv: Optional[List[str]] = None) -> None:
     args = parser.parse_args(argv)
 
     if args.cmd == "new":
+        _set_data_file_for_mode(args.mode)
         new_task(args.description)
     elif args.cmd == "add":
+        _set_data_file_for_mode(args.mode)
         add_todo(args.task_id, args.text)
     elif args.cmd == "done":
+        _set_data_file_for_mode(args.mode)
         # Handle index parsing manually to support various formats
         try:
             # Try to parse as integer first
@@ -616,8 +707,15 @@ def main(argv: Optional[List[str]] = None) -> None:
                 print("   Example: python3 todo_manager.py done <task_id> 0")
                 return
         
+        # Enforce deep analysis gate for execution mode marking done
+        if args.mode == "execution":
+            ok, msg = enforce_deep_analysis_gate(args.task_id)
+            if not ok:
+                print(f"⛔ Deep Analysis Gate BLOCK: {msg}")
+                return
         mark_done(args.task_id, index)
     elif args.cmd == "delete":
+        _set_data_file_for_mode(args.mode)
         # Handle index parsing manually to support various formats
         try:
             # Try to parse as integer first
@@ -635,14 +733,24 @@ def main(argv: Optional[List[str]] = None) -> None:
         
         delete_todo(args.task_id, index)
     elif args.cmd == "exec":
+        # Allow preview without gate; enforce gate only when --run
+        if args.run:
+            ok, msg = enforce_deep_analysis_gate(args.task_id)
+            if not ok:
+                print(f"⛔ Deep Analysis Gate BLOCK: {msg}")
+                return
         exec_substep(args.task_id, args.sub_index, args.run)
     elif args.cmd == "show":
+        _set_data_file_for_mode(args.mode)
         show_task_details(args.task_id)
     elif args.cmd == "hard_delete":
+        _set_data_file_for_mode(args.mode)
         hard_delete_task(args.task_id)
     elif args.cmd == "cleanup":
+        _set_data_file_for_mode(args.mode)
         cleanup_completed_tasks()
     else:
+        _set_data_file_for_mode("execution")
         tasks = list_open_tasks()
         if tasks:
             print(f"🔎 {len(tasks)} open tasks:")
