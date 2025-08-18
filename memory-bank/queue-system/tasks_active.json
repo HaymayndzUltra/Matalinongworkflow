@@ -9,7 +9,7 @@
       },
       {
         "text": "PHASE 1: Finalize SOTs and the Hard Gate\n\n**Explanations:**\nDefine dual Sources of Truth and the Deep Analysis Gate that blocks execution until analysis is fully complete and non-conflicting.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Execution SOT: `memory-bank/queue-system/tasks_active.json`\n- Analysis SOT: `memory-bank/queue-system/analysis_active.json` with `source_task_id` referencing the execution task, and todos containing Purpose, Scope, Checks, Logic Parity Check, Decision Gate, Findings, IMPORTANT NOTE.\n- The gate must block if any analysis phase is not done, lacks Decision Gate/IMPORTANT NOTE, or contains Findings of Type: Conflict or Type: Duplicate.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 2: Modify Scripts for Mode/Gate\n\n**Explanations:**\nMake `todo_manager.py`, `plan_next.py`, and `plain_hier.py` mode-aware and add a reusable Deep Analysis Gate check. Block `exec --run` and `done` in execution mode when the gate fails.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- `todo_manager.py`: add `--mode execution|analysis` to CRUD-like cmds; enforce gate for `exec --run` and for `done` in execution mode; allow preview without gate.\n- `plan_next.py`: add `--mode execution|analysis` and `--gate --task-id <ID>` to print PASS/BLOCK and exit non-zero on BLOCK.\n- `plain_hier.py`: add `--mode execution|analysis` for read-only views.",
@@ -26,6 +26,6 @@
     ],
     "status": "in_progress",
     "created": "2025-08-18T19:15:00+08:00",
-    "updated": "2025-08-18T23:07:11.166623+08:00"
+    "updated": "2025-08-18T23:14:57.721565+08:00"
   }
 ]
