@@ -1,31 +1,47 @@
 [
   {
-    "id": "deep_analysis_integration_actionable_20250818",
-    "description": "Deep Analysis Integration Proposal and Action Plan (memory-bank/plan/organize.md).",
+    "id": "kompletong_checklist_actionable_20250818",
+    "description": "Actionable plan compiled from Kompletong Checklist (+ Exact File / Path Refs) para sa Susunod na Sessions (memory-bank/plan/organize.md).",
     "todos": [
       {
-        "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\nEstablish Deep Analysis as the authoritative workflow. Use dual SOTs for execution and analysis, and enforce a hard gate linking them before any execution side-effects.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Do not modify queue/state files directly; produce content-only outputs.\n- Treat `.cursor/rules/deep_analysis.mdc` as the source of truth for analysis structure and gating.\n- All timestamps must be ISO `+08:00`.\n- Read-only analyzers may be invoked in later phases; execution (side-effects) is only allowed after the hard gate passes.",
-        "done": true
+        "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\nRead-only ingestion; mirror the organizer exactly. Proposal only (no file writes/execution). Timestamps must be ISO +08:00.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\n- Source of truth: memory-bank/plan/organize.md\n- Do not modify files/state during ingestion\n- Keep all commands portable and non-destructive",
+        "done": false
       },
       {
-        "text": "PHASE 1: Finalize SOTs and the Hard Gate\n\n**Explanations:**\nDefine dual Sources of Truth and the Deep Analysis Gate that blocks execution until analysis is fully complete and non-conflicting.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Execution SOT: `memory-bank/queue-system/tasks_active.json`\n- Analysis SOT: `memory-bank/queue-system/analysis_active.json` with `source_task_id` referencing the execution task, and todos containing Purpose, Scope, Checks, Logic Parity Check, Decision Gate, Findings, IMPORTANT NOTE.\n- The gate must block if any analysis phase is not done, lacks Decision Gate/IMPORTANT NOTE, or contains Findings of Type: Conflict or Type: Duplicate.",
-        "done": true
+        "text": "PHASE 1: Source of Truth — Active Agents\n\n**Explanations:**\nIdentify active agents in startup configs; provide quick greps for discovery.\n\n**Command Preview:**\n```bash\nrg -n \"^\\s*- name:\" main_pc_code/config/startup_config.yaml\nrg -n \"^\\s*- name:\" pc2_code/config/startup_config.yaml\n```\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nRead-only listing; do not edit YAMLs.",
+        "done": false
       },
       {
-        "text": "PHASE 2: Modify Scripts for Mode/Gate\n\n**Explanations:**\nMake `todo_manager.py`, `plan_next.py`, and `plain_hier.py` mode-aware and add a reusable Deep Analysis Gate check. Block `exec --run` and `done` in execution mode when the gate fails.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- `todo_manager.py`: add `--mode execution|analysis` to CRUD-like cmds; enforce gate for `exec --run` and for `done` in execution mode; allow preview without gate.\n- `plan_next.py`: add `--mode execution|analysis` and `--gate --task-id <ID>` to print PASS/BLOCK and exit non-zero on BLOCK.\n- `plain_hier.py`: add `--mode execution|analysis` for read-only views.",
-        "done": true
+        "text": "PHASE 2: Consolidation Workflow Files\n\n**Explanations:**\nValidate the presence/paths of the consolidation maps and scripts.\n- hub_manifest.yaml (hub → code_roots)\n- consolidation_ledger.yaml (legacy-agent → hub mappings)\n- Scripts: hub_membership_audit.py, verify_hub_inclusion.py, apply_commentouts.py (preview/apply)\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nPath verification only in this phase; applying changes happens later.",
+        "done": false
       },
       {
-        "text": "PHASE 3: Update Rules for Compliance\n\n**Explanations:**\nAlign rules to require the Deep Analysis Gate before execution, document new flags, and extend triggers for deep analysis usage.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Update `exec_policy.mdc`: require `python3 plan_next.py --gate --task-id <TASK_ID>` PASS before `exec --run` and `done`.\n- Update `phase_gates.mdc`: add Gate 0 (Deep Analysis Gate) before existing gates.\n- Update `trigger_phrases.mdc`: add triggers for `[deep-analysis:only]`, deep analysis validation, and analysis gate checks.\n- Update `analysis_tools.mdc`, `tasks_active_schema.mdc`, `todo_manager_flow.mdc`; optionally note gate in `tool_usage_guarantee.mdc` and `done_enforcement.mdc`.",
-        "done": true
+        "text": "PHASE 3: Autogenerated Outputs (Pre-commit Checks)\n\n**Explanations:**\nEnsure the audit artifacts exist and are up to date.\n- audits/hub_membership_report.csv\n- audits/proof_matrix.csv\n- audits/commentout_candidates.csv (may include yq_suggest)\n- audits/missing_or_weak.csv\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nDo not hand-edit generated CSVs; regenerate via scripts as needed.",
+        "done": false
       },
       {
-        "text": "PHASE 4: Verify Integration\n\n**Explanations:**\nProve the gate blocks when analysis is missing/incomplete/conflicting and allows execution once analysis passes.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- BLOCK examples: no `analysis_active.json`, missing `source_task_id`, any analysis phase not done, missing Decision Gate/IMPORTANT NOTE, or Findings with Conflict/Duplicate.\n- PASS: after a fully completed, compliant analysis task linked to the execution task.",
-        "done": true
+        "text": "PHASE 4: Code-Level Proof Hunting\n\n**Explanations:**\nUse hub code roots per manifest; search for registrations/imports that prove inclusion.\n\n**Command Preview (examples):**\n```bash\nrg -n \"(register|add_stage).*AudioCapture\" real_time_audio_pipeline\nrg -n \"import .*EmotionEngine\" affective_processing_center\n```\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nRecord evidence (paths/lines); no code edits in this phase.",
+        "done": false
+      },
+      {
+        "text": "PHASE 5: Supporting Config/Env Files\n\n**Explanations:**\nScan env/shell for PORT_OFFSET or feature flags; verify Dockerfiles for core services and base images.\n\n**Command Preview:**\n```bash\nrg -n \"PORT_OFFSET=\" --type sh --type env\n# Dockerfiles to review:\n# services/*/Dockerfile\n# docker/base-images/*/Dockerfile\n```\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nRead-only inspection; capture references and diffs only.",
+        "done": false
+      },
+      {
+        "text": "PHASE 6: CI Pipeline Guards (Repeatability)\n\n**Explanations:**\nPlan to add CI jobs in .github/workflows/port_lint.yml that run hub_membership_audit.py + verify_hub_inclusion.py and fail on bad state.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nDesign-only in this phase; CI edits are gated and separate.",
+        "done": false
+      },
+      {
+        "text": "PHASE 7: Run Sequence Reference\n\n**Explanations:**\nOrdered, reproducible runbook for audit → verify → preview → apply.\n\n**Command Preview:**\n```bash\n# 1 Audit\npython3 hub_membership_audit.py --repo . \\\n  --yaml main_pc_code/config/startup_config.yaml pc2_code/config/startup_config.yaml \\\n  --hubs AffectiveProcessingCenter RealTimeAudioPipeline ModelOpsCoordinator UnifiedObservabilityCenter MemoryFusionHub \\\n  --outdir audits/\n\n# 2 Verify proofs\npython3 verify_hub_inclusion.py\n\n# 3 Preview\npython3 apply_commentouts.py --csv audits/commentout_candidates.csv --dry-run\n\n# 4 Apply (kung passed ang proof_matrix)\npython3 apply_commentouts.py --csv audits/commentout_candidates.csv --apply\n```\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nSteps 1–3 are safe by default; step 4 (apply) must be gated/approved.",
+        "done": false
+      },
+      {
+        "text": "PHASE 8: Final-Plan Update Steps\n\n**Explanations:**\nPost-verify: update memory-bank/DOCUMENTS/plan.md; mark agents “disabled (consolidated)” when exists_in_hub=true (confidence ≥ 0.85) and commented-out in YAML; add baseline note with commit SHA.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE:\nDocumentation-only edits here; ensure evidence trails (paths/lines/CSVs) are referenced.",
+        "done": false
       }
     ],
-    "status": "completed",
+    "status": "in_progress",
     "created": "2025-08-18T19:15:00+08:00",
-    "updated": "2025-08-18T23:51:03.098880+08:00"
+    "updated": "2025-08-18T19:15:00+08:00"
   }
 ]
