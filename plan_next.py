@@ -1,28 +1,42 @@
 #!/usr/bin/env python3
-"""Plan next-phase helper (path auto-detected)."""
-import json, re, sys, os
+"""Plan next-phase helper (environment-independent path auto-detection)."""
+import json, re, sys, os, subprocess
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
+def _find_root_with_tasks(start: Path) -> Optional[Path]:
+    """Walk upwards from 'start' to locate a directory containing the plan file."""
+    cur = start.resolve()
+    while True:
+        if (cur / "memory-bank" / "queue-system" / "tasks_active.json").exists():
+            return cur
+        if cur.parent == cur:
+            break
+        cur = cur.parent
+    return None
+
 def _detect_repo_root() -> Path:
     cwd = Path.cwd()
-    if (cwd / "memory-bank" / "queue-system" / "tasks_active.json").exists():
-        return cwd
-    # Prefer new environment variable if provided; fallback to legacy for compatibility
-    new_env = os.getenv("VOICE_ASSISTANT_PROD_ROOT")
-    if new_env:
-        env_root = Path(new_env)
-        if (env_root / "memory-bank" / "queue-system" / "tasks_active.json").exists():
-            return env_root
-    legacy_env = os.getenv("AI_SYSTEM_MONOREPO")
-    if legacy_env:
-        env_root = Path(legacy_env)
-        if (env_root / "memory-bank" / "queue-system" / "tasks_active.json").exists():
-            return env_root
-    # Default to the current repository location on this system
-    default_root = Path("/home/haymayndz/MatalinongWorkflow")
-    if (default_root / "memory-bank" / "queue-system" / "tasks_active.json").exists():
-        return default_root
+    # 1) Search upwards from current working directory
+    root = _find_root_with_tasks(cwd)
+    if root:
+        return root
+    # 2) Search upwards from this script's directory
+    here = Path(__file__).resolve().parent
+    root = _find_root_with_tasks(here)
+    if root:
+        return root
+    # 3) Try git repository top-level
+    try:
+        top = subprocess.check_output([
+            "git", "rev-parse", "--show-toplevel"
+        ], stderr=subprocess.DEVNULL).decode().strip()
+        root = _find_root_with_tasks(Path(top))
+        if root:
+            return root
+    except Exception:
+        pass
+    # 4) Fallback to cwd (may error later if file truly absent)
     return cwd
 
 REPO_ROOT = _detect_repo_root()

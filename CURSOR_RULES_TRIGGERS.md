@@ -1,5 +1,4 @@
-# 📚 COMPLETE CURSOR RULES TRIGGER DOCUMENTATION
-**Generated:** January 16, 2025  
+# 📚 COMPLETE CURSOR RULES TRIGGER DOCUMENTATION 
 **Total Rules Found:** 19 files
 
 ---

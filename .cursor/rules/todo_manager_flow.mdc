@@ -19,6 +19,14 @@ python3 todo_manager.py exec TASK_ID 4.1
 # Marks as completed automatically
 ```
 
+**PLACEHOLDER SUBSTITUTION (EXEC):**
+- When running `python3 todo_manager.py exec`, common placeholders in fenced commands are automatically replaced to avoid shell redirection errors and to simplify execution:
+  - `<task_id ReplaceAll>`, `<task_id Replace All>`, `<task_id>`, `<TASK_ID>` → actual task id
+  - `<PHASE_INDEX>`, `<phase_index>` → current phase index (K)
+  - `<SUB_INDEX>`, `<sub_index>` → selected command index (1-based)
+- Substitution applies to both preview and `--run` execution.
+- Recommendation: Keep concluding command blocks readable with placeholders; `exec` will resolve them at runtime.
+
 **MARK MAIN TODO DONE:**
 ```bash
 python3 todo_manager.py done TASK_ID 4

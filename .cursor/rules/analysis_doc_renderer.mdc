@@ -1,0 +1,83 @@
+---
+description: Render strict, analysis-only doc from tasks_active.json (no scripts, no writes)
+alwaysApply: true
+---
+
+## Strict Analysis Doc Renderer — tasks_active.json → analysis-only output
+
+Scope:
+- Single source of truth: `memory-bank/queue-system/tasks_active.json` only.
+- Read-only; do NOT execute anything; do NOT read the codebase.
+- Output is content-only printed to chat; the operator may save as `goaltomakelikethis.md`.
+
+Triggers (match anywhere in the message; ignore inside quotes/code fences):
+- "Compile analysis doc"
+- "Render analysis doc"
+- "Generate analysis doc (analysis-only)"
+- "Compile analysis doc (strict)" (enables strict enforcement + summary)
+
+Input expectations:
+- Top-level is an array (or an object with key `tasks` mapping to an array).
+- Each task has: `id`, `description`, `status`, `created`, and `todos` (array).
+- Each todo `text` starts with a single-line phase title (e.g., `PHASE K: …`).
+
+Deterministic phase mapping (content-focused, no assumptions):
+1) Title: Use the first line of the phase `text` verbatim.
+2) Purpose: Use the block under `**Explanations:**` verbatim (if present).
+3) Scope: Set to "policy/contracts only; not execution" (analysis view).
+4) Checks (must be derived from existing content; do not invent):
+   - From `IMPORTANT NOTE:` bullets → copy each bullet as a check.
+   - From `**Command Preview:**` → translate each relevant line into a pre-execution precondition, e.g.:
+     - docker buildx build → reproducible builds; tag pattern `YYYYMMDD-<git_sha>`; target platforms; required build args (e.g., `TORCH_CUDA_ARCH_LIST`).
+     - docker-compose `user: "10001:10001"` → non-root runtime enforced; tini as PID 1 when applicable.
+     - compose healthcheck → `/health` returns HTTP 200 `{status:"ok"}`; port uniqueness within and across services.
+     - GitHub Actions + trivy-action → HIGH/CRITICAL severities must fail builds (gate enforced).
+     - syft → SBOM in SPDX JSON; artifact/upload present; tags align with date+git scheme.
+     - GPU env/driver (e.g., `TORCH_CUDA_ARCH_LIST`, `GPU_VISIBLE_DEVICES`) → arch/driver baselines and env naming consistency.
+     - Cache policy → single canonical cache-to/from registry approach; no alternates.
+5) LOGIC PARITY CHECK: Compare this phase’s implied policies against other phases to flag duplicates/conflicts for the same concern (tag scheme, cache policy, security gate thresholds, health contract, CPU/GPU boundaries, non-root+tini, pinned versions).
+6) DECISION GATE: Compose "Block if …" statements strictly from Checks and Parity findings for this phase (no new concerns beyond what’s present).
+7) IMPORTANT NOTE: Reproduce verbatim. If missing, print `IMPORTANT NOTE: (missing)`.
+
+Rendering rules:
+- Do NOT include `**Command Preview:**` or `**Concluding Step:**` blocks themselves in the analysis doc.
+- Preserve verbatim text where specified; otherwise, provide concise precondition phrasing derived from previews/notes.
+- Keep section order: Purpose → Scope → Checks → LOGIC PARITY CHECK → DECISION GATE → IMPORTANT NOTE.
+- Only print sections that exist or are required (Purpose/Scope/Important Note). If Purpose/Scope/Important Note are missing, mark `(missing)`.
+
+Cross-phase global guards (after rendering all phases):
+- Double logic detection: If two phases define conflicting policies for the same concern, mark CONFLICT.
+- Inventory completeness: Every image/family/service/env/port referenced in any preview must appear in at least one Check. Missing → MISSING_INVENTORY.
+- Agents/services alignment: Mentioned agents/services must have a corresponding policy Check and must not be duplicated.
+- Docker/CI alignment: build flags, tag scheme, cache policy, SBOM, and security gating must be consistent across phases.
+
+Strict enforcement (only when trigger contains "(strict)"):
+- Per phase, compute PhaseStatus:
+  - FAIL if any of: Purpose missing; Scope missing; Important Note missing; no derived Checks while previews/notes exist; parity conflict; missing inventory for referenced artifacts.
+  - PASS otherwise.
+- After all phases, print a "STRICT ANALYSIS SUMMARY" section:
+  - One line per phase: `Phase K — PASS|FAIL — Missing:[Purpose|Scope|ImportantNote|Checks] — Conflicts:[…]` (omit empty brackets).
+  - Then a `BLOCKERS:` list aggregating all FAIL/CONFLICT/MISSING_INVENTORY items.
+  - If any blockers exist, print the line: `BLOCK EXECUTION: Analysis failed; fix blockers before proceeding.`
+
+Failure handling:
+- If `tasks_active.json` is missing/invalid → print a single line: `No valid tasks_active.json`.
+- If there are zero tasks → print headers and `No active tasks.`
+- If a task has no `todos` → print metadata and skip phases.
+
+Quality guard:
+- Never execute; never scan the repo; never add links or commentary outside the rules above.
+- Do not summarize freeform; when unsure, prefer verbatim reproduction inside the correct section.
+
+Output framing (reference only; do not hardcode content):
+============================================================
+🎮 TASK COMMAND & CONTROL CENTER
+============================================================
+
+📋 ALL OPEN TASKS:
+========================================
+
+<task blocks…>
+
+<STRICT ANALYSIS SUMMARY (only in strict mode)…>
+

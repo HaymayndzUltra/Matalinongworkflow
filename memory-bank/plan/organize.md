@@ -1,34 +1,29 @@
-Create comprehensive tests for the implemented feature: Create a new feature for user authentication
+Non-Destructive Flow Test — Two Phases (Portable, Read-Only)
+Version: v1.0
+Status: Frozen (for ingestion in a separate session)
+Phase 1 — Environment & Path Sanity
+Explanations:
+Quick, safe checks for shell, time, Python, and working directory.
+Command Preview:
 
-### Test Files to Create
-- `test_create_a_new_feature_for_user_authentication.py`
-- Integration tests in appropriate test directories
+pwd
+date '+%Y-%m-%d %H:%M:%S'
+python3 -c "import sys,os; print('PY:',sys.version.split()[0],' CWD:',os.getcwd())"
+ls -la | head -n 20
 
-### Test Categories
+Phase 2 — Read-only Inspection & No-op Simulation
+Explanations:
+Tolerant, read-only peeks plus a short no-op sequence.
+Command Preview:
 
-#### 1. Unit Tests
-- Test all individual functions
-- Test edge cases and boundary conditions
-- Test error handling paths
-- Test with valid and invalid inputs
+test -f README.md && head -n 20 README.md || echo "SKIP_HEAD_README"
+ps -eo pid,comm --no-headers 2>/dev/null | head -n 5 || echo "SKIP_PS"
+git rev-parse --show-toplevel 2>/dev/null || echo "NO_GIT_REPO"
+echo "SIM_STEP_1"; sleep 1; echo "SIM_STEP_2"; true
 
-#### 2. Integration Tests
-- Test interactions with existing systems
-- Test CLI integration
-- Test state management
-- Test file operations
-
-#### 3. Performance Tests
-- Test with large datasets
-- Test concurrent operations
-- Test memory usage
-
-### Testing Patterns
-- Use pytest framework
-- Follow AAA pattern (Arrange, Act, Assert)
-- Use fixtures for common test data
-- Mock external dependencies
-- Test both success and failure paths
-
-### Test Implementation
-Implement all tests following the project's testing standards and patterns.
+End-of-Task Reporting Instruction (Do this in the executing session)
+After completing the two phases, produce a “Command Rules Mapping” report that:
+Lists ALL user-provided command rules.
+For EACH rule, shows:
+Trigger: the exact phrase/token that activated the AI.
+Runs: the exact command(s) the AI executed in response (verbatim).

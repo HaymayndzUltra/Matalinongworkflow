@@ -445,6 +445,36 @@ def _parse_sub_index(sub_index: str) -> (int, Optional[int]):
         raise ValueError("Invalid sub-index format. Use 'K' or 'K.N' (e.g., 4 or 4.1)")
 
 
+def _replace_placeholders_in_command(command: str, task_id: str, phase_index: int, command_index_one_based: Optional[int]) -> str:
+    """Replace common placeholders in a command string with concrete values.
+
+    Supported placeholders:
+      - <task_id ReplaceAll>, <task_id Replace All>, <task_id>, <TASK_ID>
+      - <PHASE_INDEX>, <phase_index>
+      - <SUB_INDEX>, <sub_index> (uses 1-based index when available)
+    """
+    replacements = {
+        "<task_id ReplaceAll>": task_id,
+        "<task_id Replace All>": task_id,
+        "<task_id>": task_id,
+        "<TASK_ID>": task_id,
+        "<PHASE_INDEX>": str(phase_index),
+        "<phase_index>": str(phase_index),
+    }
+
+    if command_index_one_based is not None:
+        replacements.update(
+            {
+                "<SUB_INDEX>": str(command_index_one_based),
+                "<sub_index>": str(command_index_one_based),
+            }
+        )
+
+    for needle, value in replacements.items():
+        command = command.replace(needle, value)
+    return command
+
+
 def exec_substep(task_id: str, sub_index: str, run: bool = False) -> None:
     """Preview (default) or run command(s) for a specific phase sub-step.
 
@@ -479,19 +509,26 @@ def exec_substep(task_id: str, sub_index: str, run: bool = False) -> None:
         return
 
     lines = [ln for ln in blocks[0].splitlines() if ln.strip() and not ln.strip().startswith("#")]
+    # Resolve placeholders before preview/execution to avoid shell redirection issues
+    resolved_lines = [
+        _replace_placeholders_in_command(
+            ln, task_id=task_id, phase_index=phase_idx, command_index_one_based=(cmd_idx + 1) if cmd_idx is not None else None
+        )
+        for ln in lines
+    ]
     if not lines:
         print("❌ No executable lines found in the first fenced code block.")
         return
 
     selected: List[str]
     if cmd_idx is None:
-        selected = lines
+        selected = resolved_lines
         print("🔎 Selected all commands in phase block (dry-run by default):")
     else:
         if cmd_idx >= len(lines):
             print(f"❌ Command index {cmd_idx + 1} out of range (1..{len(lines)})")
             return
-        selected = [lines[cmd_idx]]
+        selected = [resolved_lines[cmd_idx]]
         print(f"🔎 Selected command #{cmd_idx + 1} (dry-run by default):")
 
     for cmd in selected:

@@ -1,0 +1,16 @@
+graph TD
+  A["User: [cursor-rules:on]"] --> B["Rules Enabled"]
+  B --> C["Trigger: Ingest plan"]
+  C --> D["Read memory-bank/plan/organize.md"]
+  D --> E["Draft Plan (6 phases)"]
+  E --> F["User: approved"]
+  F --> G["Finalize JSON (content-only) user_auth_testing_actionable_20250127"]
+  G --> H["Validate Gate: plan_next.py"]
+  H --> I{"Existing active task?"}
+  I -- "Yes: organized_actionable_20250816" --> J["plain_hier.py → 6 phases, 0/6 done"]
+  J --> K["Ready for proceed protocol"]
+  K --> L["On 'proceed': plan_next.py"]
+  L --> M["If sub-step: todo_manager.py exec <TASK_ID> <SUB_INDEX>"]
+  M --> N["Show: todo_manager.py show <TASK_ID>"]
+  I -- "No" --> O["System ingests new plan as active"]
+  N --> P["Documentation created under memory-bank/DOCUMENTS"]

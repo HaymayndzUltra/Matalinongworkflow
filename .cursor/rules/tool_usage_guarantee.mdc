@@ -63,3 +63,10 @@ python3 plan_next.py
 ```
 
 These steps are required to avoid missed "done" transitions and to keep the plan in sync.
+
+### Placeholder substitution (exec)
+- `python3 todo_manager.py exec` automatically substitutes placeholders in fenced commands before preview/execute:
+  - `<task_id ReplaceAll>`, `<task_id Replace All>`, `<task_id>`, `<TASK_ID>`
+  - `<PHASE_INDEX>`, `<phase_index>`
+  - `<SUB_INDEX>`, `<sub_index>` (when selecting a specific command, e.g., K.N)
+- This prevents shell errors from `<`/`>` characters and allows safe `--run` usage against plan commands.

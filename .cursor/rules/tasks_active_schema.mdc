@@ -45,3 +45,10 @@ alwaysApply: true
 - Keep each phase self-contained; do not reference external state.
 - Ensure monotonic completion (no undone after a done) during execution.
 
+### Placeholders in concluding commands
+- Fenced command blocks inside each phase may include placeholders for readability and portability:
+  - `<task_id ReplaceAll>`, `<task_id Replace All>`, `<task_id>`, `<TASK_ID>`
+  - `<PHASE_INDEX>`, `<phase_index>`
+  - `<SUB_INDEX>`, `<sub_index>`
+- These are resolved at runtime when commands are executed via `python3 todo_manager.py exec`.
+
