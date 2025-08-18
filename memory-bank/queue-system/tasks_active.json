@@ -5,7 +5,7 @@
     "todos": [
       {
         "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\nEstablish Deep Analysis as the authoritative workflow. Use dual SOTs for execution and analysis, and enforce a hard gate linking them before any execution side-effects.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Do not modify queue/state files directly; produce content-only outputs.\n- Treat `.cursor/rules/deep_analysis.mdc` as the source of truth for analysis structure and gating.\n- All timestamps must be ISO `+08:00`.\n- Read-only analyzers may be invoked in later phases; execution (side-effects) is only allowed after the hard gate passes.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 1: Finalize SOTs and the Hard Gate\n\n**Explanations:**\nDefine dual Sources of Truth and the Deep Analysis Gate that blocks execution until analysis is fully complete and non-conflicting.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Execution SOT: `memory-bank/queue-system/tasks_active.json`\n- Analysis SOT: `memory-bank/queue-system/analysis_active.json` with `source_task_id` referencing the execution task, and todos containing Purpose, Scope, Checks, Logic Parity Check, Decision Gate, Findings, IMPORTANT NOTE.\n- The gate must block if any analysis phase is not done, lacks Decision Gate/IMPORTANT NOTE, or contains Findings of Type: Conflict or Type: Duplicate.",
@@ -26,6 +26,6 @@
     ],
     "status": "in_progress",
     "created": "2025-08-18T19:15:00+08:00",
-    "updated": "2025-08-18T19:15:00+08:00"
+    "updated": "2025-08-18T23:07:11.166623+08:00"
   }
 ]
