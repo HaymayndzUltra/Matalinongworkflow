@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Read-only hierarchical plan viewer (environment-independent path auto-detection)."""
-import json, sys, re, os, subprocess
+import json, sys, re, os, subprocess, argparse
 from pathlib import Path
 
 def _find_root_with_tasks(start: Path):
@@ -47,9 +47,14 @@ def head(line: str) -> str:
     return (line or "").strip().splitlines()[0] if line else ""
 
 def main():
-    if len(sys.argv) != 2:
-        print("usage: plan_hier.py <TASK_ID>"); sys.exit(2)
-    task_id = sys.argv[1]
+    ap = argparse.ArgumentParser(description="Plain hierarchy viewer")
+    ap.add_argument("task_id")
+    ap.add_argument("--mode", choices=["execution","analysis"], default="execution")
+    args = ap.parse_args()
+
+    global ACTIVE
+    ACTIVE = REPO_ROOT / "memory-bank" / "queue-system" / ("analysis_active.json" if args.mode=="analysis" else "tasks_active.json")
+    task_id = args.task_id
     data = json.loads(ACTIVE.read_text(encoding="utf-8"))
     if isinstance(data, dict) and "tasks" in data:
         data = data["tasks"]

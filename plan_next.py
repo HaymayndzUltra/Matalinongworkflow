@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Plan next-phase helper (environment-independent path auto-detection)."""
-import json, re, sys, os, subprocess
+import json, re, sys, os, subprocess, argparse
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 
@@ -91,6 +91,26 @@ def lint_plan(task: Dict[str, Any]) -> Dict[str, Any]:
     return {"issues": issues, "missing_important_note_indices": missing_note}
 
 def main():
+    parser = argparse.ArgumentParser(description="Next-phase analyzer")
+    parser.add_argument("--mode", choices=["execution","analysis"], default="execution")
+    parser.add_argument("--gate", action="store_true", help="Check Deep Analysis Gate for a task and exit 0/3")
+    parser.add_argument("--task-id", help="Execution task id for --gate")
+    args = parser.parse_args()
+
+    global ACTIVE
+    ACTIVE = REPO_ROOT / "memory-bank" / "queue-system" / ("analysis_active.json" if args.mode=="analysis" else "tasks_active.json")
+
+    if args.gate:
+        if not args.task_id:
+            print("❌ --gate requires --task-id"); sys.exit(2)
+        try:
+            from todo_manager import enforce_deep_analysis_gate  # type: ignore
+        except Exception as e:
+            print(f"❌ Cannot import gate: {e}"); sys.exit(2)
+        ok, msg = enforce_deep_analysis_gate(args.task_id)
+        print(f"DEEP ANALYSIS: {'PASS' if ok else 'BLOCK'} — {msg}")
+        sys.exit(0 if ok else 3)
+
     tasks = load_tasks()
     if not tasks: print("ℹ️ No active tasks."); return
     for t in tasks:
