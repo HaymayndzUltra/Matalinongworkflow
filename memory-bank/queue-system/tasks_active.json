@@ -17,7 +17,7 @@
       },
       {
         "text": "PHASE 3: Update Rules for Compliance\n\n**Explanations:**\nAlign rules to require the Deep Analysis Gate before execution, document new flags, and extend triggers for deep analysis usage.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Update `exec_policy.mdc`: require `python3 plan_next.py --gate --task-id <TASK_ID>` PASS before `exec --run` and `done`.\n- Update `phase_gates.mdc`: add Gate 0 (Deep Analysis Gate) before existing gates.\n- Update `trigger_phrases.mdc`: add triggers for `[deep-analysis:only]`, deep analysis validation, and analysis gate checks.\n- Update `analysis_tools.mdc`, `tasks_active_schema.mdc`, `todo_manager_flow.mdc`; optionally note gate in `tool_usage_guarantee.mdc` and `done_enforcement.mdc`.",
-        "done": false
+        "done": true
       },
       {
         "text": "PHASE 4: Verify Integration\n\n**Explanations:**\nProve the gate blocks when analysis is missing/incomplete/conflicting and allows execution once analysis passes.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- BLOCK examples: no `analysis_active.json`, missing `source_task_id`, any analysis phase not done, missing Decision Gate/IMPORTANT NOTE, or Findings with Conflict/Duplicate.\n- PASS: after a fully completed, compliant analysis task linked to the execution task.",
@@ -26,6 +26,6 @@
     ],
     "status": "in_progress",
     "created": "2025-08-18T19:15:00+08:00",
-    "updated": "2025-08-18T23:40:48.660836+08:00"
+    "updated": "2025-08-18T23:49:54.152153+08:00"
   }
 ]
