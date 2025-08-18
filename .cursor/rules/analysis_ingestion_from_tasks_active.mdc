@@ -6,6 +6,8 @@ alwaysApply: true
 
 Objective: Any session MUST construct a Human-Readable Analysis Draft (and, upon approval, a JSON content-only plan) using ONLY `memory-bank/queue-system/tasks_active.json` as the single source of truth. No writes, no execution.
 
+This path is selected by explicit requests to ingest analysis from `tasks_active.json`. Each analysis phase MUST include a Concluding Step block (see below).
+
 ### Inputs
 - Frozen source: `memory-bank/queue-system/tasks_active.json` (array with one active task containing `todos`/phases).
 - Use the execution phases as the basis to mirror analysis phases.

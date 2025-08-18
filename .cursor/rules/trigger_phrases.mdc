@@ -2,8 +2,19 @@
 --- existing code ...
 ---
 
+## Dispatch policy
+- Select the highest-priority matching trigger family only (single-dispatch).
+- Tie-breaker for multiple matches: right-most occurrence in the user message.
+- Family precedence:
+  Master Toggle > Mode Switch (Deep Analysis) > Ingestion > Analysis Renderer > Auto-Runner > Execute Sub-step > Mark Done > Validate/Inspect > Suggestions.
+
 ### Auto Phase Runner
 - Triggers:
   - "Execute the next unfinished phase", "Run next phase", "Ituloy ang susunod na phase", "Auto-run phase"
 - Action (gate-compliant):
   - Follow `auto_phase_runner.mdc` to preview, run, show, mark done, and re-validate for the next unfinished phase.
+
+### Ingestion (Agent Plan Ingestion)
+- Triggers: "Ingest plan", "Ingest mo ang plan", "Compile actionable plan", "Finalize plan JSON"
+- Action:
+  - Follow `agent_plan_ingestion.mdc`: Phase 0 + derived phases → human-readable draft → on approval output JSON (content-only; operator/system saves)

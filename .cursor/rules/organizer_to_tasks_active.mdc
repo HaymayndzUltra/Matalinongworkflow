@@ -41,7 +41,9 @@ alwaysApply: true
 - Hard errors if:
   - Phase 0 is missing or not first
   - Any phase lacks `IMPORTANT NOTE:`
-  - Non-monotonic completion appears in `todos`
+ 
+ - Warnings (not blocking during forward progress):
+   - Lint reports "Completion is non-monotonic (undone after done)" while later phases remain undone
 
 ### Prohibitions and Safety
 - No direct writes to any queue/state files by the agent.

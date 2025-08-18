@@ -4,6 +4,8 @@ alwaysApply: true
 
 ## Additional Triggers → Required Actions
 
+Note: Ingestion triggers are defined in `trigger_phrases.mdc` (canonical). Do not duplicate ingestion mappings here. This file only augments Validate/Inspect/Execute/Done heuristics.
+
 ### DRY RUN (Read-only Simulation)
 - Triggers: "Dry run", "Dry run next phase", "Dry run all", "Run dry run", "Simulate plan", "Simulate phases", "DRY RUN (MAX_LOOPS:<n>)"
 - Actions:

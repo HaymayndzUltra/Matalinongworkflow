@@ -16,6 +16,8 @@ Triggers (match anywhere in the message; ignore inside quotes/code fences):
 - "Generate analysis doc (analysis-only)"
 - "Compile analysis doc (strict)" (enables strict enforcement + summary)
 
+This path is selected by the above Renderer triggers. It renders an analysis-only document; do NOT include Concluding Step blocks in the output.
+
 Input expectations:
 - Top-level is an array (or an object with key `tasks` mapping to an array).
 - Each task has: `id`, `description`, `status`, `created`, and `todos` (array).

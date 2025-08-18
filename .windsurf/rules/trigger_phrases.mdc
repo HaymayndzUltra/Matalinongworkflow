@@ -42,7 +42,7 @@ Agents MUST interpret the following phrases (Tagalog/English) anywhere in the us
     - `python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>` (when applicable)
 
 ### Safety & Enforcement
-- Always enforce IMPORTANT NOTE presence per `imporant_note_enforcement.mdc`.
+- Always enforce IMPORTANT NOTE presence per `important_note_enforcement.mdc`.
 - Honor the no-scripts, no-file-writes policy for ingestion/finalization.
 - Respect monotonic completion and sequence order.
 
