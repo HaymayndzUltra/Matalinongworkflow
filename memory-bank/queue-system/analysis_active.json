@@ -1,0 +1,31 @@
+[
+    {
+      "id": "deep_analysis_integration_actionable_20250818",
+      "description": "Deep Analysis Integration Proposal and Action Plan (memory-bank/plan/organize.md).",
+      "todos": [
+        {
+          "text": "PHASE 0: SETUP & PROTOCOL (READ FIRST)\n\n**Explanations:**\nEstablish Deep Analysis as the authoritative workflow. Use dual SOTs for execution and analysis, and enforce a hard gate linking them before any execution side-effects.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Do not modify queue/state files directly; produce content-only outputs.\n- Treat `.cursor/rules/deep_analysis.mdc` as the source of truth for analysis structure and gating.\n- All timestamps must be ISO `+08:00`.\n- Read-only analyzers may be invoked in later phases; execution (side-effects) is only allowed after the hard gate passes.",
+          "done": true
+        },
+        {
+          "text": "PHASE 1: Finalize SOTs and the Hard Gate\n\n**Explanations:**\nDefine dual Sources of Truth and the Deep Analysis Gate that blocks execution until analysis is fully complete and non-conflicting.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Execution SOT: `memory-bank/queue-system/tasks_active.json`\n- Analysis SOT: `memory-bank/queue-system/analysis_active.json` with `source_task_id` referencing the execution task, and todos containing Purpose, Scope, Checks, Logic Parity Check, Decision Gate, Findings, IMPORTANT NOTE.\n- The gate must block if any analysis phase is not done, lacks Decision Gate/IMPORTANT NOTE, or contains Findings of Type: Conflict or Type: Duplicate.",
+          "done": true
+        },
+        {
+          "text": "PHASE 2: Modify Scripts for Mode/Gate\n\n**Explanations:**\nMake `todo_manager.py`, `plan_next.py`, and `plain_hier.py` mode-aware and add a reusable Deep Analysis Gate check. Block `exec --run` and `done` in execution mode when the gate fails.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- `todo_manager.py`: add `--mode execution|analysis` to CRUD-like cmds; enforce gate for `exec --run` and for `done` in execution mode; allow preview without gate.\n- `plan_next.py`: add `--mode execution|analysis` and `--gate --task-id <ID>` to print PASS/BLOCK and exit non-zero on BLOCK.\n- `plain_hier.py`: add `--mode execution|analysis` for read-only views.",
+          "done": true
+        },
+        {
+          "text": "PHASE 3: Update Rules for Compliance\n\n**Explanations:**\nAlign rules to require the Deep Analysis Gate before execution, document new flags, and extend triggers for deep analysis usage.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- Update `exec_policy.mdc`: require `python3 plan_next.py --gate --task-id <TASK_ID>` PASS before `exec --run` and `done`.\n- Update `phase_gates.mdc`: add Gate 0 (Deep Analysis Gate) before existing gates.\n- Update `trigger_phrases.mdc`: add triggers for `[deep-analysis:only]`, deep analysis validation, and analysis gate checks.\n- Update `analysis_tools.mdc`, `tasks_active_schema.mdc`, `todo_manager_flow.mdc`; optionally note gate in `tool_usage_guarantee.mdc` and `done_enforcement.mdc`.",
+          "done": false
+        },
+        {
+          "text": "PHASE 4: Verify Integration\n\n**Explanations:**\nProve the gate blocks when analysis is missing/incomplete/conflicting and allows execution once analysis passes.\n\n**Concluding Step: Phase Completion Protocol**\n```bash\npython3 todo_manager.py show <task_id ReplaceAll>\npython3 todo_manager.py done <task_id ReplaceAll> <PHASE_INDEX>\n```\n\nIMPORTANT NOTE: [SYNTHESIZED FROM ORGANIZER]\n- BLOCK examples: no `analysis_active.json`, missing `source_task_id`, any analysis phase not done, missing Decision Gate/IMPORTANT NOTE, or Findings with Conflict/Duplicate.\n- PASS: after a fully completed, compliant analysis task linked to the execution task.",
+          "done": false
+        }
+      ],
+      "status": "in_progress",
+      "created": "2025-08-18T19:15:00+08:00",
+      "updated": "2025-08-18T23:40:48.660836+08:00"
+    }
+  ]
