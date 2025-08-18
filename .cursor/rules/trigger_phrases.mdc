@@ -53,6 +53,12 @@ Agents MUST interpret the following phrases (Tagalog/English) anywhere in the us
     - `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
     - `python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>` (when applicable)
 
+### Next Action Heuristic (Always-On Suggestions)
+- After any action, the assistant should propose the most appropriate next trigger command, following `next_action_suggestions.mdc`.
+- Render suggestions exactly as:
+  - `Suggested next trigger: <exact command>`
+  - Optional: `Alternate: <exact command>`
+
 ### Safety & Enforcement
 - Always enforce IMPORTANT NOTE presence per `imporant_note_enforcement.mdc`.
 - Honor the no-scripts, no-file-writes policy for ingestion/finalization.

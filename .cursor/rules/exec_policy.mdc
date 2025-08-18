@@ -13,3 +13,7 @@ alwaysApply: true
   - Editing `memory-bank/queue-system/tasks_active.json` directly
   - Queue transitions or priority changes
   - Running arbitrary commands unrelated to the current phase
+
+## POST-ACTION SUGGESTION POLICY (REQUIRED)
+- After each allowed command is executed (validate/show/exec/done), the assistant MUST suggest the next best trigger, per `next_action_suggestions.mdc`.
+- Suggestions must be concrete commands, not prose.

@@ -1,0 +1,56 @@
+---
+description: Automatic next-step trigger suggestions after actions
+alwaysApply: true
+---
+
+## Post-Action Next-Step Suggestions (Required)
+
+Goal: After every action the assistant performs (validate, show, exec, done), the assistant MUST immediately suggest the most appropriate next trigger command so the user never has to search for it.
+
+### General Policy
+- Always end responses with a single-line suggestion:
+  - Format: `Suggested next trigger: <exact command>`
+  - If multiple options are contextually valid, list the primary then an alternate on the next line starting with `Alternate:`.
+- Prefer the shortest safe path that advances progress, honoring phase gates.
+- Respect read-only vs side-effect commands: preview first, run later when explicitly requested.
+
+### Mappings by Last Action
+- After `python3 plan_next.py` (execution mode):
+  - Suggest hierarchy then execution preview for the next unfinished phase K.
+  - `Suggested next trigger: python3 plain_hier.py <TASK_ID>`
+  - `Alternate: python3 todo_manager.py exec <TASK_ID> K`
+
+- After `python3 plain_hier.py <TASK_ID>`:
+  - Suggest execution preview for phase K (or K.N if a specific sub-step is desired).
+  - `Suggested next trigger: python3 todo_manager.py exec <TASK_ID> K`
+
+- After `python3 todo_manager.py exec <TASK_ID> K[.N]` (preview only; no --run):
+  - Suggest run if safe, otherwise show plan.
+  - `Suggested next trigger: python3 todo_manager.py exec <TASK_ID> K[.N] --run`
+  - `Alternate: python3 todo_manager.py show <TASK_ID>`
+
+- After `python3 todo_manager.py exec <TASK_ID> K[.N] --run`:
+  - Suggest marking the phase done or previewing the next sub-step/phase.
+  - `Suggested next trigger: python3 todo_manager.py done <TASK_ID> K`
+  - `Alternate: python3 plan_next.py`
+
+- After `python3 todo_manager.py done <TASK_ID> K`:
+  - Suggest validation + next-phase execution preview.
+  - `Suggested next trigger: python3 plan_next.py`
+  - `Alternate: python3 todo_manager.py exec <TASK_ID> (K+1)`
+
+- After "Finalize JSON" (plan ingestion completed):
+  - Suggest validate then hierarchy view.
+  - `Suggested next trigger: python3 plan_next.py`
+  - `Alternate: python3 plain_hier.py <TASK_ID>`
+
+### Deep Analysis Awareness (if enabled in your workflow)
+- If a Deep Analysis Gate is part of the workflow and the gate is BLOCK:
+  - Suggest analysis inspection commands instead of execution.
+  - `Suggested next trigger: python3 plan_next.py --mode analysis`
+  - `Alternate: python3 plain_hier.py --mode analysis <ANALYSIS_TASK_ID>`
+
+Notes:
+- `<TASK_ID>` and indices (K, K.N) should be filled using the current context (next unfinished phase shown by `plan_next.py`).
+- Keep suggestions concise; do not include prose between multiple suggestions—use the exact "Suggested next trigger:" and optional "Alternate:" lines only.
+
