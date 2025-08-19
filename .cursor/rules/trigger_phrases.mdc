@@ -19,3 +19,13 @@
 - Action:
   - Follow `agent_plan_ingestion.mdc`: Phase 0 + derived phases → human-readable draft → on approval output JSON
   - If latest USER message contains `[ingest:auto_write:on]`, auto-write the generated JSON to `memory-bank/queue-system/tasks_active.json`; otherwise, operator/system saves.
+
+### Unified Analysis (No Gates)
+- Triggers: "Unified analysis", "Run unified analysis", "Compile unified analysis report", "Unified audit", "Generate unified analysis (no gate)"
+- Action:
+  - Follow `unified_analysis_no_gate.mdc`: read `tasks_active.json` and render the unified per-phase analysis report with global sections. Do not execute or write files.
+
+### Unified Analysis and Search (No Gates, optional free exec)
+- Triggers: "Unified analysis and search", "Iterative analysis"
+- Action:
+  - Follow `unified_analysis_no_gate.mdc`: iteratively search/validate per phase. If `[exec:free:on]` is present, arbitrary discovery commands are allowed; otherwise, default whitelist applies.
