@@ -25,7 +25,9 @@ Objective: Any AI/session MUST generate an actionable, phase-gated plan directly
 2) JSON Finalization (Ready for tasks_active.json)
    - After approval, produce a single JSON array with one task object following the schema in `tasks_active_schema.mdc`.
    - Set `id` to `<slug>_actionable_<YYYYMMDD>`; timestamps must be ISO with `+08:00` timezone.
-   - Do not write files. Output JSON content only; the system/operator will place it into `memory-bank/queue-system/tasks_active.json`.
+   - Auto-write behavior:
+     - If `[ingest:auto_write:on]` is present in the latest USER message, the agent MAY write directly to `memory-bank/queue-system/tasks_active.json`.
+     - Otherwise, output JSON content only; the system/operator will place it into `memory-bank/queue-system/tasks_active.json`.
 
 ### IMPORTANT NOTE Enforcement
 - Every phase MUST end with an `IMPORTANT NOTE:`. If any phase lacks it, halt and request clarification or provide a sourced synthesis.
@@ -36,7 +38,7 @@ Objective: Any AI/session MUST generate an actionable, phase-gated plan directly
   - `python3 plain_hier.py <task_id Replace All>` → Verify progress counters, phase list, and command preview.
 
 ### Constraints
-- No direct edits to queue/state files by the agent. JSON is provided as content-only output.
+- Without the auto-write token, no direct edits to queue/state files by the agent. JSON is provided as content-only output.
 - Queue transitions remain autonomous. This protocol is for plan creation only.
 
 ### Triggers
