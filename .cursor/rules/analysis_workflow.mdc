@@ -1,0 +1,57 @@
+---
+description: Pre-Execution Analysis Orchestrator — phase-by-phase hard-gated workflow
+alwaysApply: false
+---
+
+## Pre-Execution Analysis Workflow (Hard Gate)
+
+Objective: Iterate each phase of `memory-bank/queue-system/tasks_active.json` and perform a deep, single-phase analysis using `analyzer.py`. Halt on first non-empty finding set. Continue only when the phase is clean.
+
+### State
+- Current phase index K is maintained externally by the operator or by re-running this workflow; the workflow always starts at the first unfinished analysis phase in `analysis_active.json` linked to the execution task.
+
+### Inputs
+- Execution task: `memory-bank/queue-system/tasks_active.json` (array, exactly one task)
+- Analysis mirror: `memory-bank/queue-system/analysis_active.json` (linked via `source_task_id`)
+- Repo root: repository top-level (auto-detected by scripts)
+
+### Loop (K = 0..N)
+1. Identify execution task `T` and its `todos`.
+2. For phase K (0-based), call the analysis engine:
+   ```bash
+   python3 analyzer.py --tasks-file /workspace/memory-bank/queue-system/tasks_active.json --phase-index K --repo-root /workspace > /tmp/analysis_K.json
+   ```
+3. Parse JSON and check `.findings.length`:
+   - If > 0: HALT immediately. Present findings. Wait for rerun trigger on the same K after remediation.
+   - If == 0: Mark analysis phase K done in `analysis_active.json` and proceed to K+1.
+
+### Hard Gate Logic
+- Any non-empty findings list blocks forward progress.
+- Findings must be surfaced with: category, severity, description, evidence (path/line/snippet).
+- All K ∈ [0..N] must pass with zero findings to declare the plan Verified.
+
+### Commands (reference)
+```bash
+# Ensure an analysis task exists (linked to execution task)
+python3 todo_manager.py new "Pre-execution analysis for <EXEC_TASK_ID>" --mode analysis
+python3 todo_manager.py add <ANALYSIS_TASK_ID> "PHASE 0: SETUP & PROTOCOL (READ FIRST) — ANALYSIS\n\nPurpose: ...\n\nDecision Gate: ...\n\nIMPORTANT NOTE: ..." --mode analysis
+
+# For each K, run analyzer (read-only) and write findings preview
+python3 analyzer.py --tasks-file /workspace/memory-bank/queue-system/tasks_active.json --phase-index K --repo-root /workspace > /tmp/analysis_K.json
+
+# HALT rule: if jq '.findings | length' > 0 → stop and display
+cat /tmp/analysis_K.json | jq -r '.findings[] | "- [\(.category)] (\(.severity)) \(.description)"'
+
+# If zero findings, mark analysis K done
+python3 todo_manager.py done <ANALYSIS_TASK_ID> K --mode analysis
+```
+
+### Completion
+- When all phases K are done in `analysis_active.json` and each had zero findings, emit:
+  - "Verified and Ready for Execution."
+
+### IMPORTANT NOTE
+- This orchestrator is analysis-only. It must not execute any side-effectful commands from execution phases.
+- The hard gate blocks `todo_manager.py exec --run` and `done` on execution tasks until analysis phases are all completed without findings.
+- Findings must be addressed via code/plan changes before rerunning the same K.
+
