@@ -23,7 +23,7 @@ install:
 	$(ACTIVATE) $(PIP) install -r "$(KYC_DIR)/requirements.txt"
 
 api:
-	$(ACTIVATE) uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+	$(ACTIVATE) uvicorn src.api.app:app --host 0.0.0.0 --port 8000
 
 test:
 	$(ACTIVATE) pytest -q "$(TEST_DIR)"

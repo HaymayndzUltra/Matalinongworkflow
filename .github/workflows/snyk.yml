@@ -1,0 +1,96 @@
+name: security-snyk
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  snyk-open-source-and-code:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Snyk CLI
+        uses: snyk/actions/setup@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Snyk Open Source (requirements.txt) — test
+        uses: snyk/actions/python@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --file="KYC VERIFICATION/requirements.txt" --severity-threshold=high --sarif-file-output=snyk_oss.sarif
+
+      - name: Snyk Open Source — monitor
+        run: snyk monitor --file="KYC VERIFICATION/requirements.txt" --project-name="kyc-python"
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Snyk Open Source results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk_oss.sarif
+
+      - name: Snyk Code (SAST) — test
+        run: snyk code test --severity-threshold=high --sarif-file-output=snyk_code.sarif
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Snyk Code — monitor
+        run: snyk code monitor --project-name="kyc-python-code"
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Upload Snyk Code results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk_code.sarif
+
+  snyk-container:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Snyk CLI
+        uses: snyk/actions/setup@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build -t kyc-api:ci .
+
+      - name: Snyk Container test
+        uses: snyk/actions/docker@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          image: kyc-api:ci
+          args: --severity-threshold=high --file=Dockerfile --sarif-file-output=snyk_container.sarif
+
+      - name: Upload Snyk Container results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: snyk_container.sarif
+
+      - name: Snyk Container — monitor
+        run: snyk monitor --docker kyc-api:ci --file=Dockerfile --project-name="kyc-api-container"
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+

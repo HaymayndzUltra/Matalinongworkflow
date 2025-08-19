@@ -823,61 +823,61 @@ async def liveness_check():
     }
 
 
-    @app.get("/ready", response_model=ReadyResponse, tags=["Health"])
-    async def readiness_check():
-        """
-        Readiness check endpoint
-        
-        Verifies all dependencies are available. This endpoint must never crash
-        even if optional heavy dependencies (e.g., dlib, torch) are missing.
-        """
-        def _has(component_name: str) -> bool:
-            try:
-                return get_component(component_name) is not None
-            except Exception:
-                # Treat missing optional deps as not-ready for that component,
-                # but keep the readiness endpoint functioning.
-                return False
+@app.get("/ready", response_model=ReadyResponse, tags=["Health"])
+async def readiness_check():
+    """
+    Readiness check endpoint
+    
+    Verifies all dependencies are available. This endpoint must never crash
+    even if optional heavy dependencies (e.g., dlib, torch) are missing.
+    """
+    def _has(component_name: str) -> bool:
+        try:
+            return get_component(component_name) is not None
+        except Exception:
+            # Treat missing optional deps as not-ready for that component,
+            # but keep the readiness endpoint functioning.
+            return False
 
-        # Check component initialization (best-effort)
-        dependencies = {
-            # Minimal set to consider the service responsive: quality + classifier
-            "ml_models": all([
-                _has("quality_analyzer"),
-                _has("document_classifier"),
-                # Face matcher can be heavy (dlib); do not block readiness on it
-                _has("face_matcher") or False,
-            ]),
-            "extractors": all([
-                _has("ocr_extractor"),
-                _has("mrz_parser"),
-                _has("barcode_reader"),
-            ]),
-            "risk_engine": all([
-                _has("risk_scorer"),
-                _has("decision_engine"),
-            ]),
-            "vendor_apis": _has("vendor_orchestrator"),
-        }
+    # Check component initialization (best-effort)
+    dependencies = {
+        # Minimal set to consider the service responsive: quality + classifier
+        "ml_models": all([
+            _has("quality_analyzer"),
+            _has("document_classifier"),
+            # Face matcher can be heavy (dlib); do not block readiness on it
+            _has("face_matcher") or False,
+        ]),
+        "extractors": all([
+            _has("ocr_extractor"),
+            _has("mrz_parser"),
+            _has("barcode_reader"),
+        ]),
+        "risk_engine": all([
+            _has("risk_scorer"),
+            _has("decision_engine"),
+        ]),
+        "vendor_apis": _has("vendor_orchestrator"),
+    }
 
-        # Consider service ready if core pieces respond; do not require biometrics
-        core_ready = dependencies["ml_models"] and dependencies["extractors"]
-        ready = bool(core_ready)
-        
-        return ReadyResponse(
-            ready=ready,
-            dependencies=dependencies,
-            timestamp=datetime.now(get_ph_timezone())
-        )
+    # Consider service ready if core pieces respond; do not require biometrics
+    core_ready = dependencies["ml_models"] and dependencies["extractors"]
+    ready = bool(core_ready)
+    
+    return ReadyResponse(
+        ready=ready,
+        dependencies=dependencies,
+        timestamp=datetime.now(get_ph_timezone())
+    )
 
     # Minimal mobile KYC capture UI (inline fallback if file missing)
-    @app.get("/web/mobile_kyc.html", response_class=HTMLResponse, include_in_schema=False)
-    async def mobile_kyc_page():
-        html_path = Path(__file__).resolve().parent.parent / "web" / "mobile_kyc.html"
-        if html_path.exists():
-            return HTMLResponse(html_path.read_text(encoding="utf-8"))
-        # Inline fallback content
-        return HTMLResponse("""
+@app.get("/web/mobile_kyc.html", response_class=HTMLResponse, include_in_schema=False)
+async def mobile_kyc_page():
+    html_path = Path(__file__).resolve().parent.parent / "web" / "mobile_kyc.html"
+    if html_path.exists():
+        return HTMLResponse(html_path.read_text(encoding="utf-8"))
+    # Inline fallback content
+    return HTMLResponse("""
 <!doctype html>
 <html lang=\"en\"><head><meta charset=\"utf-8\"/><meta name=\"viewport\" content=\"width=device-width,initial-scale=1,viewport-fit=cover\"/>
 <title>Mobile KYC Capture</title>
