@@ -26,18 +26,16 @@ This path is selected by explicit requests to ingest analysis from `tasks_active
      - `IMPORTANT NOTE:` constraints (analysis-only; no edits/execution).
    - Present the complete draft for approval.
 
-2) JSON Finalization (Content-Only by default)
+2) JSON Finalization (Content-Only)
    - After approval, produce a single JSON array (one task object) mirroring the draft.
    - Set `id` to `<original_slug>_analysis_<YYYYMMDD>`; timestamps must be ISO with `+08:00` timezone.
-   - Auto-write behavior:
-     - If `[ingest:auto_write:on]` is present in the latest USER message, the agent MAY write directly to `memory-bank/queue-system/analysis_active.json`.
-     - Otherwise, output JSON content only; the system/operator will place it where needed.
+   - Do not write files. Output JSON content only; the system/operator will place it where needed.
 
 ### IMPORTANT NOTE Enforcement
 - Every analysis phase MUST end with an `IMPORTANT NOTE:`. If any phase lacks it, halt and request clarification or provide a sourced synthesis.
 
 ### Constraints
-- Without the auto-write token, no direct edits to queue/state files by the agent; analysis remains content-only.
+- No direct edits to queue/state files by the agent; analysis is content-only.
 - Single source of truth for analysis: `tasks_active.json`. If missing or malformed, respond with:
   ```json
   {"status":"INSUFFICIENT_EVIDENCE","follow_up":"tasks_active.json not found or invalid"}
