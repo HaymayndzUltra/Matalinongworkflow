@@ -9,8 +9,11 @@ alwaysApply: true
   - `python3 plain_hier.py <task_id ReplaceAll ReplaceAll ReplaceAll ReplaceAll ReplaceAll ReplaceAll ReplaceAll>` (read-only)
   - `python3 plan_next.py` (read-only)
   - Producing JSON content for `tasks_active.json` (agent output only; no direct file writes)
+  - Conditional auto-write (ingestion artifacts only) when `[ingest:auto_write:on]` is present:
+    - Write `memory-bank/queue-system/tasks_active.json`
+    - Write `memory-bank/queue-system/analysis_active.json`
 - Forbidden:
-  - Editing `memory-bank/queue-system/tasks_active.json` directly
+  - Editing `memory-bank/queue-system/tasks_active.json` directly (unless token-enabled as above)
   - Queue transitions or priority changes
   - Running arbitrary commands unrelated to the current phase
 

@@ -17,4 +17,5 @@
 ### Ingestion (Agent Plan Ingestion)
 - Triggers: "Ingest plan", "Ingest mo ang plan", "Compile actionable plan", "Finalize plan JSON"
 - Action:
-  - Follow `agent_plan_ingestion.mdc`: Phase 0 + derived phases → human-readable draft → on approval output JSON (content-only; operator/system saves)
+  - Follow `agent_plan_ingestion.mdc`: Phase 0 + derived phases → human-readable draft → on approval output JSON
+  - If latest USER message contains `[ingest:auto_write:on]`, auto-write the generated JSON to `memory-bank/queue-system/tasks_active.json`; otherwise, operator/system saves.
