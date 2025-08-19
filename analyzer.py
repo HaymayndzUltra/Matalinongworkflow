@@ -1,20 +1,24 @@
 #!/usr/bin/env python3
 """
-analyzer.py — Phase-by-phase Pre-Execution Analysis
+analyzer.py — Phase-by-phase Pre-Execution Analysis (auto repo-root detection)
 
 Purpose
   Analyze a single phase (index K) from tasks_active.json against the repository
   to detect semantic duplicates, architectural conflicts, codebase misalignment,
   missing dependencies, and blind spots. Outputs a structured JSON report.
 
+Key features
+  - Auto-detects repository root (walks upward for memory-bank/queue-system/tasks_active.json;
+    falls back to git top-level; then CWD)
+  - Defaults tasks file to <repo_root>/memory-bank/queue-system/tasks_active.json
+  - Proactive mode performs repo-wide audits (CI policies, port collisions, global Dockerfile policies)
+
 CLI
-  python3 analyzer.py --tasks-file /path/to/tasks_active.json --phase-index K --repo-root /path/to/repo
+  python3 analyzer.py --phase-index K [--proactive]
+  python3 analyzer.py --tasks-file /abs/tasks_active.json --phase-index K --repo-root /abs/repo
+  python3 analyzer.py --tasks-json "$(cat tasks_active.json)" --phase-index K --repo-root /abs/repo
 
-  Alternatively, pass the full JSON content directly:
-  python3 analyzer.py --tasks-json "$(cat /path/to/tasks_active.json)" --phase-index K --repo-root /path/to/repo
-
-Output
-  Prints JSON to stdout with the schema:
+Output JSON schema
   {
     "phase_index": int,
     "title": str,
@@ -28,10 +32,6 @@ Output
       ...
     ]
   }
-
-Notes
-  - Heuristic-based; conservative thresholds to reduce false positives.
-  - Scans common text/code files; skips large/binary/ignored folders.
 """
 
 from __future__ import annotations
@@ -41,6 +41,7 @@ import json
 import os
 import re
 import sys
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
@@ -81,6 +82,42 @@ def iter_repo_files(root: Path) -> Iterable[Path]:
             p = Path(dirpath) / name
             if should_scan_file(p):
                 yield p
+
+
+# --------------------------- Repo Root Detection ---------------------------
+
+def _find_root_with_tasks(start: Path) -> Optional[Path]:
+    cur = start.resolve()
+    while True:
+        if (cur / "memory-bank" / "queue-system" / "tasks_active.json").exists():
+            return cur
+        if cur.parent == cur:
+            break
+        cur = cur.parent
+    return None
+
+
+def _detect_repo_root() -> Path:
+    # 1) CWD → upwards
+    cwd = Path.cwd()
+    root = _find_root_with_tasks(cwd)
+    if root:
+        return root
+    # 2) analyzer.py location → upwards
+    here = Path(__file__).resolve().parent
+    root = _find_root_with_tasks(here)
+    if root:
+        return root
+    # 3) git top-level
+    try:
+        top = subprocess.check_output(["git", "rev-parse", "--show-toplevel"], stderr=subprocess.DEVNULL).decode().strip()
+        root = _find_root_with_tasks(Path(top))
+        if root:
+            return root
+    except Exception:
+        pass
+    # 4) fallback to cwd
+    return cwd
 
 
 # --------------------------- Text Utilities -------------------------------
@@ -163,7 +200,6 @@ def detect_semantic_duplicates(phase_text: str, repo_root: Path) -> List[Finding
         file_bow = bow(text)
         sim = cosine(phase_bow, file_bow)
         if sim >= threshold:
-            # collect a few top evidence lines that match prominent keywords
             keywords = sorted(phase_bow, key=lambda k: phase_bow[k], reverse=True)[:6]
             pattern = re.compile(r"|".join(re.escape(k) for k in keywords if k), re.I) if keywords else re.compile(r"^$")
             ev_lines = lines_with_regex(text, pattern)[:5]
@@ -194,7 +230,6 @@ def detect_architectural_conflicts(phase_text: str, repo_root: Path) -> List[Fin
         "observability": re.compile(r"UnifiedObservabilityCenter|observability", re.I),
     }
 
-    # quick scan corpus of repo
     file_cache: List[Tuple[Path, str]] = []
     for fp in iter_repo_files(repo_root):
         try:
@@ -210,7 +245,6 @@ def detect_architectural_conflicts(phase_text: str, repo_root: Path) -> List[Fin
                 hits.append((p, ln, sn))
         return hits
 
-    # Check each policy only if implied by phase text, to limit noise
     for name, marker in policy_markers.items():
         if marker.search(phase_text):
             hits = repo_has(marker)
@@ -222,11 +256,9 @@ def detect_architectural_conflicts(phase_text: str, repo_root: Path) -> List[Fin
                     evidence=[],
                 ))
 
-    # Dockerfile policy checks
     dockerfiles = [p for p, _ in file_cache if p.name == "Dockerfile"]
     docker_texts = {p: (p.read_text(encoding="utf-8", errors="ignore") if p.exists() else "") for p in dockerfiles}
 
-    # Non-root user enforcement
     expects_non_root = re.search(r"non[- ]root|uid:gid|user\s+10001", phase_text, re.I) is not None
     if expects_non_root and dockerfiles:
         nonroot_evidence: List[Evidence] = []
@@ -241,7 +273,6 @@ def detect_architectural_conflicts(phase_text: str, repo_root: Path) -> List[Fin
                 evidence=[],
             ))
 
-    # Tini presence
     expects_tini = re.search(r"\btini\b", phase_text, re.I) is not None
     if expects_tini and dockerfiles:
         tini_ev: List[Evidence] = []
@@ -257,7 +288,6 @@ def detect_architectural_conflicts(phase_text: str, repo_root: Path) -> List[Fin
                 evidence=[],
             ))
 
-    # CUDA baseline
     expects_cuda = re.search(r"cuda\s*12\.1|cu121|TORCH_CUDA_ARCH_LIST", phase_text, re.I) is not None
     if expects_cuda and dockerfiles:
         cuda_ev: List[Evidence] = []
@@ -277,7 +307,6 @@ def detect_architectural_conflicts(phase_text: str, repo_root: Path) -> List[Fin
 
 def _extract_bash_code_blocks(text: str) -> List[str]:
     blocks: List[str] = []
-    # ```bash ... ``` or ```sh ... ``` or untyped fences
     fence = re.compile(r"```(?:bash|sh)?\n([\s\S]*?)\n```", re.I | re.M)
     for m in fence.finditer(text or ""):
         blocks.append(m.group(1))
@@ -287,7 +316,7 @@ def _extract_bash_code_blocks(text: str) -> List[str]:
 def detect_missing_dependencies(phase_text: str, repo_root: Path) -> List[Finding]:
     findings: List[Finding] = []
 
-    # Extract apt/pip installs ONLY from fenced bash/sh code blocks to reduce noise
+    # Extract apt/pip installs ONLY from fenced bash/sh code blocks
     req_tokens: List[str] = []
     for block in _extract_bash_code_blocks(phase_text):
         for line in block.splitlines():
@@ -297,16 +326,14 @@ def detect_missing_dependencies(phase_text: str, repo_root: Path) -> List[Findin
                 req_tokens.extend(pkgs)
             m_pip = re.search(r"pip\s+install\s+(.+)$", line.strip(), flags=re.I)
             if m_pip:
-                pkgs = [p for p in re.split(r"\s+", m_pip.group(1)) if p and not p.startswith("-") and not p.startswith("-")]
-                # skip -r requirements.txt patterns (handled via requirements files)
                 if "-r" in line or "--requirement" in line:
                     continue
+                pkgs = [p for p in re.split(r"\s+", m_pip.group(1)) if p and not p.startswith("-")]
                 req_tokens.extend(pkgs)
 
     req_tokens = [t for t in req_tokens if re.match(r"^[A-Za-z0-9_.+-]{2,}$", t)]
     req_tokens = list(dict.fromkeys(req_tokens))[:40]
 
-    # Build sets of known deps from repo
     requirements_files = [p for p in iter_repo_files(repo_root) if p.name.lower().startswith("requirements")]
     pip_known: set[str] = set()
     for rf in requirements_files:
@@ -317,7 +344,7 @@ def detect_missing_dependencies(phase_text: str, repo_root: Path) -> List[Findin
                     if pkg:
                         pip_known.add(pkg.lower())
         except Exception:
-            continue
+            pass
 
     apt_known: set[str] = set()
     for p in iter_repo_files(repo_root):
@@ -332,7 +359,6 @@ def detect_missing_dependencies(phase_text: str, repo_root: Path) -> List[Findin
                     if pkg and not pkg.startswith("-"):
                         apt_known.add(pkg.lower())
 
-    # Check missing
     for token in req_tokens:
         low = token.lower()
         if low in {"apt", "apt-get", "install", "pip"}:
@@ -350,7 +376,6 @@ def detect_missing_dependencies(phase_text: str, repo_root: Path) -> List[Findin
 
 def detect_blind_spots(phase_text: str, repo_root: Path) -> List[Finding]:
     findings: List[Finding] = []
-    # Example blind spots inferred from text
     patterns = {
         "health_endpoint": re.compile(r"/health", re.I),
         "rollback_prev_tag": re.compile(r"\bprev\b|FORCE_IMAGE_TAG", re.I),
@@ -382,44 +407,6 @@ def detect_blind_spots(phase_text: str, repo_root: Path) -> List[Finding]:
 
     return findings
 
-
-# --------------------------- Phase Extraction -----------------------------
-
-def load_tasks_from_args(tasks_file: Optional[str], tasks_json: Optional[str]) -> List[Dict[str, object]]:
-    if not tasks_file and not tasks_json:
-        raise SystemExit("Provide --tasks-file or --tasks-json")
-    data: object
-    if tasks_json:
-        data = json.loads(tasks_json)
-    else:
-        path = Path(tasks_file)  # type: ignore[arg-type]
-        if not path.exists():
-            raise SystemExit(f"tasks file not found: {path}")
-        data = json.loads(path.read_text(encoding="utf-8"))
-    if isinstance(data, dict) and "tasks" in data:
-        data = data["tasks"]  # legacy wrapper
-    if not isinstance(data, list):
-        raise SystemExit("tasks JSON must be a list of task objects")
-    return data  # type: ignore[return-value]
-
-
-def get_phase_text(tasks: List[Dict[str, object]], phase_index: int) -> Tuple[str, str]:
-    if not tasks:
-        raise SystemExit("no tasks present in tasks JSON")
-    task = tasks[0]
-    todos = task.get("todos", []) if isinstance(task, dict) else []
-    if not isinstance(todos, list) or phase_index < 0 or phase_index >= len(todos):
-        raise SystemExit(f"invalid phase index: {phase_index}")
-    td = todos[phase_index]
-    if not isinstance(td, dict):
-        raise SystemExit("todo item is not an object")
-    text = str(td.get("text", ""))
-    # title is first line
-    title = (text.splitlines()[0] if text.strip() else f"PHASE {phase_index}").strip()
-    return title, text
-
-
-# --------------------------- Main -----------------------------------------
 
 def detect_ci_policy_gaps(phase_text: str, repo_root: Path) -> List[Finding]:
     findings: List[Finding] = []
@@ -470,7 +457,6 @@ def detect_ci_policy_gaps(phase_text: str, repo_root: Path) -> List[Finding]:
                     evidence=[],
                 ))
     else:
-        # If CI dir absent but expectations present, flag misalignment
         if any([expects_trivy, expects_sbom, expects_tags]):
             findings.append(Finding(
                 category="misalignment",
@@ -494,12 +480,10 @@ def detect_port_collisions(repo_root: Path) -> List[Finding]:
     current_service: Optional[str] = None
     for line in text.splitlines():
         if re.match(r"^[A-Za-z0-9_.-]+:\s*$", line.strip()):
-            # service block starter
             current_service = line.strip().split(":")[0]
         m = re.search(r"-\s*\"?(\d{2,5}):\d{2,5}\"?", line)
         if m:
             port = int(m.group(1))
-            svc = current_service or "(unknown)"
             host_ports.setdefault(str(port), []).append(port)
     duplicates = [int(p) for p, lst in host_ports.items() if len(lst) > 1]
     if duplicates:
@@ -599,20 +583,54 @@ def analyze_phase(tasks: List[Dict[str, object]], phase_index: int, repo_root: P
     }
 
 
+def load_tasks_from_args(tasks_file: Optional[str], tasks_json: Optional[str]) -> List[Dict[str, object]]:
+    if not tasks_file and not tasks_json:
+        raise SystemExit("Provide --tasks-file or --tasks-json")
+    data: object
+    if tasks_json:
+        data = json.loads(tasks_json)
+    else:
+        path = Path(tasks_file)  # type: ignore[arg-type]
+        if not path.exists():
+            raise SystemExit(f"tasks file not found: {path}")
+        data = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(data, dict) and "tasks" in data:
+        data = data["tasks"]
+    if not isinstance(data, list):
+        raise SystemExit("tasks JSON must be a list of task objects")
+    return data  # type: ignore[return-value]
+
+
+def get_phase_text(tasks: List[Dict[str, object]], phase_index: int) -> Tuple[str, str]:
+    if not tasks:
+        raise SystemExit("no tasks present in tasks JSON")
+    task = tasks[0]
+    todos = task.get("todos", []) if isinstance(task, dict) else []
+    if not isinstance(todos, list) or phase_index < 0 or phase_index >= len(todos):
+        raise SystemExit(f"invalid phase index: {phase_index}")
+    td = todos[phase_index]
+    if not isinstance(td, dict):
+        raise SystemExit("todo item is not an object")
+    text = str(td.get("text", ""))
+    title = (text.splitlines()[0] if text.strip() else f"PHASE {phase_index}").strip()
+    return title, text
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="Pre-Execution Analyzer (single-phase)")
     ap.add_argument("--tasks-file", help="Path to tasks_active.json", default=None)
     ap.add_argument("--tasks-json", help="Raw JSON content of tasks_active.json", default=None)
     ap.add_argument("--phase-index", type=int, required=True, help="Phase index to analyze (0-based)")
-    ap.add_argument("--repo-root", required=True, help="Path to repository root")
+    ap.add_argument("--repo-root", required=False, help="Path to repository root (auto-detected if omitted)")
     ap.add_argument("--output", help="Optional output JSON file path", default=None)
     ap.add_argument("--proactive", action="store_true", help="Enable proactive repo-wide audits (CI, ports, global Dockerfile policies)")
     args = ap.parse_args()
 
-    tasks = load_tasks_from_args(args.tasks_file, args.tasks_json)
-    repo_root = Path(args.repo_root)
+    repo_root = Path(args.repo_root) if args.repo_root else _detect_repo_root()
     if not repo_root.exists():
         raise SystemExit(f"repo root not found: {repo_root}")
+
+    tasks = load_tasks_from_args(args.tasks_file or str(repo_root / "memory-bank" / "queue-system" / "tasks_active.json"), args.tasks_json)
 
     report = analyze_phase(tasks, args.phase_index, repo_root, proactive=args.proactive)
     out_text = json.dumps(report, indent=2, ensure_ascii=False)
