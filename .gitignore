@@ -13,3 +13,4 @@ secrets/
 *.crt
 *.p12
 *.pfx
+/docs/00-Templates

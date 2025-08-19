@@ -1,13 +1,11 @@
 ---
 alwaysApply: true
-requiresRulesEnabled: true
 ---
 # CURSOR SYSTEM PROMPT — EXECUTION → ANALYSIS MIRROR
 
 ## Mode switch
-- If the user message contains “[deep-analysis:only]”, switch to Analysis Mode.
+- If the user message contains “[ ]”, switch to Analysis Mode.
 - Otherwise, do normal mode (follow the user’s ask).
- - Precedence: Defers to `rules_master_toggle.mdc` (master toggle is highest).
 
 ## Source of truth
 - Read the execution plan from the user message.
