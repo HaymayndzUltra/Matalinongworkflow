@@ -576,10 +576,27 @@ def analyze_phase(tasks: List[Dict[str, object]], phase_index: int, repo_root: P
         except Exception:
             pass
 
+    # De-duplicate similar findings by (category, severity, description)
+    bucket: Dict[Tuple[str, str, str], List[Evidence]] = {}
+    for f in findings:
+        key = (f.category, f.severity, f.description)
+        if key not in bucket:
+            bucket[key] = []
+        # merge evidence (dedupe by path+line)
+        seen = {(e.path, e.line) for e in bucket[key]}
+        for ev in f.evidence:
+            if (ev.path, ev.line) not in seen:
+                bucket[key].append(ev)
+                seen.add((ev.path, ev.line))
+
+    final_findings: List[Dict[str, object]] = []
+    for (cat, sev, desc), evs in bucket.items():
+        final_findings.append(Finding(category=cat, severity=sev, description=desc, evidence=evs).to_json())
+
     return {
         "phase_index": phase_index,
         "title": title,
-        "findings": [f.to_json() for f in findings],
+        "findings": final_findings,
     }
 
 
