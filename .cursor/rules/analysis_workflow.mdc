@@ -17,9 +17,9 @@ Objective: Iterate each phase of `memory-bank/queue-system/tasks_active.json` an
 
 ### Loop (K = 0..N)
 1. Identify execution task `T` and its `todos`.
-2. For phase K (0-based), call the analysis engine:
+2. For phase K (0-based), call the analysis engine (proactive mode on):
    ```bash
-   python3 analyzer.py --tasks-file /workspace/memory-bank/queue-system/tasks_active.json --phase-index K --repo-root /workspace > /tmp/analysis_K.json
+   python3 analyzer.py --tasks-file /workspace/memory-bank/queue-system/tasks_active.json --phase-index K --repo-root /workspace --proactive > /tmp/analysis_K.json
    ```
 3. Parse JSON and check `.findings.length`:
    - If > 0: HALT immediately. Present findings. Wait for rerun trigger on the same K after remediation.
@@ -36,8 +36,8 @@ Objective: Iterate each phase of `memory-bank/queue-system/tasks_active.json` an
 python3 todo_manager.py new "Pre-execution analysis for <EXEC_TASK_ID>" --mode analysis
 python3 todo_manager.py add <ANALYSIS_TASK_ID> "PHASE 0: SETUP & PROTOCOL (READ FIRST) — ANALYSIS\n\nPurpose: ...\n\nDecision Gate: ...\n\nIMPORTANT NOTE: ..." --mode analysis
 
-# For each K, run analyzer (read-only) and write findings preview
-python3 analyzer.py --tasks-file /workspace/memory-bank/queue-system/tasks_active.json --phase-index K --repo-root /workspace > /tmp/analysis_K.json
+# For each K, run analyzer (read-only, proactive) and write findings preview
+python3 analyzer.py --tasks-file /workspace/memory-bank/queue-system/tasks_active.json --phase-index K --repo-root /workspace --proactive > /tmp/analysis_K.json
 
 # HALT rule: if jq '.findings | length' > 0 → stop and display
 cat /tmp/analysis_K.json | jq -r '.findings[] | "- [\(.category)] (\(.severity)) \(.description)"'

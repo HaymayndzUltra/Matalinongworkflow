@@ -421,11 +421,142 @@ def get_phase_text(tasks: List[Dict[str, object]], phase_index: int) -> Tuple[st
 
 # --------------------------- Main -----------------------------------------
 
-def analyze_phase(tasks: List[Dict[str, object]], phase_index: int, repo_root: Path) -> Dict[str, object]:
+def detect_ci_policy_gaps(phase_text: str, repo_root: Path) -> List[Finding]:
+    findings: List[Finding] = []
+    workflows_dir = repo_root / ".github" / "workflows"
+    expects_trivy = re.search(r"trivy|HIGH/CRITICAL|severity", phase_text, re.I) is not None
+    expects_sbom = re.search(r"sbom|spdx|syft", phase_text, re.I) is not None
+    expects_tags = re.search(r"ghcr\.io|YYYYMMDD-<git_sha>", phase_text, re.I) is not None
+
+    if workflows_dir.exists():
+        texts: List[Tuple[Path, str]] = []
+        for fp in workflows_dir.glob("**/*"):
+            if fp.is_file() and fp.suffix in {".yml", ".yaml"}:
+                try:
+                    texts.append((fp, fp.read_text(encoding="utf-8", errors="ignore")))
+                except Exception:
+                    pass
+        def any_match(pat: re.Pattern[str]) -> List[Evidence]:
+            ev: List[Evidence] = []
+            for p, t in texts:
+                for ln, sn in lines_with_regex(t, pat):
+                    ev.append(Evidence(str(p), ln, sn[:200]))
+            return ev
+        if expects_trivy:
+            ev = any_match(re.compile(r"trivy|aquasecurity/trivy-action|severity|exit-code", re.I))
+            if not ev:
+                findings.append(Finding(
+                    category="misalignment",
+                    severity="MEDIUM",
+                    description="CI missing Trivy or severity-gated config.",
+                    evidence=[],
+                ))
+        if expects_sbom:
+            ev = any_match(re.compile(r"syft|sbom|spdx|anchore/sbom-action", re.I))
+            if not ev:
+                findings.append(Finding(
+                    category="misalignment",
+                    severity="MEDIUM",
+                    description="CI missing SBOM generation (syft/SPDX).",
+                    evidence=[],
+                ))
+        if expects_tags:
+            ev = any_match(re.compile(r"ghcr\.io|\bYYYYMMDD-[0-9a-f]{7,}\b", re.I))
+            if not ev:
+                findings.append(Finding(
+                    category="misalignment",
+                    severity="LOW",
+                    description="CI missing GHCR tag scheme references (date+git).",
+                    evidence=[],
+                ))
+    else:
+        # If CI dir absent but expectations present, flag misalignment
+        if any([expects_trivy, expects_sbom, expects_tags]):
+            findings.append(Finding(
+                category="misalignment",
+                severity="LOW",
+                description=".github/workflows not found but plan expects CI security/SBOM/tag policies.",
+                evidence=[],
+            ))
+    return findings
+
+
+def detect_port_collisions(repo_root: Path) -> List[Finding]:
+    findings: List[Finding] = []
+    compose = repo_root / "docker-compose.yml"
+    if not compose.exists():
+        return findings
+    try:
+        text = compose.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return findings
+    host_ports: Dict[str, List[int]] = {}
+    current_service: Optional[str] = None
+    for line in text.splitlines():
+        if re.match(r"^[A-Za-z0-9_.-]+:\s*$", line.strip()):
+            # service block starter
+            current_service = line.strip().split(":")[0]
+        m = re.search(r"-\s*\"?(\d{2,5}):\d{2,5}\"?", line)
+        if m:
+            port = int(m.group(1))
+            svc = current_service or "(unknown)"
+            host_ports.setdefault(str(port), []).append(port)
+    duplicates = [int(p) for p, lst in host_ports.items() if len(lst) > 1]
+    if duplicates:
+        findings.append(Finding(
+            category="conflict",
+            severity="HIGH",
+            description=f"docker-compose host port collisions detected: {sorted(set(duplicates))}",
+            evidence=[Evidence(str(compose), 1, "host:container port duplicates present")],
+        ))
+    return findings
+
+
+def detect_global_docker_policies(repo_root: Path, require_nonroot: bool, require_tini: bool) -> List[Finding]:
+    findings: List[Finding] = []
+    dockerfiles = list(p for p in iter_repo_files(repo_root) if p.name == "Dockerfile")
+    if not dockerfiles:
+        return findings
+    if require_nonroot:
+        offenders: List[str] = []
+        for p in dockerfiles:
+            try:
+                txt = p.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            if not re.search(r"^\s*USER\s+10001(?::10001)?\b", txt, re.I | re.M):
+                offenders.append(str(p))
+        if offenders:
+            findings.append(Finding(
+                category="conflict",
+                severity="HIGH",
+                description="Some Dockerfiles do not enforce non-root USER 10001:10001.",
+                evidence=[Evidence(path=o, line=1, snippet="USER missing") for o in offenders[:8]],
+            ))
+    if require_tini:
+        offenders: List[str] = []
+        for p in dockerfiles:
+            try:
+                txt = p.read_text(encoding="utf-8", errors="ignore")
+            except Exception:
+                continue
+            if not re.search(r"ENTRYPOINT\s+\[.*tini.*\]|tini\s+--", txt, re.I):
+                offenders.append(str(p))
+        if offenders:
+            findings.append(Finding(
+                category="conflict",
+                severity="HIGH",
+                description="Some Dockerfiles do not use tini as PID 1.",
+                evidence=[Evidence(path=o, line=1, snippet="tini missing") for o in offenders[:8]],
+            ))
+    return findings
+
+
+def analyze_phase(tasks: List[Dict[str, object]], phase_index: int, repo_root: Path, proactive: bool = False) -> Dict[str, object]:
     title, text = get_phase_text(tasks, phase_index)
     findings: List[Finding] = []
 
-    # Detectors
+    # Detectors (phase-scoped)
     try:
         findings.extend(detect_semantic_duplicates(text, repo_root))
     except Exception:
@@ -443,6 +574,24 @@ def analyze_phase(tasks: List[Dict[str, object]], phase_index: int, repo_root: P
     except Exception:
         pass
 
+    # Proactive repo-wide audits (policy/ports/CI) when enabled
+    if proactive:
+        try:
+            findings.extend(detect_ci_policy_gaps(text, repo_root))
+        except Exception:
+            pass
+        try:
+            findings.extend(detect_port_collisions(repo_root))
+        except Exception:
+            pass
+        try:
+            require_nr = re.search(r"non[- ]root|uid:gid|user\s+10001", text, re.I) is not None
+            require_tini = re.search(r"\btini\b", text, re.I) is not None
+            if require_nr or require_tini:
+                findings.extend(detect_global_docker_policies(repo_root, require_nr, require_tini))
+        except Exception:
+            pass
+
     return {
         "phase_index": phase_index,
         "title": title,
@@ -457,6 +606,7 @@ def main() -> None:
     ap.add_argument("--phase-index", type=int, required=True, help="Phase index to analyze (0-based)")
     ap.add_argument("--repo-root", required=True, help="Path to repository root")
     ap.add_argument("--output", help="Optional output JSON file path", default=None)
+    ap.add_argument("--proactive", action="store_true", help="Enable proactive repo-wide audits (CI, ports, global Dockerfile policies)")
     args = ap.parse_args()
 
     tasks = load_tasks_from_args(args.tasks_file, args.tasks_json)
@@ -464,7 +614,7 @@ def main() -> None:
     if not repo_root.exists():
         raise SystemExit(f"repo root not found: {repo_root}")
 
-    report = analyze_phase(tasks, args.phase_index, repo_root)
+    report = analyze_phase(tasks, args.phase_index, repo_root, proactive=args.proactive)
     out_text = json.dumps(report, indent=2, ensure_ascii=False)
     if args.output:
         Path(args.output).write_text(out_text, encoding="utf-8")
