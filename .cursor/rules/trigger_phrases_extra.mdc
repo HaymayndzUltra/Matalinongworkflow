@@ -18,6 +18,12 @@ Note: Ingestion triggers are defined in `trigger_phrases.mdc` (canonical). Do no
   - Run: `python3 plan_next.py`
   - Then: `python3 plain_hier.py <task_id ReplaceAll ReplaceAll>`
 
+#### Gate-Aware Suggestion Override
+- If recent attempt to execute returned a Deep Analysis Gate block (message contains `Deep Analysis Gate BLOCK`), the next suggestion MUST be one of:
+  - Suggested next trigger: "Start pre-execution analysis"
+  - Alternate: "Compile analysis doc (strict)"
+  This prevents re-suggesting execution until analysis phases are marked done and the gate passes.
+
 ### Execute Sub-step
 - Triggers: "Gawin ang step <i>", "Execute <i>", "Run sub-step <i>", "Ituloy ang <i>"
 - Actions:

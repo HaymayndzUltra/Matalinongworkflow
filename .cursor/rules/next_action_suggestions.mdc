@@ -14,9 +14,8 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
 - Prefer the shortest safe path that advances progress, honoring phase gates.
 - Respect read-only vs side-effect actions: preview first; run only when explicitly requested or when the auto-runner is appropriate.
 
-### Mappings by Last Action
+### Mappings by Last Action (Gate-Aware)
 - After running plan validation (execution mode):
-  - Suggest hierarchy then auto-run preview/execute sequence.
   - `Suggested next trigger: "Show hierarchy"`
   - `Alternate: "Execute the next unfinished phase"`
 
@@ -30,19 +29,37 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
   - `Alternate: "I-validate ang plan"`
 
 - After executing a sub-step (run):
-  - Suggest marking the phase done or proceeding to next.
-  - `Suggested next trigger: "Tapusin ang phase <K>"`
-  - `Alternate: "Ano ang next phase?"`
+  - If execution was blocked by Deep Analysis Gate:
+    - If the block message contains "No analysis found" or "missing source_task_id":
+      - `Suggested next trigger: "Regenerate analysis mirror"`
+      - `Alternate: "Start pre-execution analysis"`
+    - Else if the block includes "Decision Gate:" or analysis findings (e.g., "CONFLICT", "OVERLAP", "DUPLICATE"):
+      - `Suggested next trigger: "Compile analysis doc (strict)"`
+      - `Alternate: "Start pre-execution analysis"`
+  - Else:
+    - `Suggested next trigger: "Tapusin ang phase <K>"`
+    - `Alternate: "Ano ang next phase?"`
 
 - After marking a phase done:
-  - Suggest validation then next-phase progression.
-  - `Suggested next trigger: "I-validate ang plan"`
-  - `Alternate: "Execute the next unfinished phase"`
+  - If analysis mirror looks stale (execution progressed beyond last analysis done:true index):
+    - `Suggested next trigger: "Regenerate analysis mirror"`
+    - `Alternate: "Start pre-execution analysis"`
+  - Else:
+    - `Suggested next trigger: "I-validate ang plan"`
+    - `Alternate: "Execute the next unfinished phase"`
 
 - After plan ingestion is finalized (JSON approved):
-  - Suggest validate then hierarchy view.
-  - `Suggested next trigger: "I-validate ang plan"`
-  - `Alternate: "Show hierarchy"`
+  - Always refresh the analysis mirror to avoid stale gate blocks:
+  - `Suggested next trigger: "Regenerate analysis mirror"`
+  - `Alternate: "Start pre-execution analysis"`
+
+- After "Compile analysis doc (strict)":
+  - If the rendered doc indicates PASS for all phases (e.g., STRICT ANALYSIS SUMMARY has no FAIL and `BLOCKERS:` is empty or `None`):
+    - `Suggested next trigger: "I-validate ang plan"`
+    - `Alternate: "Show hierarchy"`
+  - If the rendered doc indicates BLOCK/FAIL (e.g., contains `BLOCK EXECUTION:` or any FAIL in STRICT ANALYSIS SUMMARY):
+    - `Suggested next trigger: "Start pre-execution analysis"`
+    - `Alternate: "Compile analysis doc (strict)"`
 
 ### Deep Analysis Awareness (if enabled)
 - If a Deep Analysis Gate is in effect and currently BLOCK:
