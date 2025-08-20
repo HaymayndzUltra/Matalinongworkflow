@@ -16,12 +16,19 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
 
 ### Mappings by Last Action (Gate-Aware)
 - After running plan validation (execution mode):
-  - `Suggested next trigger: "Show hierarchy"`
-  - `Alternate: "Execute the next unfinished phase"`
+  - If output contains any structural gate errors (e.g., "Phase 0 is not first", "missing IMPORTANT NOTE", "IMPORTANT NOTE: (missing)") or "No active tasks":
+    - `Suggested next trigger: "Ingest mo ang plan"`
+    - `Alternate: "Compile actionable plan"`
+  - Else:
+    - `Suggested next trigger: "Show hierarchy"`
+    - `Alternate: "Execute the next unfinished phase"`
 
 - After showing hierarchy:
   - Suggest the auto phase runner to handle preview → run → show → done → re-validate.
   - `Suggested next trigger: "Execute the next unfinished phase"`
+  - If the hierarchy shows "No active tasks":
+    - `Suggested next trigger: "Ingest mo ang plan"`
+    - `Alternate: "Compile actionable plan"`
 
 - After previewing a sub-step (no run):
   - Suggest running the step or returning to plan view.
@@ -47,11 +54,19 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
   - Else:
     - `Suggested next trigger: "I-validate ang plan"`
     - `Alternate: "Execute the next unfinished phase"`
+  - If plan appears fully complete (no next phase reported by validation):
+    - `Suggested next trigger: "Compile analysis doc (strict)"`
+    - `Alternate: "Regenerate analysis mirror"`
 
 - After plan ingestion is finalized (JSON approved):
   - Always refresh the analysis mirror to avoid stale gate blocks:
   - `Suggested next trigger: "Regenerate analysis mirror"`
   - `Alternate: "Start pre-execution analysis"`
+
+- After regenerating/finalizing the analysis mirror (analysis JSON approved):
+  - Proceed to gate checks before any execution:
+  - `Suggested next trigger: "I-validate ang plan"`
+  - `Alternate: "Show hierarchy"`
 
 - After "Compile analysis doc (strict)":
   - If the rendered doc indicates PASS for all phases (e.g., STRICT ANALYSIS SUMMARY has no FAIL and `BLOCKERS:` is empty or `None`):
@@ -60,6 +75,23 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
   - If the rendered doc indicates BLOCK/FAIL (e.g., contains `BLOCK EXECUTION:` or any FAIL in STRICT ANALYSIS SUMMARY):
     - `Suggested next trigger: "Start pre-execution analysis"`
     - `Alternate: "Compile analysis doc (strict)"`
+
+- After starting or running Pre-Execution Analysis:
+  - If output contains "Verified and Ready for Execution":
+    - `Suggested next trigger: "I-validate ang plan"`
+    - `Alternate: "Show hierarchy"`
+  - If any findings are present (e.g., mentions of "CONFLICT", "OVERLAP", "DUPLICATE", or non-empty findings list):
+    - `Suggested next trigger: "Compile analysis doc (strict)"`
+    - `Alternate: "Start pre-execution analysis"`
+
+- After DRY RUN (simulation-only):
+  - `Suggested next trigger: "I-validate ang plan"`
+  - `Alternate: "Show hierarchy"`
+
+- After listing tasks:
+  - If the list shows no active tasks:
+    - `Suggested next trigger: "Ingest mo ang plan"`
+    - `Alternate: "Compile actionable plan"`
 
 ### Deep Analysis Awareness (if enabled)
 - If a Deep Analysis Gate is in effect and currently BLOCK:
