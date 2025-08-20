@@ -3,14 +3,100 @@ API Endpoint Tests
 Tests for all KYC Verification API endpoints
 """
 
+import os
+import sys
+import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from datetime import datetime
 import base64
 import json
 
+# Ensure import paths for KYC root and src
+CURRENT_DIR = os.path.dirname(__file__)
+KYC_ROOT = os.path.abspath(os.path.join(CURRENT_DIR, os.pardir))
+SRC_PATH = os.path.join(KYC_ROOT, "src")
+for p in [KYC_ROOT, SRC_PATH]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+
 # Import the FastAPI app
-from src.api.app import app
+from api.app import app
+
+
+@pytest.fixture(autouse=True)
+def _install_test_stubs(monkeypatch):
+    """Install lightweight stubs for heavy components to keep tests deterministic."""
+    import api.app as api_app
+
+    class FakeQualityAnalyzer:
+        def analyze_frame(self, image):
+            metrics = type("M", (), {
+                "resolution": (640, 480),
+                "blur_score": 0.1,
+                "glare_score": 0.05,
+                "brightness_score": 0.5,
+                "contrast_score": 0.6,
+                "orientation_angle": 0.0,
+                "document_coverage": 0.8,
+                "edge_clarity": 0.7,
+                "overall_score": 0.98,
+            })
+            return metrics, []
+
+    class FakeDocumentClassifier:
+        def classify(self, image):
+            return type("C", (), {"document_type": type("T", (), {"value": "PhilID"}), "confidence": 0.95})
+
+    class FakeAuthenticityChecker:
+        def check_authenticity(self, image):
+            return {"authentic": True, "confidence": 0.99, "issues": []}
+
+    class FakeRiskScorer:
+        def calculate_score(self, document_data, device_info, biometric_data, aml_data):
+            return {"risk_score": 10.0, "risk_factors": [], "fraud_indicators": []}
+
+    class FakeDecisionEngine:
+        def make_decision(self, risk_score, extracted_data, validation_result, policy_overrides=None):
+            return {"decision": "approve", "confidence": 0.95, "reasons": [], "policy_version": "2024.1.0", "review_required": False, "review_reasons": []}
+
+    class FakeVendorOrchestrator:
+        def verify_with_issuer(self, document_type, document_number, personal_info, adapter=None):
+            return {"verified": True, "match_score": 0.9, "issuer_response": {"status": "VALID"}}
+
+    class FakeAMLScreener:
+        def screen(self, full_name, birth_date, nationality, additional_info, screening_level):
+            return {"hits": [], "screened_lists": ["OFAC", "UN", "EU", "PEP"], "vendor": "internal"}
+
+    class FakeComplianceGenerator:
+        def generate(self, artifact_type: str, include_data_flows: bool, include_minimization: bool, format: str):
+            return {"file_path": f"./artifacts/{artifact_type}.md", "sections": ["purpose", "risks"]}
+
+    class FakeAuditLogger:
+        def export_logs(self, start_date, end_date, include_pii, format, filters):
+            return {"file_path": "/exports/audit.jsonl", "file_size": 512, "record_count": 1, "hash_chain": "sha256:abc", "manifest": {}}
+
+    stub_map = {
+        "quality_analyzer": FakeQualityAnalyzer(),
+        "document_classifier": FakeDocumentClassifier(),
+        "authenticity_checker": FakeAuthenticityChecker(),
+        "risk_scorer": FakeRiskScorer(),
+        "decision_engine": FakeDecisionEngine(),
+        "vendor_orchestrator": FakeVendorOrchestrator(),
+        "aml_screener": FakeAMLScreener(),
+        "compliance_generator": FakeComplianceGenerator(),
+        "audit_logger": FakeAuditLogger(),
+        "ocr_extractor": object(),
+        "mrz_parser": object(),
+        "barcode_reader": object(),
+        "face_matcher": object(),
+    }
+
+    def fake_get_component(name: str):
+        return stub_map.get(name)
+
+    monkeypatch.setattr(api_app, "get_component", fake_get_component, raising=False)
+    monkeypatch.setattr(api_app, "decode_base64_image", lambda _s: np.zeros((50, 50, 3), dtype=np.uint8), raising=False)
 
 # Create test client
 client = TestClient(app)
@@ -342,8 +428,9 @@ class TestOpenAPISpec:
 
 def test_cors_headers():
     """Test CORS headers are properly set"""
-    response = client.get("/health")
-    assert "access-control-allow-origin" in response.headers
+    response = client.get("/health", headers={"Origin": "http://example.com"})
+    # CORS header should be present when Origin is provided
+    assert response.headers.get("access-control-allow-origin") in {"*", "http://example.com"}
 
 
 def test_request_id_header():

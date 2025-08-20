@@ -1,5 +1,6 @@
 ---
---- existing code ...
+description: Trigger phrases → action dispatch map
+alwaysApply: true
 ---
 
 ## Dispatch policy

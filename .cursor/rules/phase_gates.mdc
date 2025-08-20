@@ -1,5 +1,6 @@
 ---
---- existing code ...
+description: Phase Gates (pre-execution checks)
+alwaysApply: true
 ---
 ## Phase Gates (Pre-Execution Checks)
 

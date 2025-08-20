@@ -4,35 +4,22 @@
     "type": "split",
     "children": [
       {
-        "id": "5def80d94f4d9bf9",
+        "id": "7a5a8ac7802766be",
         "type": "tabs",
         "children": [
           {
-            "id": "ea2b65a4802aee04",
+            "id": "8beb25f51e30177a",
             "type": "leaf",
             "state": {
-              "type": "mk-uri-view",
+              "type": "image",
               "state": {
-                "path": "https://www.make.md/static/latest.md"
+                "file": "a.jpg"
               },
-              "icon": "lucide-file",
-              "title": "https://www.make.md/static/latest.md"
-            }
-          },
-          {
-            "id": "93bdef15d13115b1",
-            "type": "leaf",
-            "state": {
-              "type": "mk-uri-view",
-              "state": {
-                "path": "https://www.make.md/static/GetStarted.md"
-              },
-              "icon": "lucide-file",
-              "title": "https://www.make.md/static/GetStarted.md"
+              "icon": "lucide-image",
+              "title": "a"
             }
           }
-        ],
-        "currentTab": 1
+        ]
       }
     ],
     "direction": "vertical"
@@ -86,7 +73,7 @@
             }
           },
           {
-            "id": "f53fb7fa8d194ce9",
+            "id": "8a62328271930f5d",
             "type": "leaf",
             "state": {
               "type": "mk-path-view",
@@ -94,19 +81,9 @@
               "icon": "layout-grid",
               "title": "Navigator"
             }
-          },
-          {
-            "id": "fdc97c38687e53d9",
-            "type": "leaf",
-            "state": {
-              "type": "file-tree-view",
-              "state": {},
-              "icon": "sheets-in-box",
-              "title": "File Tree"
-            }
           }
         ],
-        "currentTab": 4
+        "currentTab": 3
       }
     ],
     "direction": "horizontal",
@@ -126,6 +103,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "a.jpg",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -135,7 +113,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks"
+              "title": "Backlinks for a"
             }
           },
           {
@@ -144,11 +122,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
+                "file": "a.jpg",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links"
+              "title": "Outgoing links from a"
             }
           },
           {
@@ -172,12 +151,13 @@
             "state": {
               "type": "outline",
               "state": {
+                "file": "a.jpg",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline"
+              "title": "Outline of a"
             }
           },
           {
@@ -185,7 +165,9 @@
             "type": "leaf",
             "state": {
               "type": "footnotes",
-              "state": {},
+              "state": {
+                "file": "a.jpg"
+              },
               "icon": "lucide-file-signature",
               "title": "Footnotes"
             }
@@ -207,15 +189,31 @@
       "command-palette:Open command palette": false,
       "bases:Create new base": false,
       "markdown-importer:Open format converter": false,
-      "file-tree-alternative:File Tree Alternative Plugin": false
+      "file-tree-alternative:File Tree Alternative Plugin": false,
+      "mermaid-tools:Open Mermaid Toolbar": false,
+      "templater-obsidian:Templater": false
     }
   },
-  "active": "93bdef15d13115b1",
+  "active": "8a62328271930f5d",
   "lastOpenFiles": [
-    "KYC_VERIFICATION/src/api/__pycache__/response_formatter.cpython-310.pyc",
-    "KYC_VERIFICATION/src/api/__pycache__/v2_endpoints.cpython-310.pyc",
-    "KYC_VERIFICATION/tests/__pycache__/test_api_smoke.cpython-310-pytest-8.4.1.pyc",
-    "KYC_VERIFICATION/tests/test_api_smoke.py",
-    "Tags"
+    "IMPLEMENTATION_REVIEW.md",
+    "CURSOR_RULES_TRIGGERS.md",
+    "KYC_VERIFICATION/src/liveness/__pycache__/pad_detector.cpython-310.pyc",
+    "KYC_VERIFICATION/src/liveness/__pycache__",
+    "photo-id/SAMPLE5.jpg:Zone.Identifier",
+    "photo-id/SAMPLE5.jpg",
+    "photo-id/Unconfirmed 121126.crdownload",
+    "outputs/kyc_image_test_report.md",
+    "KYC_VERIFICATION/tests/__pycache__/test_photos_run.cpython-310-pytest-8.4.1.pyc",
+    "KYC_VERIFICATION/tests/test_photos_run.py",
+    "scripts/run_photo_id_test.py",
+    "KYC_VERIFICATION/tests/__pycache__/test_ux_acceptance.cpython-310-pytest-8.4.1.pyc",
+    "KYC_VERIFICATION/tests/__pycache__/test_telemetry_consolidation.cpython-310-pytest-8.4.1.pyc",
+    "KYC_VERIFICATION/tests/__pycache__/test_suite_unit.cpython-310-pytest-8.4.1.pyc",
+    "photo-id/sample4.jpg",
+    "photo-id/sample3.jpg",
+    "photo-id/537208979_797532246269972_1813466440644137981_n.jpg",
+    "KYC_VERIFICATION/tests/533904077_2276824019446806_6237073994118006227_n.jpg",
+    "KYC_VERIFICATION/tests/532033240_31118443054436335_7131684919330489726_n.jpg"
   ]
 }

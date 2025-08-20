@@ -88,6 +88,14 @@ def install_component_stubs(monkeypatch):
         def screen(self, full_name, birth_date, nationality, additional_info, screening_level):
             return {"hits": [], "screened_lists": ["OFAC", "UN", "EU", "PEP"], "vendor": "internal"}
 
+    class FakeComplianceGenerator:
+        def generate(self, artifact_type: str, include_data_flows: bool, include_minimization: bool, format: str):
+            return {"file_path": f"./artifacts/{artifact_type}.md", "sections": ["purpose", "risks"]}
+
+    class FakeAuditLogger:
+        def export_logs(self, start_date, end_date, include_pii, format, filters):
+            return {"file_path": "/exports/audit.jsonl", "file_size": 512, "record_count": 1, "hash_chain": "sha256:abc", "manifest": {}}
+
     stub_map = {
         "quality_analyzer": FakeQualityAnalyzer(),
         "document_classifier": FakeDocumentClassifier(),
@@ -96,6 +104,8 @@ def install_component_stubs(monkeypatch):
         "decision_engine": FakeDecisionEngine(),
         "vendor_orchestrator": FakeVendorOrchestrator(),
         "aml_screener": FakeAMLScreener(),
+        "compliance_generator": FakeComplianceGenerator(),
+        "audit_logger": FakeAuditLogger(),
         # Extractor placeholders for readiness check only
         "ocr_extractor": object(),
         "mrz_parser": object(),
@@ -228,6 +238,27 @@ def test_issuer_and_aml(client, monkeypatch):
     aml = ra.json()
     assert isinstance(aml.get("clean"), bool)
     assert aml.get("risk_level") in {"low", "medium", "high", "critical"}
+
+    # Compliance (smoke)
+    comp_req = {
+        "artifact_type": "dpia",
+        "include_data_flows": True,
+        "include_minimization": True,
+        "format": "markdown",
+    }
+    rc = client.post("/compliance/generate", json=comp_req)
+    assert rc.status_code == 200 and rc.json().get("artifact_type") == "dpia"
+
+    # Audit (smoke)
+    audit_req = {
+        "start_date": "2024-01-01T00:00:00+08:00",
+        "end_date": "2024-01-02T00:00:00+08:00",
+        "include_pii": False,
+        "format": "jsonl",
+        "filters": {},
+    }
+    raud = client.post("/audit/export", json=audit_req)
+    assert raud.status_code == 200
 
 
 def test_complete_flow_with_stubs(client, monkeypatch):

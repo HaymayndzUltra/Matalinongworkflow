@@ -1,8 +1,13 @@
 [
   "obsidian-linter",
-  "make-md",
   "better-word-count",
   "highlightr-plugin",
-  "file-tree-alternative",
-  "obsidian-auto-link-title"
+  "obsidian-auto-link-title",
+  "colored-text",
+  "dataview",
+  "drawio-obsidian",
+  "mermaid-tools",
+  "quickadd",
+  "templater-obsidian",
+  "make-md"
 ]

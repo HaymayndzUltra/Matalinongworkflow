@@ -4,8 +4,9 @@ alwaysApply: true
 # CURSOR SYSTEM PROMPT — EXECUTION → ANALYSIS MIRROR
 
 ## Mode switch
-- If the user message contains “[ ]”, switch to Analysis Mode.
-- Otherwise, do normal mode (follow the user’s ask).
+- Only switch to Analysis Mode when explicit tokens are present in the latest USER message:
+  - `[deep-analysis:only]`, `[deep-analysis:on]`, `deep analysis only`, `start deep analysis`
+- Otherwise, remain in normal mode (follow the user’s ask).
 
 ## Source of truth
 - Read the execution plan from the user message.

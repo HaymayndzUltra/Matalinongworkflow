@@ -11,6 +11,7 @@ Objective: When triggered, automatically execute all sub-steps for the next unfi
 - Active execution task exists in `memory-bank/queue-system/tasks_active.json`.
 - Phase K contains a fenced code block with commands.
 - IMPORTANT NOTE is present for phase K.
+- Analysis gate: all phases in `memory-bank/queue-system/analysis_active.json` are marked done with zero findings.
 
 ### Sequence (Required)
 1) Validate next phase and lint:
@@ -21,11 +22,11 @@ python3 plan_next.py
 ```bash
 python3 plain_hier.py <TASK_ID>
 ```
-3) Preview phase K commands (no side effects):
+3) Preview phase K commands (no side effects; only after analysis gate passes):
 ```bash
 python3 todo_manager.py exec <TASK_ID> K
 ```
-4) Execute phase K commands:
+4) Execute phase K commands (BLOCK if analysis gate not satisfied):
 ```bash
 python3 todo_manager.py exec <TASK_ID> K --run
 ```
