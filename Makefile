@@ -26,7 +26,7 @@ api:
 	$(ACTIVATE) uvicorn src.api.app:app --host 0.0.0.0 --port 8000
 
 test:
-	$(ACTIVATE) pytest -q "$(TEST_DIR)"
+	PYTHONPATH="$(PWD)/KYC VERIFICATION/src" $(ACTIVATE) pytest -q "$(TEST_DIR)"
 
 bench:
 	$(PY) "$(KYC_DIR)/scripts/bench_metrics.py" --dataset "$(DATASET)" --out artifacts/benchmarks.csv
