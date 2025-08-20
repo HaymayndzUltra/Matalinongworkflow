@@ -11,12 +11,14 @@
             "id": "8beb25f51e30177a",
             "type": "leaf",
             "state": {
-              "type": "image",
+              "type": "markdown",
               "state": {
-                "file": "a.jpg"
+                "file": "CURSOR_RULES_TRIGGERS.md",
+                "mode": "source",
+                "source": false
               },
-              "icon": "lucide-image",
-              "title": "a"
+              "icon": "lucide-file",
+              "title": "CURSOR_RULES_TRIGGERS"
             }
           }
         ]
@@ -103,7 +105,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "a.jpg",
+                "file": "CURSOR_RULES_TRIGGERS.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -113,7 +115,7 @@
                 "unlinkedCollapsed": true
               },
               "icon": "links-coming-in",
-              "title": "Backlinks for a"
+              "title": "Backlinks for CURSOR_RULES_TRIGGERS"
             }
           },
           {
@@ -122,12 +124,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "a.jpg",
+                "file": "CURSOR_RULES_TRIGGERS.md",
                 "linksCollapsed": false,
                 "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "Outgoing links from a"
+              "title": "Outgoing links from CURSOR_RULES_TRIGGERS"
             }
           },
           {
@@ -151,13 +153,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "a.jpg",
+                "file": "CURSOR_RULES_TRIGGERS.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "Outline of a"
+              "title": "Outline of CURSOR_RULES_TRIGGERS"
             }
           },
           {
@@ -166,7 +168,7 @@
             "state": {
               "type": "footnotes",
               "state": {
-                "file": "a.jpg"
+                "file": "CURSOR_RULES_TRIGGERS.md"
               },
               "icon": "lucide-file-signature",
               "title": "Footnotes"
@@ -194,8 +196,16 @@
       "templater-obsidian:Templater": false
     }
   },
-  "active": "8a62328271930f5d",
+  "active": "8beb25f51e30177a",
   "lastOpenFiles": [
+    "INTEGRATION_SUMMARY.md",
+    "KYC_FACE_INTEGRATION_PLAN.md",
+    "a.jpg",
+    "KYC_VERIFICATION/src/review/__pycache__/review_console.cpython-310.pyc",
+    "KYC_VERIFICATION/src/review/__pycache__",
+    "KYC_VERIFICATION/src/device_intel/__pycache__/device_analyzer.cpython-310.pyc",
+    "KYC_VERIFICATION/src/device_intel/__pycache__/__init__.cpython-310.pyc",
+    "KYC_VERIFICATION/src/device_intel/__pycache__",
     "IMPLEMENTATION_REVIEW.md",
     "CURSOR_RULES_TRIGGERS.md",
     "KYC_VERIFICATION/src/liveness/__pycache__/pad_detector.cpython-310.pyc",
@@ -205,11 +215,6 @@
     "photo-id/Unconfirmed 121126.crdownload",
     "outputs/kyc_image_test_report.md",
     "KYC_VERIFICATION/tests/__pycache__/test_photos_run.cpython-310-pytest-8.4.1.pyc",
-    "KYC_VERIFICATION/tests/test_photos_run.py",
-    "scripts/run_photo_id_test.py",
-    "KYC_VERIFICATION/tests/__pycache__/test_ux_acceptance.cpython-310-pytest-8.4.1.pyc",
-    "KYC_VERIFICATION/tests/__pycache__/test_telemetry_consolidation.cpython-310-pytest-8.4.1.pyc",
-    "KYC_VERIFICATION/tests/__pycache__/test_suite_unit.cpython-310-pytest-8.4.1.pyc",
     "photo-id/sample4.jpg",
     "photo-id/sample3.jpg",
     "photo-id/537208979_797532246269972_1813466440644137981_n.jpg",

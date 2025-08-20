@@ -140,6 +140,9 @@ def get_component(component_name: str):
         elif component_name == "device_analyzer":
             from src.device_intel.device_analyzer import DeviceAnalyzer
             _components[component_name] = DeviceAnalyzer()
+        elif component_name == "review_console":
+            from src.review.review_console import ReviewConsole
+            _components[component_name] = ReviewConsole()
     return _components.get(component_name)
 
 
@@ -199,6 +202,47 @@ def get_application() -> FastAPI:
 
         response.headers["X-Process-Time"] = str(process_time)
         return response
+
+    # Global simple rate limiting (per-client IP)
+    RATE_LIMIT_QPS = int(os.getenv("API_RATE_LIMIT_QPS", "25"))
+    RATE_LIMIT_WINDOW_SEC = 1.0
+    _rate_limit_buckets: Dict[str, deque] = {}
+
+    @app.middleware("http")
+    async def global_rate_limiter(request: Request, call_next):
+        try:
+            path = request.url.path
+            # Skip low-impact/monitoring endpoints
+            if path.startswith(("/metrics", "/health", "/ready", "/openapi", "/docs", "/redoc")):
+                return await call_next(request)
+
+            client_ip = (request.client.host if request.client else "unknown")
+            now = time.time()
+            bucket = _rate_limit_buckets.setdefault(client_ip, deque())
+
+            # Drop entries outside the time window
+            cutoff = now - RATE_LIMIT_WINDOW_SEC
+            while bucket and bucket[0] < cutoff:
+                bucket.popleft()
+
+            if len(bucket) >= RATE_LIMIT_QPS:
+                retry_after = max(0.0, RATE_LIMIT_WINDOW_SEC - (now - bucket[0]))
+                return JSONResponse(
+                    status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                    content={
+                        "error": "Too Many Requests",
+                        "error_code": "RATE_LIMITED",
+                        "retry_after_ms": int(retry_after * 1000),
+                        "timestamp": get_timestamp(),
+                    },
+                    headers={"Retry-After": str(max(1, int(retry_after)))}
+                )
+
+            bucket.append(now)
+            return await call_next(request)
+        except Exception:
+            # Never break requests due to limiter errors
+            return await call_next(request)
     
     @app.on_event("startup")
     async def _obs_startup():
@@ -488,17 +532,57 @@ async def calculate_risk_score(request: ScoreRequest):
         
         # Get risk scorer
         risk_scorer = get_component("risk_scorer")
-        
-        # Calculate risk score
+
+        # Calculate base risk score from core engine
         risk_result = risk_scorer.calculate_score(
             document_data=request.document_data.dict(),
             device_info=request.device_info,
             biometric_data=request.biometric_data,
             aml_data=request.aml_data
         )
-        
-        # Determine risk level
-        risk_score = risk_result.get("risk_score", 0)
+
+        # Device intelligence quick-win: analyze device and hard-weight risky traits
+        device_analysis = None
+        try:
+            device_analyzer = get_component("device_analyzer")
+            device_analysis = device_analyzer.analyze(request.device_info or {})
+        except Exception:
+            device_analysis = None
+
+        # Start with engine score
+        risk_score = float(risk_result.get("risk_score", 0))
+        risk_factors: List[Dict[str, Any]] = list(risk_result.get("risk_factors", []))
+        fraud_indicators: List[str] = list(risk_result.get("fraud_indicators", []))
+
+        if device_analysis is not None:
+            # Additive weighting (bounded); quick-win policy
+            if device_analysis.vpn_detected:
+                risk_score += 20
+                risk_factors.append({"factor": "vpn_detected", "weight": 20})
+                fraud_indicators.append("VPN_TRAFFIC")
+            if device_analysis.tor_detected:
+                risk_score += 30
+                risk_factors.append({"factor": "tor_exit_node", "weight": 30})
+                fraud_indicators.append("TOR_EXIT")
+            if device_analysis.proxy_detected:
+                risk_score += 10
+                risk_factors.append({"factor": "proxy_user_agent", "weight": 10})
+            if device_analysis.emulator_detected:
+                risk_score += 20
+                risk_factors.append({"factor": "emulator_detected", "weight": 20})
+                fraud_indicators.append("EMULATOR")
+            if device_analysis.root_jailbreak_detected:
+                risk_score += 10
+                risk_factors.append({"factor": "root_or_jailbreak_hints", "weight": 10})
+            if device_analysis.geo_anomaly:
+                risk_score += 10
+                risk_factors.append({"factor": "sim_gps_country_mismatch", "weight": 10})
+            if device_analysis.velocity_impossible:
+                risk_score += 10
+                risk_factors.append({"factor": "impossible_travel", "weight": 10})
+
+        # Bound the score
+        risk_score = max(0.0, min(100.0, risk_score))
         if risk_score < 20:
             risk_level = RiskLevel.LOW
         elif risk_score < 50:
@@ -517,17 +601,25 @@ async def calculate_risk_score(request: ScoreRequest):
             pass
         
         # Prepare response
+        # Build response
+        metadata: Dict[str, Any] = {
+            "processing_time_ms": int((time.time() - start_time) * 1000),
+            "model_version": "1.0.0",
+            "threshold_set": "standard",
+            "scoring_timestamp": get_timestamp(),
+        }
+        if device_analysis is not None:
+            metadata["device_risk"] = {
+                "score": device_analysis.risk_score,
+                "reasons": device_analysis.reasons,
+            }
+
         response = ScoreResponse(
             risk_score=risk_score,
             risk_level=risk_level,
-            risk_factors=risk_result.get("risk_factors", []),
-            fraud_indicators=risk_result.get("fraud_indicators", []),
-            metadata={
-                "processing_time_ms": int((time.time() - start_time) * 1000),
-                "model_version": "1.0.0",
-                "threshold_set": "standard",
-                "scoring_timestamp": get_timestamp()
-            }
+            risk_factors=risk_factors,
+            fraud_indicators=fraud_indicators,
+            metadata=metadata
         )
         
         return response
@@ -1107,23 +1199,75 @@ async def complete_kyc_verification(request: CompleteKYCRequest):
         except Exception:
             active_live_ok = None
 
+        # Enforce active liveness quick-win: if explicitly failed, downgrade to review
+        final_decision = decision_details.decision
+        final_reasons = list(decision_details.reasons)
+        review_required = getattr(decision_details, "review_required", False)
+        review_reasons = list(getattr(decision_details, "review_reasons", []) or [])
+
+        if active_live_ok is False:
+            final_decision = DecisionType.REVIEW
+            final_reasons.append("Active liveness not verified")
+            review_required = True
+            if "ACTIVE_LIVENESS_NOT_VERIFIED" not in review_reasons:
+                review_reasons.append("ACTIVE_LIVENESS_NOT_VERIFIED")
+
+        # If review, open a case in the human review console (quick-win wiring)
+        review_case_id = None
+        try:
+            if final_decision == DecisionType.REVIEW:
+                review_console = get_component("review_console")
+                # Normalize risk to 0..1 for console
+                risk_norm = float(scoring.risk_score or 0) / 100.0
+                evidence = {
+                    "document_type": extraction.document_type.value if extraction and extraction.document_type else None,
+                    "quality_score": getattr(validation, "quality_score", None),
+                    "issues": getattr(validation, "issues", None),
+                    "risk_level": scoring.risk_level.value if hasattr(scoring.risk_level, 'value') else str(scoring.risk_level),
+                }
+                alerts = list(set(final_reasons + review_reasons))
+                customer_id = (request.personal_info.get("full_name") if request.personal_info else None) or request.session_id or "UNKNOWN"
+                case = review_console.create_case(
+                    customer_id=customer_id,
+                    case_type="kyc_review",
+                    risk_score=risk_norm,
+                    evidence=evidence,
+                    alerts=alerts,
+                )
+                review_case_id = case.case_id
+        except Exception:
+            # Non-blocking
+            review_case_id = None
+
+        # Build final decision details snapshot for response coherence
+        decision_details_out = DecideResponse(
+            decision=final_decision,
+            confidence=decision_details.confidence,
+            reasons=final_reasons,
+            policy_version=decision_details.policy_version,
+            review_required=review_required,
+            review_reasons=review_reasons,
+            metadata=getattr(decision_details, "metadata", {})
+        )
+
         response = CompleteKYCResponse(
             session_id=request.session_id,
-            decision=decision_details.decision,
+            decision=final_decision,
             confidence=decision_details.confidence,
             risk_score=scoring.risk_score,
             risk_level=scoring.risk_level,
             validation=validation,
             extraction=extraction,
             scoring=scoring,
-            decision_details=decision_details,
+            decision_details=decision_details_out,
             issuer_verification=issuer_verification,
             aml_screening=aml_screening,
             processing_time_ms=int((time.time() - start_time) * 1000),
             metadata={
                 "timestamp": get_timestamp(),
                 "api_version": API_VERSION,
-                "active_liveness_ok": active_live_ok
+                "active_liveness_ok": active_live_ok,
+                "review_case_id": review_case_id,
             }
         )
         
