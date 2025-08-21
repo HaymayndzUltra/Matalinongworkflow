@@ -14,6 +14,11 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
 - Prefer the shortest safe path that advances progress, honoring phase gates.
 - Respect read-only vs side-effect actions: preview first; run only when explicitly requested or when the auto-runner is appropriate.
 
+### Non-Stop Default (Auto-Advance)
+- When there are no high-priority problem signals, prefer auto-running the next phase to minimize friction.
+- Primary default suggestion in clean states: `Execute the next unfinished phase` (invokes the auto-runner which performs validate → show → preview → run → show → done → re-validate).
+- Fall back to read-only validation (`I-validate ang plan` or `Show hierarchy`) only when signals are ambiguous, or on warnings the user prefers to inspect.
+
 ### Proactive Decision Engine (Signal-ranked)
 - The assistant MUST evaluate output signals from the most recent action(s) before deciding the next suggestion. Signals come from tool outputs or messages (e.g., `plan_next.py`, `plain_hier.py`, `todo_manager.py exec|done`, analysis renderer):
   - Structural Gate Errors: "Phase 0 is not first", "missing IMPORTANT NOTE", "IMPORTANT NOTE: (missing)".
@@ -30,7 +35,7 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
   3) Mirror/linkage issues → Regenerate analysis mirror.
   4) Stale analysis vs execution → Regenerate analysis mirror.
   5) Unknown/ambiguous state → Validate plan (read-only), then inspect hierarchy.
-  6) Normal flow → Auto-run next phase.
+  6) Normal flow (clean) → Auto-run next phase (default).
 
 - Ambiguity & Safety-First Fallback:
   - If signals are insufficient or outputs are ambiguous, suggest read-only validation first: `I-validate ang plan` then `Show hierarchy`.
@@ -46,11 +51,11 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
     - `Suggested next trigger: "Ingest mo ang plan"`
     - `Alternate: "Compile actionable plan"`
   - If output contains "Completion is non-monotonic (undone after done)":
-    - `Suggested next trigger: "Show hierarchy"`
-    - `Alternate: "Execute the next unfinished phase"`
-  - Else:
-    - `Suggested next trigger: "Show hierarchy"`
-    - `Alternate: "Execute the next unfinished phase"`
+    - `Suggested next trigger: "Execute the next unfinished phase"`
+    - `Alternate: "Show hierarchy"`
+  - Else (clean):
+    - `Suggested next trigger: "Execute the next unfinished phase"`
+    - `Alternate: "Show hierarchy"`
 
 - After showing hierarchy:
   - Suggest the auto phase runner to handle preview → run → show → done → re-validate.
@@ -63,7 +68,7 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
     - `Alternate: "Compile actionable plan"`
 
 - After previewing a sub-step (no run):
-  - Suggest running the step or returning to plan view.
+  - Suggest running the step immediately to avoid stalls.
   - `Suggested next trigger: "Execute the next unfinished phase"`
   - `Alternate: "I-validate ang plan"`
 
@@ -83,9 +88,9 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
   - If analysis mirror looks stale (execution progressed beyond last analysis done:true index):
     - `Suggested next trigger: "Regenerate analysis mirror"`
     - `Alternate: "Start pre-execution analysis"`
-  - Else:
-    - `Suggested next trigger: "I-validate ang plan"`
-    - `Alternate: "Execute the next unfinished phase"`
+  - Else (clean, not complete):
+    - `Suggested next trigger: "Execute the next unfinished phase"`
+    - `Alternate: "I-validate ang plan"`
   - If plan appears fully complete (no next phase reported by validation):
     - `Suggested next trigger: "Compile analysis doc (strict)"`
     - `Alternate: "Regenerate analysis mirror"`
@@ -96,29 +101,29 @@ Goal: After every action the assistant performs (validate, show, exec, done), th
   - `Alternate: "Start pre-execution analysis"`
 
 - After regenerating/finalizing the analysis mirror (analysis JSON approved):
-  - Proceed to gate checks before any execution:
-  - `Suggested next trigger: "I-validate ang plan"`
-  - `Alternate: "Show hierarchy"`
+  - Proceed to analysis gate quickly:
+  - `Suggested next trigger: "Start pre-execution analysis"`
+  - `Alternate: "I-validate ang plan"`
 
 - After "Compile analysis doc (strict)":
   - If the rendered doc indicates PASS for all phases (e.g., STRICT ANALYSIS SUMMARY has no FAIL and `BLOCKERS:` is empty or `None`):
-    - `Suggested next trigger: "I-validate ang plan"`
-    - `Alternate: "Show hierarchy"`
+    - `Suggested next trigger: "Execute the next unfinished phase"`
+    - `Alternate: "I-validate ang plan"`
   - If the rendered doc indicates BLOCK/FAIL (e.g., contains `BLOCK EXECUTION:` or any FAIL in STRICT ANALYSIS SUMMARY):
     - `Suggested next trigger: "Start pre-execution analysis"`
     - `Alternate: "Compile analysis doc (strict)"`
 
 - After starting or running Pre-Execution Analysis:
   - If output contains "Verified and Ready for Execution":
-    - `Suggested next trigger: "I-validate ang plan"`
-    - `Alternate: "Show hierarchy"`
+    - `Suggested next trigger: "Execute the next unfinished phase"`
+    - `Alternate: "I-validate ang plan"`
   - If any findings are present (e.g., mentions of "CONFLICT", "OVERLAP", "DUPLICATE", or non-empty findings list):
     - `Suggested next trigger: "Compile analysis doc (strict)"`
     - `Alternate: "Start pre-execution analysis"`
 
 - After DRY RUN (simulation-only):
-  - `Suggested next trigger: "I-validate ang plan"`
-  - `Alternate: "Show hierarchy"`
+  - `Suggested next trigger: "Execute the next unfinished phase"`
+  - `Alternate: "I-validate ang plan"`
 
 - After listing tasks:
   - If the list shows no active tasks:
