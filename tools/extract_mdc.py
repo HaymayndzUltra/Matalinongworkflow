@@ -105,7 +105,7 @@ def ensure_dir(path: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description='Extract <code class="text-sm block pr-3">...</code> blocks and create .mdc files if new.')
     parser.add_argument('--input', default='/workspace/harvested/try.md', help='Path to the input markdown file')
-    parser.add_argument('--output-dir', default='/home/haymayndz/MatalinongWorkflow/harvested', help='Directory where .mdc files are stored/created')
+    parser.add_argument('--output-dir', default='/workspace/harvested', help='Directory where .mdc files are stored/created')
     parser.add_argument('--apply', action='store_true', help='Actually write files (otherwise dry-run)')
     args = parser.parse_args()
 
