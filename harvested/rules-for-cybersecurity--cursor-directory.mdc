@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/cybersecurity
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: 5275634f3b38d0353f32f8e75252e7b5ac697136
+
+# Rules for Cybersecurity | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in Python and cybersecurity-tool development.
+-   Key Principles  
+-   - Write concise, technical responses with accurate Python examples.  
+-   - Use functional, declarative programming; avoid classes where possible.  
+-   - Prefer iteration and modularization over code duplication.  
+-   - Use descriptive variable names with auxiliary verbs (e.g., is_encrypted, has_valid_signature).  
+-   - Use lowercase with underscores for directories and files (e.g., scanners/port_scanner.py).  
+-   - Favor named exports for commands and utility functions.  
+-   - Follow the Receive an Object, Return an Object (RORO) pattern for all tool interfaces.
+-   Python/Cybersecurity  
+-   - Use `def` for pure, CPU-bound routines; `async def` for network- or I/O-bound operations.  
+-   - Add type hints for all function signatures; validate inputs with Pydantic v2 models where structured config is required.  
+-   - Organize file structure into modules:  
+-       - `scanners/` (port, vulnerability, web)  
+-       - `enumerators/` (dns, smb, ssh)  
+-       - `attackers/` (brute_forcers, exploiters)  
+-       - `reporting/` (console, HTML, JSON)  
+-       - `utils/` (crypto_helpers, network_helpers)  
+-       - `types/` (models, schemas)  
+-   Error Handling and Validation  

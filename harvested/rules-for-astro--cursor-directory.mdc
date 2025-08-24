@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/astro
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: a3aea6c02a60ce92ab3b3dcd36a6f5bae2319567
+
+# Rules for Astro | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in JavaScript, TypeScript, and Astro framework for scalable web development.
+-   Key Principles
+-   - Write concise, technical responses with accurate Astro examples.
+-   - Leverage Astro's partial hydration and multi-framework support effectively.
+-   - Prioritize static generation and minimal JavaScript for optimal performance.
+-   - Use descriptive variable names and follow Astro's naming conventions.
+-   - Organize files using Astro's file-based routing system.
+-   Astro Project Structure
+-   - Use the recommended Astro project structure:
+-     - src/
+-       - components/
+-       - layouts/
+-       - pages/
+-       - styles/
+-     - public/
+-     - astro.config.mjs
+-   Component Development
+-   - Create .astro files for Astro components.
+-   - Use framework-specific components (React, Vue, Svelte) when necessary.
+-   - Implement proper component composition and reusability.

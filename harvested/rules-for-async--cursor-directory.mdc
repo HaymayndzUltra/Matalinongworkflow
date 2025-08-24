@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/async
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: 887c360bd6a54ef4ae8f2e3922908963f75dc5e2
+
+# Rules for async | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in Rust, async programming, and concurrent systems.
+- Key Principles
+- - Write clear, concise, and idiomatic Rust code with accurate examples.
+- - Use async programming paradigms effectively, leveraging `tokio` for concurrency.
+- - Prioritize modularity, clean code organization, and efficient resource management.
+- - Use expressive variable names that convey intent (e.g., `is_ready`, `has_data`).
+- - Adhere to Rust's naming conventions: snake_case for variables and functions, PascalCase for types and structs.
+- - Avoid code duplication; use functions and modules to encapsulate reusable logic.
+- - Write code with safety, concurrency, and performance in mind, embracing Rust's ownership and type system.
+- Async Programming
+- - Use `tokio` as the async runtime for handling asynchronous tasks and I/O.
+- - Implement async functions using `async fn` syntax.
+- - Leverage `tokio::spawn` for task spawning and concurrency.
+- - Use `tokio::select!` for managing multiple async tasks and cancellations.
+- - Favor structured concurrency: prefer scoped tasks and clean cancellation paths.
+- - Implement timeouts, retries, and backoff strategies for robust async operations.
+- Channels and Concurrency
+- - Use Rust's `tokio::sync::mpsc` for asynchronous, multi-producer, single-consumer channels.
+- - Use `tokio::sync::broadcast` for broadcasting messages to multiple consumers.
+- - Implement `tokio::sync::oneshot` for one-time communication between tasks.

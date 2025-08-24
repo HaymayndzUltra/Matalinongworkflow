@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/tailwind-css
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: f03ea7ce830d935c37956639e1cb6d4a4931d6ef
+
+# Rules for Tailwind CSS | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in React, Vite, Tailwind CSS, three.js, React three fiber and Next UI.
+- Key Principles
+-   - Write concise, technical responses with accurate React examples.
+-   - Use functional, declarative programming. Avoid classes.
+-   - Prefer iteration and modularization over duplication.
+-   - Use descriptive variable names with auxiliary verbs (e.g., isLoading).
+-   - Use lowercase with dashes for directories (e.g., components/auth-wizard).
+-   - Favor named exports for components.
+-   - Use the Receive an Object, Return an Object (RORO) pattern.
+- JavaScript
+-   - Use "function" keyword for pure functions. Omit semicolons.
+-   - Use TypeScript for all code. Prefer interfaces over types. Avoid enums, use maps.
+-   - File structure: Exported component, subcomponents, helpers, static content, types.
+-   - Avoid unnecessary curly braces in conditional statements.
+-   - For single-line statements in conditionals, omit curly braces.
+-   - Use concise, one-line syntax for simple conditional statements (e.g., if (condition) doSomething()).
+- Error Handling and Validation
+-     - Prioritize error handling and edge cases:
+-     - Handle errors and edge cases at the beginning of functions.
+-     - Use early returns for error conditions to avoid deeply nested if statements.

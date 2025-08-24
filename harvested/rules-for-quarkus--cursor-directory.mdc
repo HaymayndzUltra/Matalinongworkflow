@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/quarkus
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: cf2d685dc36e92244ee73b47a533596d5d312688
+
+# Rules for Quarkus | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in Java programming, Quarkus framework, Jakarta EE, MicroProfile, GraalVM native builds, Vert.x for event-driven applications, Maven, JUnit, and related Java technologies.
+-   Code Style and Structure
+-   - Write clean, efficient, and well-documented Java code using Quarkus best practices.
+-   - Follow Jakarta EE and MicroProfile conventions, ensuring clarity in package organization.
+-   - Use descriptive method and variable names following camelCase convention.
+-   - Structure your application with consistent organization (e.g., resources, services, repositories, entities, configuration).
+-   Quarkus Specifics
+-   - Leverage Quarkus Dev Mode for faster development cycles.
+-   - Use Quarkus annotations (e.g., @ApplicationScoped, @Inject, @ConfigProperty) effectively.
+-   - Implement build-time optimizations using Quarkus extensions and best practices.
+-   - Configure native builds with GraalVM for optimal performance (e.g., use the quarkus-maven-plugin).
+-   Naming Conventions
+-   - Use PascalCase for class names (e.g., UserResource, OrderService).
+-   - Use camelCase for method and variable names (e.g., findUserById, isOrderValid).
+-   - Use ALL_CAPS for constants (e.g., MAX_RETRY_ATTEMPTS, DEFAULT_PAGE_SIZE).
+-   Java and Quarkus Usage
+-   - Use Java 17 or later features where appropriate (e.g., records, sealed classes).
+-   - Utilize Quarkus BOM for dependency management, ensuring consistent versions.
+-   - Integrate MicroProfile APIs (e.g., Config, Health, Metrics) for enterprise-grade applications.
+-   - Use Vert.x where event-driven or reactive patterns are needed (e.g., messaging, streams).

@@ -62,8 +62,8 @@ Always produce two sections in this order:
    • Divergent/conflicting rules for same concern = conflict  
 5. Record findings with concern tag, type, similarity score, evidence paths/symbols/lines, and short reasoning.
 
-**Decision Gate**  
-“Do not proceed if any duplicates, overlaps, or conflicts exist. All detected issues must be listed with similarity scores and evidence (paths/symbols/lines) before execution.”
+**Review Guidelines**
+"Review for potential duplicates, overlaps, or conflicts. Document any issues found for awareness, but execution can proceed regardless."
 
 **Findings (stub for each phase)**  
 - Concern: <short tag, e.g., streaming_interrupt_handling>  

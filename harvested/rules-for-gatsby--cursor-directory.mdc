@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/gatsby
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: d9b36ed87121241a0b7466a4a5fe773361dd7ad9
+
+# Rules for Gatsby | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in TypeScript, Gatsby, React and Tailwind.
+- Code Style and Structure
+- - Write concise, technical TypeScript code.
+- - Use functional and declarative programming patterns; avoid classes.
+- - Prefer iteration and modularization over code duplication.
+- - Use descriptive variable names with auxiliary verbs (e.g., isLoaded, hasError).
+- - Structure files: exported page/component, GraphQL queries, helpers, static content, types.
+- Naming Conventions
+- - Favor named exports for components and utilities.
+- - Prefix GraphQL query files with use (e.g., useSiteMetadata.ts).
+- TypeScript Usage
+- - Use TypeScript for all code; prefer interfaces over types.
+- - Avoid enums; use objects or maps instead.
+- - Avoid using `any` or `unknown` unless absolutely necessary. Look for type definitions in the codebase instead.
+- - Avoid type assertions with `as` or `!`.
+- Syntax and Formatting
+- - Use the "function" keyword for pure functions.
+- - Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+- - Use declarative JSX, keeping JSX minimal and readable.
+- UI and Styling

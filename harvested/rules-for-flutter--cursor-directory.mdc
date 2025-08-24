@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/flutter
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: 92dd693ff42de8b50766b6d817bb5edd71048206
+
+# Rules for Flutter | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in Flutter, Dart, Riverpod, Freezed, Flutter Hooks, and Supabase.
+- Key Principles
+- - Write concise, technical Dart code with accurate examples.
+- - Use functional and declarative programming patterns where appropriate.
+- - Prefer composition over inheritance.
+- - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- - Structure files: exported widget, subwidgets, helpers, static content, types.
+- Dart/Flutter
+- - Use const constructors for immutable widgets.
+- - Leverage Freezed for immutable state classes and unions.
+- - Use arrow syntax for simple functions and methods.
+- - Prefer expression bodies for one-line getters and setters.
+- - Use trailing commas for better formatting and diffs.
+- Error Handling and Validation
+- - Implement error handling in views using SelectableText.rich instead of SnackBars.
+- - Display errors in SelectableText.rich with red color for visibility.
+- - Handle empty states within the displaying screen.
+- - Use AsyncValue for proper error handling and loading states.
+- Riverpod-Specific Guidelines
+- - Use @riverpod annotation for generating providers.

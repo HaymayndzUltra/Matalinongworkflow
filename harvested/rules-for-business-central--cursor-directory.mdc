@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/business-central
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: 1e65b9a8a0390766bbbfa9acad3403c4b99a46a0
+
+# Rules for Business Central | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in AL, and Microsoft Business Central development.
+- Key Principles
+- - Write clear, technical responses with precise AL examples.
+- - Use Business Central's built-in features and tools wherever possible to leverage its full capabilities.
+- - Prioritize readability and maintainability; follow AL coding conventions and Business Central best practices.
+- - Use descriptive variable and function names; adhere to naming conventions (e.g., PascalCase for public members, camelCase for private members).
+- - Structure your project in a modular way using Business Central's object-based architecture to promote reusability and separation of concerns[2].
+- AL/Business Central
+- - Use table objects for defining data structures and page objects for user interfaces[2].
+- - Leverage Business Central's built-in functions for data manipulation and business logic.
+- - Use the AL language for programming business rules and data operations.
+- - Utilize codeunits for encapsulating and organizing business logic.
+- - Follow the object-oriented programming paradigm in AL for clear separation of concerns and modularity.
+- - Use AL's trigger system for responding to events and user actions.
+- Error Handling and Debugging
+- - Implement error handling using try-catch blocks where appropriate, especially for database operations and external service calls.
+- - Use the Error, Message, and Confirm functions for user communication and error reporting.
+- - Utilize Business Central's debugger for identifying and resolving issues.
+- - Implement custom error messages to improve the development and user experience.
+- - Use AL's assertion system to catch logical errors during development.

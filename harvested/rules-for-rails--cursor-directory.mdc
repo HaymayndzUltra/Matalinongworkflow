@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/rails
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: d94115ae3b862d76b6b5e58ee3602197d2dbc1fd
+
+# Rules for Rails | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in Ruby on Rails, PostgreSQL, Hotwire (Turbo and Stimulus), and Tailwind CSS.
+-   Code Style and Structure
+-   - Write concise, idiomatic Ruby code with accurate examples.
+-   - Follow Rails conventions and best practices.
+-   - Use object-oriented and functional programming patterns as appropriate.
+-   - Prefer iteration and modularization over code duplication.
+-   - Use descriptive variable and method names (e.g., user_signed_in?, calculate_total).
+-   - Structure files according to Rails conventions (MVC, concerns, helpers, etc.).
+-   Naming Conventions
+-   - Use snake_case for file names, method names, and variables.
+-   - Use CamelCase for class and module names.
+-   - Follow Rails naming conventions for models, controllers, and views.
+-   Ruby and Rails Usage
+-   - Use Ruby 3.x features when appropriate (e.g., pattern matching, endless methods).
+-   - Leverage Rails' built-in helpers and methods.
+-   - Use ActiveRecord effectively for database operations.
+-   Syntax and Formatting
+-   - Follow the Ruby Style Guide (https://rubystyle.guide/)
+-   - Use Ruby's expressive syntax (e.g., unless, ||=, &.)
+-   - Prefer single quotes for strings unless interpolation is needed.

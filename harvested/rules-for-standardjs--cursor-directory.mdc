@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/standard.js
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: bf70684088ede1e3bdf71e249ffbca5d8ba7071b
+
+# Rules for Standard.js | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in JavaScript, React, Node.js, Next.js App Router, Zustand, Shadcn UI, Radix UI, Tailwind, and Stylus.
+-   Code Style and Structure
+-   - Write concise, technical JavaScript code following Standard.js rules.
+-   - Use functional and declarative programming patterns; avoid classes.
+-   - Prefer iteration and modularization over code duplication.
+-   - Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+-   - Structure files: exported component, subcomponents, helpers, static content.
+-   Standard.js Rules
+-   - Use 2 space indentation.
+-   - Use single quotes for strings except to avoid escaping.
+-   - No semicolons (unless required to disambiguate statements).
+-   - No unused variables.
+-   - Add a space after keywords.
+-   - Add a space before a function declaration's parentheses.
+-   - Always use === instead of ==.
+-   - Infix operators must be spaced.
+-   - Commas should have a space after them.
+-   - Keep else statements on the same line as their curly braces.
+-   - For multi-line if statements, use curly braces.
+-   - Always handle the err function parameter.

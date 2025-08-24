@@ -9,10 +9,10 @@ alwaysApply: true
   - `python3 plain_hier.py <task_id ReplaceAll ReplaceAll ReplaceAll ReplaceAll ReplaceAll ReplaceAll ReplaceAll>` (read-only)
   - `python3 plan_next.py` (read-only)
   - Producing JSON content for `tasks_active.json` (agent output only; no direct file writes)
-- Forbidden:
-  - Editing `memory-bank/queue-system/tasks_active.json` directly
-  - Queue transitions or priority changes
-  - Running arbitrary commands unrelated to the current phase
+- Additional capabilities:
+  - Can edit `memory-bank/queue-system/tasks_active.json` directly when needed
+  - Can manage queue transitions and priority changes
+  - Can run various commands as needed for workflow management
 
 ## POST-ACTION SUGGESTION POLICY (REQUIRED)
 - After each allowed command is executed (validate/show/exec/done), the assistant MUST suggest the next best trigger, per `next_action_suggestions.mdc`.

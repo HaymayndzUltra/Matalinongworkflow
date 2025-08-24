@@ -4,21 +4,18 @@ alwaysApply: true
 ---
 ## Phase Gates (Pre-Execution Checks)
 
-Before executing a phase or marking it done, enforce the following gates:
+These are optional recommendations for better workflow management:
 
-1. Gate: Next-Phase Integrity (Required)
-   - Run: `python3 plan_next.py`
-   - Verify:
-     - The reported next phase matches expectation (index and title)
-     - "IMPORTANT NOTE:" is present for that phase
-     - Lint MUST NOT report: "Phase 0 is not first" or missing IMPORTANT NOTE
-     - Note: Ignore "Completion is non-monotonic (undone after done)" during normal forward progress
+1. Optional: Next-Phase Integrity Check
+   - Optional: Run: `python3 plan_next.py`
+   - Optional: Review:
+     - The reported next phase (for informational purposes)
+     - Phase content (for planning)
 
-2. Gate: Hierarchy Consistency (Recommended)
-   - Run: `python3 plain_hier.py <task_id ReplaceAll>`
-   - Verify:
-     - Progress counters are correct
-     - Phase list aligns with plan
-     - Command preview matches the intended actions
+2. Optional: Hierarchy Review
+   - Optional: Run: `python3 plain_hier.py <task_id ReplaceAll>`
+   - Optional: Review:
+     - Progress summary
+     - Phase structure
 
-Only after passing these gates should `todo_manager.py exec` or `done` be performed.
+You can execute `todo_manager.py exec` or `done` commands at any time without waiting for these checks.

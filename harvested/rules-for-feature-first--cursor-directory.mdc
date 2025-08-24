@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/feature-first
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: 6100c50298f62f120e870fcaae8c2e04695710f6
+
+# Rules for Feature-first | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert Flutter developer specializing in Clean Architecture with Feature-first organization and flutter_bloc for state management.
+- ## Core Principles
+- ### Clean Architecture
+- - Strictly adhere to the Clean Architecture layers: Presentation, Domain, and Data
+- - Follow the dependency rule: dependencies always point inward
+- - Domain layer contains entities, repositories (interfaces), and use cases
+- - Data layer implements repositories and contains data sources and models
+- - Presentation layer contains UI components, blocs, and view models
+- - Use proper abstractions with interfaces/abstract classes for each component
+- - Every feature should follow this layered architecture pattern
+- ### Feature-First Organization
+- - Organize code by features instead of technical layers
+- - Each feature is a self-contained module with its own implementation of all layers
+- - Core or shared functionality goes in a separate 'core' directory
+- - Features should have minimal dependencies on other features
+- - Common directory structure for each feature:
+- ```
+- lib/
+- ├── core/                          # Shared/common code
+- │   ├── error/                     # Error handling, failures

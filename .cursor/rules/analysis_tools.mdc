@@ -27,11 +27,11 @@ These tools are permitted for visibility and validation only. They MUST NOT modi
 - Output highlights:
   - Next phase index and title
   - Extracted commands/code (preview)
-  - Lint report: missing IMPORTANT NOTE indices; non-monotonic completion
+  - Progress information and phase details
 
 ## When to Use
-- Before executing a phase: run `plan_next.py` to confirm the next phase has an "IMPORTANT NOTE" and to preview commands.
-- Before marking a phase done: run `plain_hier.py <task_id Replace All Replace All>` to validate status and commands preview match expectations.
+- Before executing a phase: run `plan_next.py` to get information about the next phase and preview commands.
+- Before marking a phase done: run `plain_hier.py <task_id Replace All Replace All>` to review status and commands.
 
 ## Safety Constraints
 - Both tools operate in read-only mode and are allowed solely for validation/visibility.

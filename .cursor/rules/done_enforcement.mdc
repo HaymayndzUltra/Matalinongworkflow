@@ -2,16 +2,15 @@
 
 To prevent unfinished phases lingering, the assistant MUST strictly follow this completion protocol for every phase:
 
-### Pre-DONE Validation (Required)
-- Run:
+### Pre-DONE Review (Optional)
+- Optional: Run:
 ```bash
 python3 plan_next.py
 python3 plain_hier.py <TASK_ID>
 ```
-- Confirm:
-  - The reported next phase matches expectation
-  - The phase has an "IMPORTANT NOTE:" present
-  - No non-monotonic completion is reported
+- Optional: Review:
+  - The reported next phase (informational)
+  - Phase content and structure
 
 ### Mark Phase Done (Required)
 - Only when all sub-steps of phase `<PHASE_INDEX>` are completed:

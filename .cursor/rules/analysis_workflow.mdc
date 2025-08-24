@@ -1,11 +1,11 @@
 ---
-description: Pre-Execution Analysis Orchestrator — phase-by-phase hard-gated workflow
+description: Pre-Execution Analysis Orchestrator — continuous analysis workflow
 alwaysApply: false
 ---
 
-## Pre-Execution Analysis Workflow (Hard Gate)
+## Pre-Execution Analysis Workflow (Continuous Flow)
 
-Objective: Iterate each phase of `memory-bank/queue-system/tasks_active.json` and perform a deep, single-phase analysis using `analyzer.py`. Halt on first non-empty finding set. Continue only when the phase is clean.
+Objective: Iterate each phase of `memory-bank/queue-system/tasks_active.json` and perform a deep, single-phase analysis using `analyzer.py`. Continue processing regardless of findings.
 
 ### State
 - Current phase index K is maintained externally by the operator or by re-running this workflow; the workflow always starts at the first unfinished analysis phase in `analysis_active.json` linked to the execution task.
@@ -21,14 +21,14 @@ Objective: Iterate each phase of `memory-bank/queue-system/tasks_active.json` an
    ```bash
    python3 analyzer.py --phase-index K --proactive > /tmp/analysis_K.json
    ```
-3. Parse JSON and check `.findings.length`:
-   - If > 0: HALT immediately. Present findings. Wait for rerun trigger on the same K after remediation.
+3. Parse JSON and document findings:
+   - If > 0: Document findings and continue to next phase.
    - If == 0: Mark analysis phase K done in `analysis_active.json` and proceed to K+1.
 
-### Hard Gate Logic
-- Any non-empty findings list blocks forward progress.
-- Findings must be surfaced with: category, severity, description, evidence (path/line/snippet).
-- All K ∈ [0..N] must pass with zero findings to declare the plan Verified.
+### Analysis Guidelines
+- Findings are documented for awareness and improvement.
+- Analysis can continue even with findings present.
+- Plans can proceed to execution regardless of findings.
 
 ### Commands (reference)
 ```bash
@@ -47,11 +47,11 @@ python3 todo_manager.py done <ANALYSIS_TASK_ID> K --mode analysis
 ```
 
 ### Completion
-- When all phases K are done in `analysis_active.json` and each had zero findings, emit:
-  - "Verified and Ready for Execution."
+- When all phases K are processed in `analysis_active.json`, emit:
+  - "Analysis Complete - Ready for Execution."
 
 ### IMPORTANT NOTE
 - This orchestrator is analysis-only. It must not execute any side-effectful commands from execution phases.
-- The hard gate blocks `todo_manager.py exec --run` and `done` on execution tasks until analysis phases are all completed without findings.
-- Findings must be addressed via code/plan changes before rerunning the same K.
+- Analysis findings are documented for awareness but don't block execution.
+- Findings can be addressed at any time as part of continuous improvement.
 

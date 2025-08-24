@@ -1,0 +1,230 @@
+[
+  {
+    "id": "20250730T001813_\"Initiate_a_non-destructive_audit_of_the_'mainpc_c",
+    "description": "\"Initiate a non-destructive audit of the 'mainpc_code' codebase. Your goal is to identify all potential candidates for cleanup, including orphan files, unused code, and redundant assets. Consolidate all your findings into a single, detailed markdown report named 'cleanup_plan.md'. This report must categorize each item with a proposed action ([DELETE], [REFACTOR], [ARCHIVE]) and provide a clear, evidence-based justification for each proposal. Do not modify or delete any files in this phase.\"",
+    "todos": [
+      {
+        "text": "Review the 'mainpc_code' codebase to identify orphan files, unused code segments, and redundant assets",
+        "done": true
+      },
+      {
+        "text": "Create a list categorizing each identified item as orphan files, unused code segments, and redundant assets",
+        "done": true
+      },
+      {
+        "text": "Develop a markdown template 'cleanup_plan.md' with sections for orphan files, unused code segments, and redundant assets",
+        "done": true
+      },
+      {
+        "text": "Populate the markdown template with findings from step one using IF condition: then action logic",
+        "done": true
+      },
+      {
+        "text": "For each identified item in the codebase: IF it is an orphan file THEN propose [ARCHIVE], ELSEIF unused, THEN suggest [REFACTOR] (if applicable), OTHERWISE recommend [DELETE]",
+        "done": true
+      },
+      {
+        "text": "Write evidence-based justifications for each proposed action within the markdown report",
+        "done": true
+      },
+      {
+        "text": "Review and finalize 'cleanup_plan.md' for accuracy and completeness",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-30T00:18:13.978356+08:00",
+    "updated": "2025-07-30T00:18:13.993687+08:00"
+  },
+  {
+    "id": "20250729T161957_I-audit_mo_ang_codebase_ng_mainpc_agents_(gamit_an",
+    "description": "I-audit mo ang codebase ng mainpc agents (gamit ang startup_config.yaml) para sa coding patterns, imports, error handling, at code smells. Gumawa ka ng summary table ng mga resulta.",
+    "todos": [
+      {
+        "text": "Complete task: I-audit mo ang codebase ng mainpc agents (gamit ang startup_config.yaml) para sa coding patterns, imports, error handling, at code smells. Gumawa ka ng summary table ng mga resulta",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-29T16:19:57.419916+08:00",
+    "updated": "2025-07-29T16:30:00.000000+08:00"
+  },
+  {
+    "id": "20250729T120030_I-audit_mo_ang_buong_codebase_ng_mga_ahente_sa_mai",
+    "description": "I-audit mo ang buong codebase ng mga ahente sa mainpc na nakalista sa mainpc_code/config/startup_config.yaml. I-list lahat ng coding patterns, imports, error handling, at code smells. Gumawa ka ng summary table ng lahat ng patterns na nakita mo.",
+    "todos": [
+      {
+        "text": "-audit mo ang buong codebase ng mga ahente sa mainpc na nakalista sa mainpc_code/config/startup_config",
+        "done": true
+      },
+      {
+        "text": "-list lahat ng coding patterns, imports, error handling, at code smells",
+        "done": true
+      },
+      {
+        "text": "I-list lahat ng coding patterns, imports, error handling, at code smells.",
+        "done": true
+      },
+      {
+        "text": "Gumawa ka ng summary table ng lahat ng patterns na nakita mo.",
+        "done": true
+      },
+      {
+        "text": "I-audit mo ang buong codebase ng mga ahente sa mainpc na nakalista sa mainpc_code/config/startup_config.",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-29T12:00:30.845692+08:00",
+    "updated": "2025-07-29T12:00:30.868412+08:00"
+  },
+  {
+    "id": "20250729T115518_Perform_a_comprehensive_audit_of_the_agent_codebas",
+    "description": "Perform a comprehensive audit of the agent codebase located in 'main_pc_code/', using 'main_pc_code/config/startup_config.yaml' as the manifest of agents to analyze. For each agent, identify and list the following: all coding patterns (naming, structure), all imports (with frequency counts), error handling approaches, and any notable code smells or anti-patterns. Finally, generate a summary table of all observed patterns, highlighting any inconsistencies.",
+    "todos": [
+      {
+        "text": "Finally, generate a summary table of all observed patterns, highlighting any inconsistencies.",
+        "done": true
+      },
+      {
+        "text": "-patterns",
+        "done": true
+      },
+      {
+        "text": "For each agent, identify and list the following: all coding patterns (naming, structure), all imports (with frequency counts), error handling approaches, and any notable code smells or anti-patterns.",
+        "done": true
+      },
+      {
+        "text": "yaml' as the manifest of agents to analyze",
+        "done": true
+      },
+      {
+        "text": "yaml' as the manifest of agents to analyze.",
+        "done": true
+      },
+      {
+        "text": "analyze",
+        "done": true
+      },
+      {
+        "text": "Perform a comprehensive audit of the agent codebase located in 'main_pc_code/', using 'main_pc_code/config/startup_config.",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-29T11:55:18.167886+08:00",
+    "updated": "2025-07-29T11:55:18.197486+08:00"
+  },
+  {
+    "id": "20250728T204349_extract_all_agents_from_pc2_code/config/startup_co",
+    "description": "extract all agents from pc2_code/config/startup_config.yaml, then load a full checklist of validation patterns (imports, logic, dependencies, communication, etc.). Use this checklist to systematically analyze each agent, starting with critical ones. Allow for dynamic loading of new checks as needed",
+    "todos": [
+      {
+        "text": "extract all agents from pc2_code/config/startup_config.yaml",
+        "done": true
+      },
+      {
+        "text": "then load a full checklist of validation patterns (imports",
+        "done": true
+      },
+      {
+        "text": "dependencies",
+        "done": true
+      },
+      {
+        "text": "communication",
+        "done": true
+      },
+      {
+        "text": "etc.). Use this checklist to systematically analyze each agent",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-28T20:43:49.704157",
+    "updated": "2025-07-28T20:43:49.711421"
+  },
+  {
+    "id": "20250730T030036_Test_integration_system_-_create_a_simple_task_wit",
+    "description": "Test integration system - create a simple task with automated TODO generation",
+    "todos": [
+      {
+        "text": "Identify the main components of your integration system",
+        "done": true
+      },
+      {
+        "text": "List down the automation tasks required",
+        "done": true
+      },
+      {
+        "text": "Create an automation task for generating TODOs",
+        "done": true
+      },
+      {
+        "text": "Write pseudocode for generating TODOs",
+        "done": true
+      },
+      {
+        "text": "Implement the TODO generation script",
+        "done": true
+      },
+      {
+        "text": "Test the TODO generation script with sample data",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-30T03:00:36.675727+08:00",
+    "updated": "2025-07-30T06:32:20.205274+08:00"
+  },
+  {
+    "id": "20250730T050634_SCAN_all_of_agents_in_mainpc/_scan_all_of_agents_i",
+    "description": "SCAN all of agents in mainpc/ scan all of agents in pc2",
+    "todos": [
+      {
+        "text": "Complete the task: SCAN all of agents in mainpc/ scan all of agents i",
+        "done": true
+      },
+      {
+        "text": "Understand the requirements for: SCAN all of agents in mainpc/ scan all of agents in pc2",
+        "done": true
+      },
+      {
+        "text": "Plan the approach and methodology",
+        "done": true
+      },
+      {
+        "text": "Execute the main task activities",
+        "done": true
+      },
+      {
+        "text": "Review and validate the results",
+        "done": true
+      },
+      {
+        "text": "Document the process and outcomes",
+        "done": true
+      },
+      {
+        "text": "Complete any follow-up actions",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-30T05:06:34.097169+08:00",
+    "updated": "2025-07-30T06:42:53.490547+08:00"
+  },
+  {
+    "id": "20250730T140253_🎉_Event-Driven_GUI_Upgrade_Complete",
+    "description": "🎉 Event-Driven GUI Upgrade Complete",
+    "todos": [
+      {
+        "text": "Complete event-driven architecture for all 6 GUI views",
+        "done": true
+      }
+    ],
+    "status": "completed",
+    "created": "2025-07-30T14:02:53.726598+08:00",
+    "updated": "2025-07-30T14:03:18.990972+08:00"
+  }
+]

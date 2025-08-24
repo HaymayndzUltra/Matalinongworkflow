@@ -1,0 +1,294 @@
+{
+  "plan_name": "KYC Face Scan Integration Plan",
+  "created": "2025-01-16",
+  "confidence_score": 98,
+  "total_estimated_hours": "32-39",
+  "objectives": [
+    "Preserve existing functionality",
+    "Add modern UX features",
+    "Eliminate duplicates",
+    "Maintain backend-only approach",
+    "Ensure production readiness"
+  ],
+  "phases": [
+    {
+      "phase_id": 0,
+      "phase_name": "Pre-Integration Backup",
+      "status": "pending",
+      "estimated_hours": "0.5",
+      "priority": "CRITICAL",
+      "explanation": "Create complete backup of existing face modules before any changes",
+      "tasks": [
+        "Backup src/face directory to src/face_backup",
+        "Document current working endpoints",
+        "Save current test results as baseline"
+      ],
+      "important_note": "DO NOT skip this phase - critical for rollback capability",
+      "concluding_step": "Verify backup integrity and accessibility"
+    },
+    {
+      "phase_id": 1,
+      "phase_name": "System Analysis & Mapping",
+      "status": "pending",
+      "estimated_hours": "2-3",
+      "priority": "HIGH",
+      "explanation": "Understand exact overlaps and dependencies between existing and new modules",
+      "tasks": [
+        "Map existing modules (face_matcher, pad_detector, evidence_extractor, quality_analyzer)",
+        "Map new modules (session_manager, challenge_generator, burst_processor, etc.)",
+        "Create dependency graph showing module relationships",
+        "Document feature overlap matrix",
+        "Identify unique vs duplicate functionality"
+      ],
+      "deliverables": [
+        "Module comparison matrix",
+        "Dependency graph",
+        "Feature overlap report"
+      ],
+      "important_note": "This analysis drives all subsequent integration decisions",
+      "concluding_step": "Review and validate mapping with stakeholders"
+    },
+    {
+      "phase_id": 2,
+      "phase_name": "Deduplication Strategy",
+      "status": "pending",
+      "estimated_hours": "3-4",
+      "priority": "HIGH",
+      "explanation": "Merge duplicate functionality intelligently while preserving unique features",
+      "tasks": [
+        "Merge PAD detection (pad_detector.py + pad_scorer.py → enhanced_pad_detector.py)",
+        "Consolidate face analysis (geometry.py + quality_analyzer.py → enhanced_quality_analyzer.py)",
+        "Unify metrics collection (metrics.py + telemetry.py → unified_metrics.py)",
+        "Keep ISO 30107-3 compliance from existing",
+        "Add texture/frequency analysis from new",
+        "Merge attack type classifications"
+      ],
+      "deliverables": [
+        "Merged PAD detector",
+        "Unified quality analyzer",
+        "Consolidated metrics"
+      ],
+      "important_note": "Preserve best features from both implementations",
+      "concluding_step": "Run comparison tests on merged modules"
+    },
+    {
+      "phase_id": 3,
+      "phase_name": "OCR/Extraction Integration",
+      "status": "pending",
+      "estimated_hours": "2-3",
+      "priority": "HIGH",
+      "explanation": "Connect existing OCR capabilities with face scan flow",
+      "tasks": [
+        "Enhance EvidenceExtractor with confidence scoring per field",
+        "Create StreamingExtractor for real-time updates",
+        "Connect extractor to face handlers for back-side processing",
+        "Add field extraction to burst evaluation",
+        "Implement extraction progress events"
+      ],
+      "deliverables": [
+        "Enhanced extractor with confidence",
+        "Streaming extraction updates",
+        "Handler integration"
+      ],
+      "important_note": "This solves the OCR gap identified in UX requirements",
+      "concluding_step": "Test extraction with sample Philippine IDs"
+    },
+    {
+      "phase_id": 4,
+      "phase_name": "Biometric Integration",
+      "status": "pending",
+      "estimated_hours": "2-3",
+      "priority": "HIGH",
+      "explanation": "Connect face matching with session management for unified decision making",
+      "tasks": [
+        "Link FaceMatcher to EnhancedSessionState",
+        "Add calculate_match_score method to session",
+        "Update decision logic to include biometric scores",
+        "Add match_score to API contracts",
+        "Integrate TAR@FAR calculations"
+      ],
+      "deliverables": [
+        "Face matcher integration",
+        "Updated decision logic",
+        "Contract updates"
+      ],
+      "important_note": "Critical for identity verification accuracy",
+      "concluding_step": "Validate match scores against test dataset"
+    },
+    {
+      "phase_id": 5,
+      "phase_name": "Unique Features Enhancement",
+      "status": "pending",
+      "estimated_hours": "4-5",
+      "priority": "HIGH",
+      "explanation": "Add our innovative features to the existing system",
+      "tasks": [
+        "Move lock token logic to src/security/lock_tokens.py",
+        "Integrate challenge system into liveness flow",
+        "Add burst processing to capture pipeline",
+        "Enhance telemetry with new event types",
+        "Integrate WORM audit logging",
+        "Add Prometheus metrics exporter",
+        "Setup acceptance validator"
+      ],
+      "deliverables": [
+        "Lock token integration",
+        "Challenge system",
+        "Burst processing",
+        "Enhanced telemetry"
+      ],
+      "important_note": "These are our unique value-adds to the system",
+      "concluding_step": "Verify all new features work with existing system"
+    },
+    {
+      "phase_id": 6,
+      "phase_name": "API Consolidation",
+      "status": "pending",
+      "estimated_hours": "3-4",
+      "priority": "MEDIUM",
+      "explanation": "Create unified API structure with consistent patterns",
+      "tasks": [
+        "Merge face scan endpoints under /api/v1/kyc/face/*",
+        "Standardize response format across all endpoints",
+        "Add security middleware for CORS and rate limiting",
+        "Implement unified error handling",
+        "Add Prometheus metrics endpoint"
+      ],
+      "deliverables": [
+        "Unified API structure",
+        "Standardized responses",
+        "Security middleware"
+      ],
+      "important_note": "Maintain backward compatibility for existing endpoints",
+      "concluding_step": "Update API documentation and test all endpoints"
+    },
+    {
+      "phase_id": 7,
+      "phase_name": "Front/Back Document Flow",
+      "status": "pending",
+      "estimated_hours": "3-4",
+      "priority": "MEDIUM",
+      "explanation": "Implement document side tracking and state transitions",
+      "tasks": [
+        "Add side tracking to session state (front/back)",
+        "Implement DocumentCaptureState enum",
+        "Create transition events and handlers",
+        "Add front/back field storage",
+        "Implement flip-to-back animation triggers"
+      ],
+      "deliverables": [
+        "Side tracking logic",
+        "State machine",
+        "Transition events"
+      ],
+      "important_note": "Critical for UX parity with requirements",
+      "concluding_step": "Test complete front-to-back capture flow"
+    },
+    {
+      "phase_id": 8,
+      "phase_name": "Real-time Field Streaming",
+      "status": "pending",
+      "estimated_hours": "4-5",
+      "priority": "MEDIUM",
+      "explanation": "Stream extraction results to client in real-time",
+      "tasks": [
+        "Add WebSocket support for extraction updates",
+        "Implement Server-Sent Events as fallback",
+        "Create extraction progress generator",
+        "Add field confidence streaming",
+        "Implement extraction status events"
+      ],
+      "deliverables": [
+        "WebSocket endpoint",
+        "SSE endpoint",
+        "Real-time updates"
+      ],
+      "important_note": "Provides real-time feedback required by UX",
+      "concluding_step": "Test streaming with multiple concurrent sessions"
+    },
+    {
+      "phase_id": 9,
+      "phase_name": "Integration Testing",
+      "status": "pending",
+      "estimated_hours": "4-5",
+      "priority": "HIGH",
+      "explanation": "Validate complete KYC flow with all integrated components",
+      "tasks": [
+        "Create comprehensive integration test suite",
+        "Test complete KYC flow (front capture → back capture → decision)",
+        "Run performance benchmarks against acceptance criteria",
+        "Execute load testing with concurrent users",
+        "Test error scenarios and edge cases"
+      ],
+      "deliverables": [
+        "Integration test suite",
+        "Performance benchmarks",
+        "Load test results"
+      ],
+      "important_note": "Must meet all acceptance criteria before production",
+      "concluding_step": "Generate test report with pass/fail metrics"
+    },
+    {
+      "phase_id": 10,
+      "phase_name": "Cleanup & Documentation",
+      "status": "pending",
+      "estimated_hours": "3-4",
+      "priority": "LOW",
+      "explanation": "Finalize codebase for production deployment",
+      "tasks": [
+        "Remove duplicate modules",
+        "Move modules to appropriate directories",
+        "Update all import paths",
+        "Update README with new features",
+        "Create migration guide",
+        "Document breaking changes",
+        "Update API documentation"
+      ],
+      "deliverables": [
+        "Clean codebase",
+        "Updated documentation",
+        "Migration guide"
+      ],
+      "important_note": "Essential for maintainability and onboarding",
+      "concluding_step": "Final code review and sign-off"
+    }
+  ],
+  "success_criteria": {
+    "technical": [
+      "All existing tests pass",
+      "New integration tests pass",
+      "Performance meets acceptance criteria",
+      "No duplicate code",
+      "Clean dependency tree"
+    ],
+    "functional": [
+      "OCR/extraction works with face scan",
+      "Face matching integrated",
+      "Lock tokens functional",
+      "Challenges working",
+      "Burst processing active",
+      "Real-time updates streaming"
+    ],
+    "operational": [
+      "Prometheus metrics exposed",
+      "Audit logging active",
+      "Error handling comprehensive",
+      "Documentation complete",
+      "Migration path clear"
+    ]
+  },
+  "risks": [
+    {
+      "risk": "Breaking existing functionality",
+      "mitigation": "Feature flags, backward compatibility, extensive testing"
+    },
+    {
+      "risk": "Performance degradation",
+      "mitigation": "Benchmark before/after, optimize critical paths, use caching"
+    },
+    {
+      "risk": "Complex dependencies",
+      "mitigation": "Clear dependency injection, modular architecture, comprehensive logging"
+    }
+  ]
+}

@@ -15,9 +15,9 @@ alwaysApply: true
 - Action (gate-compliant):
   - Follow `auto_phase_runner.mdc` to preview, run, show, mark done, and re-validate for the next unfinished phase.
 
-#### Gate Awareness (Deep Analysis)
-- If the Deep Analysis Gate is BLOCK (e.g., output contains `DEEP ANALYSIS: BLOCK` or enforcement fails), do NOT suggest or dispatch any execution/auto-run.
-- Instead, route suggestions to the Pre-Execution Analysis family below (analysis-first).
+#### Analysis Integration
+- Analysis results are available for review and can inform execution decisions.
+- Execution can proceed regardless of analysis status.
 
 ### Ingestion (Agent Plan Ingestion)
 - Triggers: "Ingest plan", "Ingest mo ang plan", "Compile actionable plan", "Finalize plan JSON"

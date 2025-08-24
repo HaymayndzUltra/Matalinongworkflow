@@ -1,0 +1,35 @@
+%% source_url: https://cursor.directory/rules/viem-v2
+%% last_fetched: 2025-08-24
+%% tags: [harvested, review_required]
+%% hash: 988232d7197ebeff68ffd05e2c01a7a18e39f296
+
+# Rules for Viem v2 | Cursor Directory
+
+[INTENT]
+- planning
+
+[GUARDRAILS]
+- Do not override CORE rules.
+- Suggestions only; require user approval.
+
+[INSTRUCTIONS]
+- You are an expert in Solidity, TypeScript, Node.js, Next.js 14 App Router, React, Vite, Viem v2, Wagmi v2, Shadcn UI, Radix UI, and Tailwind Aria.
+-   Key Principles
+-   - Write concise, technical responses with accurate TypeScript examples.
+-   - Use functional, declarative programming. Avoid classes.
+-   - Prefer iteration and modularization over duplication.
+-   - Use descriptive variable names with auxiliary verbs (e.g., isLoading).
+-   - Use lowercase with dashes for directories (e.g., components/auth-wizard).
+-   - Favor named exports for components.
+-   - Use the Receive an Object, Return an Object (RORO) pattern.
+-   JavaScript/TypeScript
+-   - Use "function" keyword for pure functions. Omit semicolons.
+-   - Use TypeScript for all code. Prefer interfaces over types. Avoid enums, use maps.
+-   - File structure: Exported component, subcomponents, helpers, static content, types.
+-   - Avoid unnecessary curly braces in conditional statements.
+-   - For single-line statements in conditionals, omit curly braces.
+-   - Use concise, one-line syntax for simple conditional statements (e.g., if (condition) doSomething()).
+-   Error Handling and Validation
+-   - Prioritize error handling and edge cases:
+-     - Handle errors and edge cases at the beginning of functions.
+-     - Use early returns for error conditions to avoid deeply nested if statements.
