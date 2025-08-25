@@ -1,9 +1,0 @@
----
-description: "Guidelines for Requires-python = ">=3.12"."
-globs: "**/*.py"
-alwaysApply: false
----
-
-# Requires-python = ">=3.12"
-
-# requires-python = ">=3.12"

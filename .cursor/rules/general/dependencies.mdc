@@ -1,9 +1,0 @@
----
-description: "Guidelines for Dependencies = [."
-globs: "**/*"
-alwaysApply: false
----
-
-# Dependencies = [
-
-# dependencies = [

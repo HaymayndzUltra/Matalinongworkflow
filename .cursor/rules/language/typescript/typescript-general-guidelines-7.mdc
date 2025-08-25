@@ -1,9 +1,0 @@
----
-description: "Guidelines for Typescript General Guidelines."
-globs: "**/*.ts"
-alwaysApply: false
----
-
-# Typescript General Guidelines
-
-## TypeScript General Guidelines

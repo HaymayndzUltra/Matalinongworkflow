@@ -1,9 +1,0 @@
----
-description: IMPORTANT NOTE compliance
-alwaysApply: true
----
-## IMPORTANT NOTE POLICY
-- For phases with an "IMPORTANT NOTE":
-  - Extract and review the "IMPORTANT NOTE" from the phase text
-  - Consider the constraints when planning execution
-  - Continue execution even if "IMPORTANT NOTE" is missing

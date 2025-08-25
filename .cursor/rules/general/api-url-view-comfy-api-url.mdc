@@ -1,9 +1,0 @@
----
-description: "Guidelines for Api_url=view_comfy_api_url,."
-globs: "**/*"
-alwaysApply: false
----
-
-# Api_url=view_comfy_api_url,
-
-#         api_url=view_comfy_api_url,
