@@ -1,10 +1,39 @@
 ---
-description: "Guidelines and best practices for Chrome extension development"
-globs: "**/*.{js,ts,json}"
-alwaysApply: false
+description: Cursor Rules for Chrome Extension Development
+globs: *.mdc
 ---
 
-# Chrome Extension Expert Rules
+# Cursor Rules for Chrome Extension Development
+
+<rule>
+name: chrome_extension_expert
+description: Expert guidelines for Chrome extension development with JavaScript/TypeScript
+filters:
+  - type: file_extension
+    pattern: "\\.(js|ts|json)$"
+  - type: content
+    pattern: "(?s)chrome\\..*API|manifest.*v3|background.*script"
+  - type: event
+    pattern: "file_create|file_edit"
+
+actions:
+  - type: enforce
+    conditions:
+      - pattern: "chrome\\..*API"
+        message: "Use Chrome extension APIs correctly (storage, tabs, runtime, etc.)"
+      - pattern: "Manifest V3"
+        message: "Strictly follow Manifest V3 specifications"
+      - pattern: "background.*script"
+        message: "Use Service Worker for background scripts (MV3 requirement)"
+
+  - type: suggest
+    message: |
+      Chrome Extension Development Best Practices:
+      - Use Manifest V3 specifications
+      - Implement proper error handling and logging
+      - Follow security best practices
+      - Use modern build tools (webpack/vite)
+</rule>
 
 You are an expert Chrome extension developer, proficient in JavaScript/TypeScript, browser extension APIs, and web development.
 

@@ -1,10 +1,40 @@
 ---
-description: "Guidelines and best practices for Gatsby development"
-globs: "**/*.{jsx,tsx,css,scss,html,vue}"
-alwaysApply: false
+description: Cursor Rules for Gatsby Development
+globs: *.mdc
 ---
 
-# Gatsby Expert Rules
+# Cursor Rules for Gatsby Development
+
+<rule>
+name: gatsby_expert
+description: Expert guidelines for Gatsby static site generation
+filters:
+  - type: file_extension
+    pattern: "\\.(jsx|tsx|js|ts)$"
+  - type: content
+    pattern: "(?s)gatsby|useStaticQuery|GraphQL|Link.*from.*gatsby"
+  - type: event
+    pattern: "file_create|file_edit"
+
+actions:
+  - type: enforce
+    conditions:
+      - pattern: "useStaticQuery|graphql"
+        message: "Use Gatsby's useStaticQuery for build-time GraphQL queries"
+      - pattern: "from.*gatsby.*Link"
+        message: "Use Gatsby's Link component for internal navigation"
+      - pattern: "gatsby-node\\.js"
+        message: "Use gatsby-node.js for programmatic page creation"
+
+  - type: suggest
+    message: |
+      Gatsby Best Practices:
+      - Use Tailwind for utility-based styling
+      - Optimize images with gatsby-plugin-image
+      - Follow Gatsby's documentation for best practices
+      - Use environment variables for sensitive data
+      - Implement proper caching strategies
+</rule>
 
 You are an expert in TypeScript, Gatsby, React and Tailwind.
 

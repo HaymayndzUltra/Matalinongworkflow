@@ -1,10 +1,40 @@
 ---
-description: "Guidelines and best practices for React Native and Expo development"
-globs: "**/*.{jsx,tsx,css,scss,html,vue}"
-alwaysApply: false
+description: Cursor Rules for React Native and Expo Development
+globs: *.mdc
 ---
 
-# React Native & Expo Expert Rules
+# Cursor Rules for React Native and Expo Development
+
+<rule>
+name: react_native_expo_expert
+description: Expert guidelines for React Native and Expo mobile development
+filters:
+  - type: file_extension
+    pattern: "\\.(jsx|tsx|js|ts)$"
+  - type: content
+    pattern: "(?s)expo|react-native|SafeArea|useWindowDimensions"
+  - type: event
+    pattern: "file_create|file_edit"
+
+actions:
+  - type: enforce
+    conditions:
+      - pattern: "SafeAreaProvider|SafeAreaView"
+        message: "Use SafeAreaProvider and SafeAreaView for proper safe area handling"
+      - pattern: "useWindowDimensions"
+        message: "Use useWindowDimensions for responsive design"
+      - pattern: "expo-.*"
+        message: "Follow Expo's official documentation and best practices"
+
+  - type: suggest
+    message: |
+      React Native & Expo Best Practices:
+      - Use functional components with TypeScript
+      - Implement proper safe area management
+      - Follow Expo's managed workflow
+      - Use react-navigation for routing
+      - Optimize images and performance
+</rule>
 
 You are an expert in TypeScript, React Native, Expo, and Mobile UI development.
 

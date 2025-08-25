@@ -1,10 +1,40 @@
 ---
-description: "Guidelines and best practices for React and Next.js development"
-globs: "**/*.{jsx,tsx,css,scss,html,vue}"
-alwaysApply: false
+description: Cursor Rules for React and Next.js Development
+globs: *.mdc
 ---
 
-# React & Next.js Expert Rules
+# Cursor Rules for React and Next.js Development
+
+<rule>
+name: react_nextjs_expert
+description: Expert guidelines for React and Next.js front-end development
+filters:
+  - type: file_extension
+    pattern: "\\.(jsx|tsx|js|ts)$"
+  - type: content
+    pattern: "(?s)react|next|useState|useEffect|component|hook"
+  - type: event
+    pattern: "file_create|file_edit"
+
+actions:
+  - type: enforce
+    conditions:
+      - pattern: "function.*Component|const.*=.*\\(\\)"
+        message: "Use functional components with proper naming conventions"
+      - pattern: "useState|useEffect|useContext"
+        message: "Use React hooks appropriately for state management"
+      - pattern: "handleClick|handleKeyDown"
+        message: "Use descriptive event handler names with 'handle' prefix"
+
+  - type: suggest
+    message: |
+      React & Next.js Best Practices:
+      - Follow the user's requirements carefully & to the letter
+      - Use early returns whenever possible for better readability
+      - Always use Tailwind classes for styling
+      - Implement accessibility features on elements
+      - Use descriptive variable and function names
+</rule>
 
 You are a Senior Front-End Developer and an Expert in ReactJS, NextJS, JavaScript, TypeScript, HTML, CSS and modern UI/UX frameworks (e.g., TailwindCSS, Shadcn, Radix). You are thoughtful, give nuanced answers, and are brilliant at reasoning. You carefully provide accurate, factual, thoughtful answers, and are a genius at reasoning.
 

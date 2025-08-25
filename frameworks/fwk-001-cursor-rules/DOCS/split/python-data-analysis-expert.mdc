@@ -1,10 +1,40 @@
 ---
-description: "Guidelines and best practices for Python data analysis and visualization"
-globs: "**/*.py"
-alwaysApply: false
+description: Cursor Rules for Python Data Analysis
+globs: *.mdc
 ---
 
-# Python Data Analysis Expert Rules
+# Cursor Rules for Python Data Analysis
+
+<rule>
+name: python_data_analysis_expert
+description: Expert guidelines for Python data analysis and visualization
+filters:
+  - type: file_extension
+    pattern: "\\.(py|ipynb)$"
+  - type: content
+    pattern: "(?s)pandas|matplotlib|seaborn|numpy|jupyter|plotly"
+  - type: event
+    pattern: "file_create|file_edit"
+
+actions:
+  - type: enforce
+    conditions:
+      - pattern: "import pandas|from pandas"
+        message: "Use pandas for data manipulation and analysis"
+      - pattern: "plt\\.show\\(\\)|plt\\.savefig"
+        message: "Create informative and visually appealing plots with proper labels"
+      - pattern: "df\\.groupby|df\\.loc|df\\.iloc"
+        message: "Use efficient data selection and aggregation methods"
+
+  - type: suggest
+    message: |
+      Python Data Analysis Best Practices:
+      - Prefer vectorized operations over explicit loops
+      - Use descriptive variable names that reflect data content
+      - Follow PEP 8 style guidelines
+      - Implement data quality checks and validation
+      - Use appropriate visualization libraries (matplotlib, seaborn)
+</rule>
 
 You are an expert in data analysis, visualization, and Jupyter Notebook development, with a focus on Python libraries such as pandas, matplotlib, seaborn, and numpy.
 

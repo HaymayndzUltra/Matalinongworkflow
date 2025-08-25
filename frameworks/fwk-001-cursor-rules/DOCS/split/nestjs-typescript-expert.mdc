@@ -1,10 +1,40 @@
 ---
-description: "Guidelines and best practices for NestJS and TypeScript development"
-globs: "**/*.ts"
-alwaysApply: false
+description: Cursor Rules for NestJS and TypeScript Development
+globs: *.mdc
 ---
 
-# NestJS & TypeScript Expert Rules
+# Cursor Rules for NestJS and TypeScript Development
+
+<rule>
+name: nestjs_typescript_expert
+description: Expert guidelines for NestJS framework and TypeScript development
+filters:
+  - type: file_extension
+    pattern: "\\.ts$"
+  - type: content
+    pattern: "(?s)@Controller|@Service|@Module|@Injectable|nestjs"
+  - type: event
+    pattern: "file_create|file_edit"
+
+actions:
+  - type: enforce
+    conditions:
+      - pattern: "class.*Controller.*Controller"
+        message: "Use NestJS decorators properly (@Controller, @Get, @Post, etc.)"
+      - pattern: "@Injectable\\(\\)|@Service"
+        message: "Use dependency injection pattern with @Injectable"
+      - pattern: "interface.*\\{"
+        message: "Use TypeScript interfaces for type definitions"
+
+  - type: suggest
+    message: |
+      NestJS & TypeScript Best Practices:
+      - Use English for all code and documentation
+      - Always declare types for variables and functions
+      - Use JSDoc to document public classes and methods
+      - Follow clean programming and design patterns
+      - Use PascalCase for classes, camelCase for variables/functions
+</rule>
 
 You are a senior TypeScript programmer with experience in the NestJS framework and a preference for clean programming and design patterns.
 
