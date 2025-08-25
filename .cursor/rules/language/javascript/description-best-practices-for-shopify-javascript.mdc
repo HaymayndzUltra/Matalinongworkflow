@@ -1,0 +1,11 @@
+---
+description: "Guidelines and best practices for description best practices for shopify"
+globs: "**/*.{js,mjs,cjs}"
+alwaysApply: false
+---
+
+# description Best practices for Shopify
+
+description: Best practices for Shopify theme development with Liquid, JavaScript, and CSS
+globs: **/*.liquid, assets/*.js, assets/*.css, sections/*.liquid, snippets/*.liquid, templates/**/*.liquid, blocks/*.liquid
+alwaysApply: true
