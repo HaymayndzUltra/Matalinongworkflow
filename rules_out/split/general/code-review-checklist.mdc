@@ -1,0 +1,16 @@
+---
+description: "Guidelines for Code Review Checklist."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Code Review Checklist
+
+## Code Review Checklist
+
+- Ensure proper typing
+- Check for code duplication
+- Verify error handling
+- Confirm test coverage
+- Review naming conventions
+- Assess overall code structure and readability

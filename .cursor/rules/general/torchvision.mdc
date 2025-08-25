@@ -1,0 +1,9 @@
+---
+description: "Guidelines for "torchvision",."
+globs: "**/*"
+alwaysApply: false
+---
+
+# "torchvision",
+
+#     "torchvision",

@@ -1,0 +1,30 @@
+---
+description: "Guidelines for Coding Standards."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Coding Standards
+
+## Coding Standards
+
+### Naming Conventions
+
+- Classes: PascalCase
+- Variables, functions, methods: camelCase
+- Files, directories: kebab-case
+- Constants, env variables: UPPERCASE
+
+### Functions
+
+- Use descriptive names: verbs & nouns (e.g., getUserData)
+- Prefer arrow functions for simple operations
+- Use default parameters and object destructuring
+- Document with JSDoc
+
+### Types and Interfaces
+
+- For any new types, prefer to create a Zod schema, and zod inference type for the created schema.
+- Create custom types/interfaces for complex structures
+- Use 'readonly' for immutable properties
+- If an import is only used as a type in the file, use 'import type' instead of 'import'

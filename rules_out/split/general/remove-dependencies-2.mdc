@@ -1,0 +1,10 @@
+---
+description: "Guidelines for Remove Dependencies."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Remove Dependencies
+
+# Remove dependencies
+uv remove <package>

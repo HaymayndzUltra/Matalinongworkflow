@@ -1,0 +1,16 @@
+---
+description: "Guidelines for ///."
+globs: "**/*"
+alwaysApply: false
+---
+
+# ///
+
+# ///
+
+print("some python code")
+```
+
+Or using uv cli:
+
+```bash

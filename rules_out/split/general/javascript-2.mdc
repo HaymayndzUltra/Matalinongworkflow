@@ -1,0 +1,59 @@
+---
+description: "Guidelines for Javascript."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Javascript
+
+## JavaScript
+
+### General Principles
+* Lean towards using zero external dependencies.
+* Use JS when needed, but reach for native browser features first.
+    * e.g., use "popover" or "details" over JS unless there is a good reason to do otherwise.
+* Do not use "var".
+* Prefer "const" over "let" - avoid mutation unless necessary.
+* Prefer "for (const thing of things)" over "things.forEach()".
+* Put new lines before new "blocks" of code. A block is anything with a "{" and "}".
+
+### Performance Optimization
+- Optimize **image loading** by using Shopify's CDN and the `image_url` filter.
+- Minify **JavaScript and CSS files**.
+- Leverage **browser caching**.
+- Reduce the number of **HTTP requests**.
+- Consider **lazy loading**.
+- Monitor **theme performance** using Google Lighthouse and Shopify Theme Check.
+
+### File Structure
+* Group scripts by feature area where appropriate.
+    * e.g., "collection.js" contains multiple classes related to the collection page; they don't each need to be their own file if they are all being used together consistently.
+
+### Modules
+* Use the module pattern for loading JavaScript. This avoids polluting the global scope and allows for easier code splitting.
+
+#### Privacy and Instance Methods
+* The public API of a module should be the smallest possible surface to provide the necessary functionality.
+* All other instance methods should be prefixed with "#" and are private.
+* Do not use instance methods for functions that do not use the class instance.
+
+```javascript
+class MyClass {
+  constructor() {
+    this.cache = new Map();
+  }
+
+  // This is a method that is meant to be used by other classes that import this module
+  myPublicMethod() {
+    this.#myPrivateMethod();
+  }
+
+  // This is a method that is only meant to be used within this module and requires access to the instance
+  #myPrivateMethod() {
+    this.cache.set('key', 'value');
+  }
+}
+
+// This is a utility that is scoped to this module.  It does not require access to the instance to work
+const someUtilityFunction = (num1, num2) => num1 + num2;
+```

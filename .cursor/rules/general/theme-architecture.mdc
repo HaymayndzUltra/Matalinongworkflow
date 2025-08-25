@@ -1,0 +1,21 @@
+---
+description: "Guidelines for Theme Architecture."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Theme Architecture
+
+## Theme Architecture
+
+### Folder Structure
+* `sections`: Liquid files that define customizable sections of a page. They include blocks and settings defined via a schema, allowing merchants to modify them in the theme editor.
+* `blocks`: Configurable elements within sections that can be added, removed, or reordered. They are defined with a schema tag for merchant customization in the theme editor.
+* `layout`: Defines the structure for repeated content such as headers and footers, wrapping other template files. It's the frame that holds the page together, but it's not the content.
+* `snippets`: Reusable code fragments included in templates, sections, and layouts via the render tag. Ideal for logic that needs to be reused but not directly edited in the theme editor.
+* `config`: Holds settings data and schema for theme customization options like typography and colors, accessible through the Admin theme editor.
+* `assets`: Contains static files such as CSS, JavaScript, and images. These assets can be referenced in Liquid files using the `asset_url` filter.
+* `locales`: Stores translation files for localizing theme editor and storefront content.
+* `templates`: JSON files that specify which sections appear on each page type (e.g., product, collection, blog). They are wrapped by layout files for consistent header/footer content. Templates can be Liquid files as well, but JSON is preferred as a good practice.
+* `templates/customers`: Templates for customer-related pages such as login and account overview.
+* `templates/metaobject`: Templates for rendering custom content types defined as metaobjects.

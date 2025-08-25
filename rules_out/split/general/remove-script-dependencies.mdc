@@ -1,0 +1,10 @@
+---
+description: "Guidelines for Remove Script Dependencies."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Remove Script Dependencies
+
+# Remove script dependencies
+uv remove package-name --script script.py

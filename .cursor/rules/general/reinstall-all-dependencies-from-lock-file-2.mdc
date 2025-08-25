@@ -1,0 +1,15 @@
+---
+description: "Guidelines for Reinstall All Dependencies From Lock File."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Reinstall All Dependencies From Lock File
+
+# Reinstall all dependencies from lock file
+uv sync
+```
+
+**🔁 Scripts**
+
+```bash

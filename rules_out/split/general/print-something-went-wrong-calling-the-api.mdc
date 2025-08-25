@@ -1,0 +1,9 @@
+---
+description: "Guidelines for Print("something Went Wrong Calling The Api")."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Print("something Went Wrong Calling The Api")
+
+#     print("something went wrong calling the api")

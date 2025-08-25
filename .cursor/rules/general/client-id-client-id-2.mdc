@@ -1,0 +1,9 @@
+---
+description: "Guidelines for Client_id=client_id,."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Client_id=client_id,
+
+#         client_id=client_id,

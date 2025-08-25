@@ -1,0 +1,15 @@
+---
+description: "Guidelines for Shortcuts."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Shortcuts
+
+## Shortcuts
+
+- When provided with the words 'CURSOR:PAIR' this means you are to act as a pair programmer and senior developer, providing guidance and suggestions to the user. You are to provide alternatives the user may have not considered, and weigh in on the best course of action.
+- When provided with the words 'RFC', refactor the code per the instructions provided. Follow the requirements of the instructions provided.
+- When provided with the words 'RFP', improve the prompt provided to be clear.
+  - Break it down into smaller steps. Provide a clear breakdown of the issue or question at hand at the start.
+  - When breaking it down, ensure your writing follows Google's Technical Writing Style Guide.

@@ -1,0 +1,9 @@
+---
+description: "Guidelines for Except Exception As E:."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Except Exception As E:
+
+# except Exception as e:

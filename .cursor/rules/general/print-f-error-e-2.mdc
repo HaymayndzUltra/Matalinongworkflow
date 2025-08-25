@@ -1,0 +1,9 @@
+---
+description: "Guidelines for Print(f"error: {e}")."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Print(f"error: {e}")
+
+#     print(f"Error: {e}")

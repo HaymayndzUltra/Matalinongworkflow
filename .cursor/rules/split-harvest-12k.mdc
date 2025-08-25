@@ -1,0 +1,77 @@
+---
+description: "Split & normalize one big harvested file into many .mdc rules"
+alwaysApply: false
+---
+
+# Split & Normalize 12k-line Harvested Rules
+
+/run-split-harvest-12k <ABS_OR_REL_PATH_TO_BIG_FILE>
+
+Task:
+You are given a single large text file (e.g., 12k lines) that contains many rule prompts/snippets with inconsistent formatting.
+Goal: Split it into multiple `.mdc` files with valid frontmatter, sensible titles, appropriate `globs`, and organized folders.
+
+Steps:
+
+1) Read the file path from the command argument (e.g., `/workspace/frameworks/fwk-001-cursor-rules/DOCS/harvested/all_rules.txt`).
+
+2) Identify block boundaries using these anchors (case-insensitive, line-start preferred):
+   - lines that look like filenames ending in `.mdc`
+   - lines starting with `rules for`, `rules-for-`, `you are an expert`, `overview`, `test-case`, `write code`, `this comprehensive guide`
+   - markdown headings `# `, `## `
+   Fallback: split by double-blank lines.
+
+3) For each block:
+   - Skip if content (trimmed) < 5 chars.
+   - Derive a clean Title from the first anchor line:
+       * remove hashes/IDs/suffixes, keep core topic (e.g., "rules for django" → "Django Rules")
+       * Title-Case words; keep acronyms (API, ORM, PHP)
+   - Derive short description: e.g., "Guidelines for <Title>."
+   - Infer persona bucket + file globs via Mapping (below).
+
+4) Write one `.mdc` file per block with this structure:
+
+---
+description: "<derived short description>"
+globs: "<derived globs from Mapping>"
+alwaysApply: false
+---
+
+# <Title>
+
+<Original block content preserved below this line.>
+
+5) File naming & placement:
+   - Name: kebab-case of Title, e.g., `django-general.mdc`, `python-fastapi.mdc`
+   - Place under both:
+       a) MIRROR OUTPUT: `/workspace/frameworks/fwk-001-cursor-rules/DOCS/split/<bucket>/`
+       b) PROJECT RULES:  `./.cursor/rules/<bucket>/`
+     Create folders if they don't exist.
+   - If filename exists, append numeric suffix `-2`, `-3`, etc.
+
+6) Minimal normalization:
+   - If a block already contains a frontmatter, keep it; only add missing keys (`description`, `globs`, `alwaysApply`).
+   - Ensure there is a top-level "# <Title>" heading once.
+
+7) Mapping (keyword → bucket + globs + default base):
+   - python → language/python, "**/*.py", "python-general"
+   - django → framework/django, "**/*.py", "django-general"
+   - fastapi → framework/fastapi, "**/*.py", "fastapi-general"
+   - react|react-native|r3f|shadcn|tailwind → framework/react, "**/*.{jsx,tsx,css,scss,html,vue}", "react-general"
+   - vue|nuxt → framework/vue, "**/*.vue", "vue-general"
+   - node|nodejs → platform/nodejs, "**/*.{js,mjs,cjs,ts}", "nodejs-general"
+   - typescript → language/typescript, "**/*.ts", "typescript-general"
+   - php|laravel|wordpress|drupal → framework/<laravel|wordpress|drupal>, "**/*.php", "<framework>-general"
+   - golang|go → language/golang, "**/*.go", "golang-general"
+   - rust → language/rust, "**/*.rs", "rust-general"
+   - terraform → domain/devops/terraform, "**/*.tf", "terraform-general"
+   - testing|qa|test-case → domain/testing, "**/*.{spec,test}.{js,ts,tsx,py}", "testing-general"
+   - serverless|tooling|devops → domain/devops/<serverless|tooling>, "**/*", "<bucket>-general"
+   - fallback (no match) → general, "**/*", "general"
+
+8) Summary:
+   - After writing files, print a brief table in the chat: [Title | Bucket | Globs | Output Path (mirror) | Output Path (project rules)]
+
+Safety:
+- Do not delete or modify the original 12k-line file.
+- If a block is empty/noisy, skip it.

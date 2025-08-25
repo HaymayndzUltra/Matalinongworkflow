@@ -1,0 +1,15 @@
+---
+description: "Guidelines for Run Script With Proper Dependencies."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Run Script With Proper Dependencies
+
+# Run script with proper dependencies
+uv run script.py
+```
+
+You can edit inline-metadata manually:
+
+```python

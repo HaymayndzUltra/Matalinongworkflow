@@ -1,0 +1,9 @@
+---
+description: "Guidelines for Prompt_result = Await Infer(."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Prompt_result = Await Infer(
+
+#     prompt_result = await infer(

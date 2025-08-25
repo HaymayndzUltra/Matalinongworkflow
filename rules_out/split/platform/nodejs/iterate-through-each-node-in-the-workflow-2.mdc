@@ -1,0 +1,45 @@
+---
+description: "Guidelines for Iterate Through Each Node In The Workflow."
+globs: "**/*.{js,mjs,cjs,ts}"
+alwaysApply: false
+---
+
+# Iterate Through Each Node In The Workflow
+
+# Iterate through each node in the workflow
+for node_id, node in workflow.items():
+    # Add the class_type-info key, preferring _meta.title if available
+    class_type_info = node.get("_meta", {}).get("title") or node.get("class_type")
+    flattened[f"_{node_id}-node-class_type-info"] = class_type_info
+    
+    # Process all inputs
+    if "inputs" in node:
+        for input_key, input_value in node["inputs"].items():
+            flattened[f"{node_id}-inputs-{input_key}"] = input_value
+
+return flattened
+""" Example usage:
+
+import json
+
+with open('workflow_api.json', 'r') as f: workflow_json = json.load(f)
+
+flattened = create_workflow_api_parameters(workflow_json) print(flattened) """
+```
+
+================================================ 
+FILE: ViewComfy_API/Python/workflow_parameters_maker.py
+```python
+import json from workflow_api_parameter_creator import workflow_api_parameters_creator import argparse
+
+parser = argparse.ArgumentParser(description='Process workflow API parameters') parser.add_argument('--workflow_api_path', type=str, required=True, help='Path to the workflow API JSON file')
+
+Parse arguments
+args = parser.parse_args()
+
+with open(args.workflow_api_path, 'r') as f: workflow_json = json.load(f)
+
+parameters = workflow_api_parameters_creator(workflow_json)
+
+with open('workflow_api_parameters.json', 'w') as f: json.dump(parameters, f, indent=4)
+```

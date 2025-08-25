@@ -1,0 +1,29 @@
+---
+description: "Guidelines for Make The API Call."
+globs: "**/*"
+alwaysApply: false
+---
+
+# Make The API Call
+
+# Make the API call
+result = await client.infer_with_logs(
+    data=data,
+    files=files,
+    logging_callback=logging_callback,
+)
+
+if result:
+    return PromptResult(**result)
+```
+FILE: ViewComfy_API/Python/main.py
+```python
+import asyncio import base64 import json import os from api import infer, infer_with_logs
+
+async def api_examples():
+
+view_comfy_api_url = "<Your_ViewComfy_endpoint>"
+client_id = "<Your_ViewComfy_client_id>"
+client_secret = "<Your_ViewComfy_client_secret>"
+
+override_workflow_api_path = None # Advanced feature: overwrite default workflow with a new one
