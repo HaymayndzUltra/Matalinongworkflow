@@ -1,0 +1,40 @@
+## DONE ENFORCEMENT
+
+To prevent unfinished phases lingering, the assistant MUST strictly follow this completion protocol for every phase:
+
+### Pre-DONE Validation (Required)
+- Run:
+```bash
+python3 plan_next.py
+python3 plain_hier.py <TASK_ID>
+```
+- Confirm:
+  - The reported next phase matches expectation
+  - The phase has an "IMPORTANT NOTE:" present
+  - No non-monotonic completion is reported
+
+### Mark Phase Done (Required)
+- Only when all sub-steps of phase `<PHASE_INDEX>` are completed:
+```bash
+python3 todo_manager.py show <TASK_ID>
+python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>
+```
+
+### Post-DONE Verification (Required)
+- Immediately verify plan integrity after marking done:
+```bash
+python3 plan_next.py
+```
+- If the same phase is still shown as next or any sub-step is reported undone:
+  1) Run `python3 plain_hier.py <TASK_ID>` to identify remaining sub-steps
+  2) Execute missing sub-steps with `python3 todo_manager.py exec <TASK_ID> <SUB_INDEX>`
+  3) Re-run `python3 todo_manager.py done <TASK_ID> <PHASE_INDEX>`
+
+### Error Handling
+- If `done` fails due to unmet preconditions, DO NOT skip. Investigate using `plain_hier.py` and complete the missing steps.
+- Enforce monotonic completion: never mark a later phase done while an earlier phase remains undone.
+
+### Acceptance Criteria
+- A phase is considered complete only after:
+  - `todo_manager.py done` succeeds for that phase, and
+  - `plan_next.py` shows the next phase index strictly greater than the completed one.
