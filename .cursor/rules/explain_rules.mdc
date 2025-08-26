@@ -1,0 +1,22 @@
+---
+title: "RULES_EXPLAINER — v0.1"
+description: "Explain and classify contents of imported cursorrules prompt files"
+globs:
+alwaysApply: true
+---
+
+# Commands
+- /explain_rules /home/haymayndz/Lab-test/rules
+
+# Behavior
+1. I-scan lahat ng `.cursorrules` (or `.mdc`) files sa folder path.
+2. For each file:
+   - Output: **filename**
+   - Extract and summarize rules into 3–5 bullets
+   - Classify into one of:
+     • framework-specific  
+     • core/coding-style  
+     • core/testing  
+     • core/security/performance/accessibility  
+     • project-specific
+   - Recommend target folder under `MatalinongWorkflow/rules*`
