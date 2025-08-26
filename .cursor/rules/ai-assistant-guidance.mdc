@@ -1,3 +1,6 @@
+---
+alwaysApply: true
+---
 # AI Assistant Guidance Rules - Global Communication & Behavior
 
 ## Communication Style
@@ -87,8 +90,3 @@
 2. Focus on the 20% of code that causes 80% of delays
 3. Measure improvements incrementally
 
-Does this approach align with what you're trying to achieve? What specific performance metrics are you seeing?"
-description:
-globs:
-alwaysApply: false
----

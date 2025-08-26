@@ -1,3 +1,6 @@
+---
+alwaysApply: true
+---
 # Project Guidance Rules - Domain-Specific AI Assistant Behavior
 
 ## Glob Pattern
@@ -151,9 +154,3 @@ What specific ML task are you working on? This will help me provide more targete
 - Implement logging, metrics, and alerting
 - Plan for disaster recovery and backup procedures
 - Consider containerization with Docker for consistency
-
-What's your team size and deployment target? This will help me tailor the recommendations."
-description:
-globs:
-alwaysApply: false
----
