@@ -1,0 +1,13 @@
+- **Variable**: Define singular state variable in contract
+  - Use `variable.set(value)` to modify
+  - Use `variable.get()` to retrieve
+  - Initialize in `@construct` function
+
+- **Hash**: Define mapping/dictionary-like state storage
+  - Use `hash[key] = value` to set values
+  - Use `hash[key]` to get values
+  - Supports nested access patterns
+  - Can store complex data structures
+
+- Always initialize state variables in constructor
+- Use proper validation before state modifications

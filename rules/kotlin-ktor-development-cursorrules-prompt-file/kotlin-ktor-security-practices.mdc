@@ -1,0 +1,10 @@
+- Install Authentication with JWT configuration
+- Use DefaultHeaders plugin for security headers:
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY
+  - Content-Security-Policy: default-src 'self'
+  - Strict-Transport-Security: max-age=31536000; includeSubDomains
+- Implement proper input validation and sanitization
+- Use environment variables for sensitive configuration
+- Follow OWASP security guidelines
+- Implement proper error handling without exposing internal details

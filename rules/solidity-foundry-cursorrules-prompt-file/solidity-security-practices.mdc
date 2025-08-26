@@ -1,0 +1,9 @@
+- Use static analysis tools like Slither and Mythril in development workflow
+- Implement timelocks and multisig controls for sensitive operations
+- Conduct thorough gas optimization considering deployment and runtime costs
+- Implement proper randomness using Chainlink VRF or similar oracle solutions
+- Use assembly for gas-intensive operations with extensive documentation
+- Use OpenZeppelin's ReentrancyGuard as additional protection against reentrancy
+- Implement proper access control for initializers in upgradeable contracts
+- Implement rate limiting for sensitive functions to prevent abuse
+- Warn users if they add private keys directly into non-environment files

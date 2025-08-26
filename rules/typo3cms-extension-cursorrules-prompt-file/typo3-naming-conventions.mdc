@@ -1,0 +1,8 @@
+- **File Names**: Use `PascalCase.php` (e.g., `MyService.php`)
+- **Class and Enum Names**: Use `PascalCase` (e.g., `MyUtilityClass`)
+- **Method Names**: Use `camelCase` (e.g., `getUserData`)
+- **Variable and Property Names**: Use `camelCase` (e.g., `userService`)
+- **Constants and Enum Case Names**: Use `SCREAMING_SNAKE_CASE` (e.g., `DEFAULT_LIMIT`)
+- **Namespaces**: Respect PSR-4 autoloading, use `Vendor\ExtensionName\SubNamespace`
+- Follow consistent naming patterns across extension
+- Use descriptive names for clarity and maintainability

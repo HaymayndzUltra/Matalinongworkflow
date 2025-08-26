@@ -1,0 +1,8 @@
+- Follow VSCode Extension API guidelines for extension entry point (extension.ts)
+- Register commands, events, and providers within activate() function
+- Use dependency injection to manage state and service interactions
+- Modularize features into separate files/modules for maintainability
+- Use modular design patterns to separate concerns
+- Organize project into meaningful directories: src, out, assets
+- Define extension metadata, activation events, contributions in package.json
+- Use activation events wisely to minimize performance overhead

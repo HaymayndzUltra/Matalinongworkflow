@@ -1,0 +1,11 @@
+- Use PHP 8.3+ features where appropriate
+- Follow TYPO3 Coding Guidelines (CGL) and Core Team Best Practices
+- Apply PSR-12 coding standards
+- Utilize strict typing, union types, readonly properties, and modern attributes
+- Prefer dependency injection over static access or global scope
+- Focus on excellent Developer Experience (DX):
+  - Clear type annotations
+  - IDE autocompletion
+  - Precise PHPDoc blocks
+  - Consistent naming conventions
+- Use Extension Builder as starting point, favor manual organization for control

@@ -1,0 +1,11 @@
+- **Health Checks & Monitoring**: Implement `/health` and `/metrics` endpoints
+- **Performance Tuning**:
+  - JVM Settings: `-XX:+UseG1GC -XX:MaxGCPauseMillis=100 -XX:MaxRAMPercentage=75.0`
+  - Connection Pooling: Configure HikariCP with proper sizing
+  - Caching: Use Caffeine for in-memory caching
+  - Coroutines: Use structured concurrency for async processing
+  - Database Queries: Optimize with indexing, batch operations, pagination
+
+- Install MicrometerMetrics with Prometheus registry
+- Monitor JVM memory, GC, processor, and thread metrics
+- Configure proper logging with structured output

@@ -1,0 +1,11 @@
+- **Application Logic Design**:
+  1. Route handlers: Handle requests/responses only
+  2. Services: Contain business logic, call repositories
+  3. Repositories: Handle database operations
+  4. Entity classes: Data classes for database models
+  5. DTOs: Data transfer between layers
+
+- Use Repository Pattern with interfaces for testability
+- Implement Service Layer for business logic separation
+- Use dependency injection with Koin for loose coupling
+- Apply proper error handling and exception management

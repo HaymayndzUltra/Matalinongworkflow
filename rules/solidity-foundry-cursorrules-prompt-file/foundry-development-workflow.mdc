@@ -1,0 +1,9 @@
+- Utilize Foundry's forge for compilation, testing, and deployment
+- Use Foundry's cast for command-line interaction with contracts
+- Implement comprehensive Foundry scripts for deployment and verification
+- Use Foundry's script capabilities for complex deployment sequences
+- Implement a robust CI/CD pipeline for smart contract deployments
+- Use static type checking and linting tools in pre-commit hooks
+- Utilize `forge fmt` for consistent code formatting
+- Place remappings in `foundry.toml` instead of `remappings.txt` file
+- Use separate profiles for via_ir and deterministic deployment when needed

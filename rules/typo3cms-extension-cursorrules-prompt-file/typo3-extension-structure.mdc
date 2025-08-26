@@ -1,0 +1,12 @@
+- **Standard Extension Structure**:
+  - `Classes/`: Controller, Domain (Model/Repository), Service, EventListener, Middleware, Utility
+  - `Configuration/`: TCA, Services.yaml, ext_localconf.php
+  - `Resources/`: Private (templates, language files), Public (CSS, JS, images)
+  - `Tests/`: Unit and Functional tests
+  - `Documentation/`: Sphinx documentation
+
+- Use proper MVC architecture with Extbase controllers
+- Organize domain logic in Model and Repository classes
+- Implement business logic in Service classes
+- Use PSR-14 event listeners for extensibility
+- Configure services properly in Services.yaml
