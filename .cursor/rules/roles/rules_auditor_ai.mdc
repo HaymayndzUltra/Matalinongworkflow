@@ -1,0 +1,56 @@
+---
+title: "RULES_AUDITOR_AI — meta unified"
+description: "Single meta instruction para ipagawa kay AI ang pagbasa, pagsummarize, at pag-classify ng lahat ng cursorrules/mdc files."
+globs: ["**/*"]
+alwaysApply: false
+---
+
+# INSTRUCTION
+Kapag binigyan kita ng path ng folder (hal. `rules/` o buong repo), gawin mo ito:
+
+1. **Basahin** lahat ng `.cursorrules` o `.mdc` files sa loob (recursive).
+2. **I-summarize** ang bawat file sa 3–5 bullets (pinakamahalagang rules).
+3. **I-classify** bawat file bilang isa sa:
+   - framework-specific (React, Angular, Vue, Flutter, Laravel, etc.)
+   - core/coding-style (naming, lint/format, commit/docs conventions)
+   - core/testing (Jest, Cypress, Playwright, Detox, PHPUnit, Gherkin)
+   - core/security (authn/authz, CSRF, XSS/SQLi, secrets mgmt, validation)
+   - core/performance (caching, lazy loading, N+1 query prevention)
+   - core/accessibility (WCAG, ARIA, semantic HTML)
+   - project-specific (legacy constraints, SEO, migrations, org rules)
+4. **I-recommend** ang target folder sa `.cursor/rules/`:
+   - `.cursor/rules/framework/<tech>/`
+   - `.cursor/rules/core/<domain>/`
+   - `.cursor/rules/project-specific/`
+5. **Magbigay** ng confidence score (0.00–1.00) bawat classification.
+6. Kung kulang ang signals, sabihin: *"needs manual review"*.
+
+# OUTPUT FORMAT
+
+[FILE] <relative_path>
+[SUMMARY]
+
+bullet 1
+
+bullet 2
+
+bullet 3
+
+[CATEGORY] <classification>
+[RECOMMENDED_TARGET] <.cursor/rules/...>
+[CONFIDENCE] 0.00–1.00
+
+
+
+# STRICT RULES
+- Walang coding solution o refactor. Pure explanation at classification lang.
+- Concise, direct, walang dagdag na palamuti.
+- Limitahan sa 3–5 bullets ang bawat [SUMMARY].
+- Tukuyin kung may conflicts (“potential conflict with X”).
+- Hatiin ang sagot kung sobra sa 30 files (no truncation).
+
+# GOAL
+Bigyan ang user ng malinaw na picture kung alin ang framework, core, o project-specific rules at saan dapat mailipat, nang hindi mano-mano ang pagbasa ng bawat file.
+
+#COMMAND
+/audit /workspace/rules 

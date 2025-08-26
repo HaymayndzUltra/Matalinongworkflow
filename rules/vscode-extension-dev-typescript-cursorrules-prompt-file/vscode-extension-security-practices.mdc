@@ -1,0 +1,8 @@
+- Adhere to principle of least privilege; request only needed permissions
+- Validate and sanitize any input or configuration data
+- Avoid exposing sensitive APIs or secrets within extension
+- Implement error handling and logging without leaking internal state
+- Use VSCode's Webview API securely for custom UIs
+- Follow Content Security Policy (CSP) guidelines for webviews
+- Sanitize any user-generated content displayed in webviews
+- Handle extension lifecycle events properly for resource cleanup

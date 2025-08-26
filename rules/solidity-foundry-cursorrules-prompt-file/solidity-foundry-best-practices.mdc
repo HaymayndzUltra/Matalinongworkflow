@@ -1,0 +1,10 @@
+- Use explicit function visibility modifiers and appropriate natspec comments
+- Utilize function modifiers for common checks, enhancing readability
+- Follow consistent naming: CamelCase for contracts, PascalCase for interfaces (prefixed with "I")
+- Implement comprehensive events for all significant state changes
+- Follow the Checks-Effects-Interactions pattern to prevent reentrancy
+- Use Solidity 0.8.0+ for built-in overflow/underflow protection
+- Use OpenZeppelin's AccessControl for fine-grained permissions
+- Implement circuit breakers using OpenZeppelin's Pausable when appropriate
+- Use pull over push payment patterns to mitigate reentrancy attacks
+- Use OpenZeppelin's SafeERC20 for interacting with ERC20 tokens

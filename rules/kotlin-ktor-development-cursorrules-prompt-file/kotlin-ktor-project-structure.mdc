@@ -1,0 +1,8 @@
+- **Organize by business features, not technical layers**
+- Each feature is self-contained with all related components
+- Promotes modularity, reusability, and better team collaboration
+- Structure: `src/main/kotlin/com/company/app/features/{feature}/`
+- Each feature contains: `models/`, `repositories/`, `services/`, `routes/`
+- Common utilities in `common/` directory
+- Configuration and DI in `config/` directory
+- Test structure mirrors the feature-based organization

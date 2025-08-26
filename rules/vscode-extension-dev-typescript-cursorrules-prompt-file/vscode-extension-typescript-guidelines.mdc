@@ -1,0 +1,8 @@
+- Write clear, concise TypeScript code following modern ECMAScript standards
+- Leverage TypeScript for static type checking and enhanced developer experience
+- Use interfaces and types to define extension commands, configuration schemas
+- Utilize generics, union types, and type guards for robust APIs
+- Configure strict type checking in tsconfig.json to catch errors early
+- Include comprehensive inline comments and JSDoc annotations for public APIs
+- Use camelCase for variables and functions, PascalCase for classes/interfaces
+- Use kebab-case for file and folder names

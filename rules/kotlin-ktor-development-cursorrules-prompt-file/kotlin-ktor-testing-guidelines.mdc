@@ -1,0 +1,11 @@
+- **Key Principles for Testable Code**:
+  1. **Single Responsibility**: Each method should do one thing well
+  2. **Pure Functions**: Same input always produces same output
+  3. **Dependency Injection**: Constructor injection for testable components
+  4. **Clear Boundaries**: Well-defined inputs and outputs
+  5. **Small Methods**: Extract complex logic into testable helper functions
+
+- Use Kotest for testing framework
+- Write unit tests for services and repositories
+- Use test containers for integration testing
+- Mock external dependencies properly

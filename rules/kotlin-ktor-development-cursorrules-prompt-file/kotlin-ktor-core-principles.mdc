@@ -1,0 +1,7 @@
+- Follow **SOLID**, **DRY**, **KISS**, and **YAGNI** principles
+- Adhere to **OWASP** security best practices
+- Break tasks into smallest units and solve problems step-by-step
+- Use **Framework**: Kotlin Ktor with Kotlin 2.1.20+
+- Use **JDK**: 21 (LTS)
+- Use **Build**: Gradle with Kotlin DSL
+- Dependencies: Ktor Server Core/Netty, kotlinx.serialization, Exposed, HikariCP, kotlin-logging, Koin, Kotest

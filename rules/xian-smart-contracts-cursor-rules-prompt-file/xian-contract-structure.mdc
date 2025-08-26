@@ -1,0 +1,9 @@
+- Smart contracts are written in native Python without transpilation
+- Contract names must follow pattern: `^con_[a-z][a-z0-9_]*$`
+- Contract names must start with 'con_' prefix (except system contracts)
+- Contract names must be lowercase, max 64 characters
+- Cannot use '_' as prefix for variables or functions
+- Follow standard Python naming conventions
+- Use descriptive names for clarity
+- A contract cannot be deployed by another contract
+- XIAN is the currency of the Xian blockchain (never mention TAU or Lamden)

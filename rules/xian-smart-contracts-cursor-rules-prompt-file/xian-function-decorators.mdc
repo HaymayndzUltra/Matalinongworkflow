@@ -1,0 +1,7 @@
+- `@export` decorator defines public functions callable by any user or contract
+- `@construct` decorator defines initialization function executed once at submission (optional)
+- Functions without decorators are private and only callable by contract itself
+- Functions with `@export` can call private functions internally
+- Optional arguments can be provided to `@construct` function
+- Initial state can be setup using constructor arguments
+- Use proper error handling and validation in exported functions
