@@ -1,22 +1,74 @@
 ---
-title: "RULES_EXPLAINER — v0.1"
-description: "Explain and classify contents of imported cursorrules prompt files"
-globs:
+title: "📋 RULES_EXPLAINER — Enhanced v2.0"
+description: "Comprehensive guide for analyzing, explaining, and classifying cursorrules prompt files in the Lab-test rules directory"
+globs: "**/*.mdc, **/*.cursorrules"
 alwaysApply: true
+priority: high
 ---
 
-# Commands
-- /explain_rules /home/haymayndz/Lab-test/rules
+# 🚀 Enhanced Rules Explainer
 
-# Behavior
-1. I-scan lahat ng `.cursorrules` (or `.mdc`) files sa folder path.
-2. For each file:
-   - Output: **filename**
-   - Extract and summarize rules into 3–5 bullets
-   - Classify into one of:
-     • framework-specific  
-     • core/coding-style  
-     • core/testing  
-     • core/security/performance/accessibility  
-     • project-specific
-   - Recommend target folder under `MatalinongWorkflow/rules*`
+## 📋 Commands
+- **Primary Command**: `/explain_rules /home/haymayndz/MatalinongWorkflow/rules `
+- **Secondary Command**: `/explain_rules [specific-folder-path]`
+
+## 🎯 Core Mission
+Transform the `/home/haymayndz/MatalinongWorkflow/rules` directory into a well-organized, searchable knowledge base by systematically analyzing and categorizing all `.cursorrules` and `.mdc` files.
+
+---
+
+# �� Analysis Process
+
+## 1. 📁 **Comprehensive Directory Scan**
+- **Scan ALL** `.cursorrules` (or `.mdc`) files in the specified folder path
+- **Include subdirectories** recursively
+- **Identify file types**: `.cursorrules`, `.mdc`, `.md`, `.txt`
+- **Count total files** found for inventory purposes
+
+## 2. 📊 **File-by-File Analysis**
+For each discovered file, perform detailed analysis:
+
+### **File Header Information**
+- **📄 Filename** (with full path)
+- **📝 File Type** (.cursorrules, .mdc, etc.)
+- **�� File Size** (approximate line count)
+- **🕒 Last Modified** (if available)
+
+### **Content Analysis**
+- **�� Purpose**: What is this file designed to do?
+- **🔧 Technology Focus**: Which frameworks/languages does it target?
+- **📋 Key Rules**: Extract 3-5 most important rules/concepts
+- **💡 Special Features**: Any unique or innovative approaches?
+- **⚠️ Warnings/Constraints**: Important limitations or requirements
+
+## 3. 🏷️ **Classification System**
+
+### **Primary Categories**
+- **�� Framework-Specific**: React, Angular, Vue, Flutter, Python, etc.
+- **🎨 Core/Coding-Style**: General programming principles, code quality
+- **🧪 Core/Testing**: Testing methodologies, test frameworks
+- **🔒 Core/Security**: Security best practices, authentication
+- **⚡ Core/Performance**: Optimization, performance guidelines
+- **♿ Core/Accessibility**: Accessibility standards, inclusive design
+- **📱 Core/Mobile**: Mobile development, responsive design
+- **🌐 Core/Web**: Web development, frontend/backend patterns
+- **📊 Core/Database**: Database design, ORM patterns
+- **🔄 Core/State-Management**: State management solutions
+- **📦 Core/Build-Tools**: Build systems, deployment
+- **🔧 Core/DevOps**: CI/CD, infrastructure, deployment
+- **📚 Project-Specific**: Custom project rules, team conventions
+- **📖 Documentation**: How-to guides, tutorials, references
+- **🛠️ Utilities**: Helper tools, automation scripts
+
+### **Secondary Tags**
+- **Beginner-Friendly**: Suitable for new developers
+- **Advanced**: Complex concepts, senior-level
+- **Production-Ready**: Enterprise-grade guidelines
+- **Learning**: Educational content, examples
+- **Reference**: Quick lookup, cheat sheets
+
+---
+
+# 📋 Output Format
+
+## **Standard Report Structure**
